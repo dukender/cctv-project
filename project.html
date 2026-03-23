@@ -1482,5 +1482,87 @@ removePart5Contractor(idx) {
 
   const app = new ProjectManager();
 </script>
+	 <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // --- วาง Config ของคุณตรงนี้ ---
+const firebaseConfig = {
+  apiKey: "AIzaSyCl-hJel6JB8AtXj6LYzFvLXvXaKdzAs_I",
+  authDomain: "jes-project-all.firebaseapp.com",
+  projectId: "jes-project-all",
+  storageBucket: "jes-project-all.firebasestorage.app",
+  messagingSenderId: "694313677420",
+  appId: "1:694313677420:web:7110fbfad46eea943c5e49"
+};
+
+    const firebaseApp = initializeApp(firebaseConfig);
+    const db = getFirestore(firebaseApp);
+
+    class ProjectManager {
+      constructor() {
+        this.projects = [];
+        this.activeProjectId = null;
+        this.searchQuery = '';
+        this.initRealtimeData();
+      }
+
+      initRealtimeData() {
+        const docRef = doc(db, "projects", "main_data");
+        onSnapshot(docRef, (snapshot) => {
+          if (snapshot.exists()) {
+            this.projects = snapshot.data().projectList || [];
+          } else {
+            this.projects = [];
+          }
+          this.render();
+        });
+      }
+
+      async saveProjects() {
+        const docRef = doc(db, "projects", "main_data");
+        await setDoc(docRef, { 
+          projectList: this.projects,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
+      createNewProject() {
+        const newProject = {
+          id: 'proj_' + Date.now(),
+          name: 'โครงการใหม่',
+          customerName: '',
+          projectLocation: '',
+          docs: [],
+          createdAt: new Date().toISOString()
+        };
+        this.projects.push(newProject);
+        this.activeProjectId = newProject.id;
+        this.saveProjects();
+      }
+
+      openProject(id) { this.activeProjectId = id; this.render(); }
+      closeProject() { this.activeProjectId = null; this.render(); }
+
+      updateProjectField(field, value) {
+        const project = this.projects.find(p => p.id === this.activeProjectId);
+        if (project) {
+          project[field] = value;
+          this.saveProjects();
+        }
+      }
+
+      // (หมายเหตุ: คุณต้องนำเอาฟังก์ชัน renderDashboard และ renderProjectDetail 
+      // จากไฟล์เดิมของคุณมาใส่ไว้ใน Class นี้ด้วยเพื่อให้หน้าตาเหมือนเดิมครับ)
+
+      render() {
+        const appElement = document.getElementById('app');
+        appElement.innerHTML = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
+        lucide.createIcons();
+      }
+    }
+
+    window.appManager = new ProjectManager();
+  </script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e04e72135489958',t:'MTc3NDE3OTQzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
