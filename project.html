@@ -136,7 +136,7 @@
           companyName: '',
           projectName: '',
           salesName: '',
-          channel: 'Facebook'
+          channel: 'Line'
         },
         part2: { items: [] },
         part3: { items: [] },
@@ -1094,7 +1094,7 @@ removePart5Contractor(idx) {
                            <select onchange="app.updateProject(proj => ({...proj, part1: {...proj.part1, channel: this.value}}))" class="w-full bg-transparent border-b border-slate-200 text-sm py-1 outline-none">
                              <option ${p.part1.channel === 'Facebook' ? 'selected' : ''}>Facebook</option>
                              <option ${p.part1.channel === 'Line' ? 'selected' : ''}>Line</option>
-                             <option ${p.part1.channel === 'TikTok' ? 'selected' : ''}>TikTok</option>
+                             <option ${p.part1.channel === 'Phone' ? 'selected' : ''}>Phone</option>
                              <option ${p.part1.channel === 'Walk-in' ? 'selected' : ''}>Walk-in</option>
                              <option ${p.part1.channel === 'อื่นๆ' ? 'selected' : ''}>อื่นๆ</option>
                            </select>
@@ -1169,7 +1169,7 @@ removePart5Contractor(idx) {
                             <button onclick="app.togglePart2Self(${idx})" class="flex-shrink-0">
                               <i data-lucide="${item.isSelf?.checked ? 'check-circle-2' : 'circle'}" style="width:20px;height:20px" class="${item.isSelf?.checked ? 'text-blue-500' : 'text-slate-300'}"></i>
                             </button>
-                            <span class="text-sm font-bold text-slate-600">ทำเอง</span>
+                            <span class="text-sm font-bold text-slate-600">ทำภายในทีม</span>
                           </div>
                           ${item.isSelf?.checked ? `
                             <div class="space-y-2">
@@ -1208,7 +1208,7 @@ removePart5Contractor(idx) {
 
               <!-- Part 3: การแก้ไข -->
               ${this.activeTab === 'part3' ? `
-              <section class="bg-amber-50 rounded-3xl p-6 md:p-8 border border-amber-200 relative shadow-sm fade-in">
+              <section class="bg-white rounded-3xl p-6 md:p-8 border border-amber-200 relative shadow-sm fade-in">
                 <div class="flex justify-between items-center mb-6">
                   <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 text-amber-600">
                     <i data-lucide="history" style="width:20px;height:20px"></i> ส่วนที่ 3: การแก้ไข
@@ -1259,7 +1259,7 @@ removePart5Contractor(idx) {
                             <button onclick="app.togglePart3Self(${index})" class="flex-shrink-0">
                               <i data-lucide="${item.isSelf?.checked ? 'check-circle-2' : 'circle'}" style="width:20px;height:20px" class="${item.isSelf?.checked ? 'text-blue-500' : 'text-slate-300'}"></i>
                             </button>
-                            <span class="text-sm font-bold text-slate-600">ทำเอง</span>
+                            <span class="text-sm font-bold text-slate-600">ทำภายในทีม</span>
                           </div>
                           ${item.isSelf?.checked ? `
                             <div class="space-y-2">
@@ -1352,7 +1352,7 @@ removePart5Contractor(idx) {
 
               <!-- Part 5: การติดตั้ง -->
               ${this.activeTab === 'part5' ? `
-              <section class="bg-orange-50/30 rounded-3xl p-6 md:p-8 border border-orange-200 shadow-sm fade-in">
+              <section class="bg-white rounded-3xl p-6 md:p-8 border border-orange-200 shadow-sm fade-in">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 text-orange-600 mb-6">
                   <i data-lucide="truck" style="width:20px;height:20px"></i> ส่วนที่ 5: การติดตั้ง
                 </h3>
@@ -1424,7 +1424,7 @@ removePart5Contractor(idx) {
 
               <!-- Part 7: การรับประกัน -->
               ${this.activeTab === 'part7' ? `
-              <section class="bg-slate-900 text-white rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden fade-in">
+              <section class="bg-white rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden fade-in">
                 <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 rounded-full blur-[80px] opacity-10 -mr-20 -mt-20"></div>
                 <h3 class="text-lg font-bold flex items-center gap-2 text-blue-400 relative z-10 mb-8">
                   <i data-lucide="shield-check" style="width:20px;height:20px"></i> ส่วนที่ 7: การรับประกัน
