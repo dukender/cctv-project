@@ -18,7 +18,7 @@
  </head>
  <body class="h-full bg-white">
   <div id="app" class="h-full w-full bg-white overflow-auto"></div>
-  <script>
+  <script type="module">
   // Initialize Element SDK
   window.elementSdk?.init({
     defaultConfig: {},
@@ -48,7 +48,7 @@
   // --- ต่อด้วย Class ProjectManager เดิมของคุณ ---
   class ProjectManager {
     constructor() {
-	  this.projects = []; // เริ่มต้นเป็นว่าง
+	  this.projects = []; 
 	  this.fetchProjectsFromFirebase(); // เรียกใช้ฟังก์ชันดึงข้อมูล (ที่จะสร้างเพิ่มด้านล่าง)
       this.sharedDocOptions = this.loadDocOptions();
       this.activeProjectId = null;
