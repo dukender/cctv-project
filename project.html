@@ -1482,47 +1482,49 @@ removePart5Contractor(idx) {
 
   const app = new ProjectManager();
 </script>
-	 <script type="module">
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // --- วาง Config ของคุณตรงนี้ ---
-const firebaseConfig = {
-  apiKey: "AIzaSyBo0comaBXhHtuxiiNUGFldu-8ZcxtdQ7A",
-  authDomain: "work-jes.firebaseapp.com",
-  projectId: "work-jes",
-  storageBucket: "work-jes.firebasestorage.app",
-  messagingSenderId: "112074428386",
-  appId: "1:112074428386:web:0c2be99dc00fbda47173bb"
-};
+    // --- Firebase Config ของคุณ ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBo0comaBXhHtuxiiNUGFldu-8ZcxtdQ7A",
+      authDomain: "work-jes.firebaseapp.com",
+      projectId: "work-jes",
+      storageBucket: "work-jes.firebasestorage.app",
+      messagingSenderId: "112074428386",
+      appId: "1:112074428386:web:0c2be99dc00fbda47173bb"
+    };
 
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
     class ProjectManager {
-	constructor() {
-	  this.projects = [];
-	  this.activeProjectId = null;
-	  this.searchQuery = '';
-	  this.initRealtimeData(); // เรียกใช้ฟังก์ชันดึงข้อมูล Cloud
-	}
-	initRealtimeData() {
-	  const docRef = doc(db, "projects", "main_data");
-	  onSnapshot(docRef, (snapshot) => {
-	    if (snapshot.exists()) {
-	      this.projects = snapshot.data().projectList || [];
-	    }
-	    this.render(); // สั่งให้หน้าเว็บวาดใหม่ทันทีเมื่อข้อมูลใน Cloud เปลี่ยน
-	  });
-	}
+      constructor() {
+        this.projects = [];
+        this.activeProjectId = null;
+        this.searchQuery = '';
+        this.initRealtimeData();
+      }
 
-	async saveProjects() {
-	  const docRef = doc(db, "projects", "main_data");
-	  await setDoc(docRef, { 
-	    projectList: this.projects,
-	    lastUpdated: new Date().toISOString()
-	  });
-	}
+      // ฟังข้อมูลจาก Cloud: เมื่อเครื่องใดบันทึก ทุกเครื่องจะเปลี่ยนตามทันที
+      initRealtimeData() {
+        const docRef = doc(db, "projects", "main_data");
+        onSnapshot(docRef, (snapshot) => {
+          if (snapshot.exists()) {
+            this.projects = snapshot.data().projectList || [];
+          }
+          this.render(); 
+        });
+      }
+
+      async saveProjects() {
+        const docRef = doc(db, "projects", "main_data");
+        await setDoc(docRef, { 
+          projectList: this.projects,
+          lastUpdated: new Date().toISOString()
+        });
+      }
 
       createNewProject() {
         const newProject = {
@@ -1531,15 +1533,17 @@ const firebaseConfig = {
           customerName: '',
           projectLocation: '',
           docs: [],
+          warranty: {
+            start: '',
+            years: 1,
+            expiry: ''
+          },
           createdAt: new Date().toISOString()
         };
         this.projects.push(newProject);
         this.activeProjectId = newProject.id;
         this.saveProjects();
       }
-
-      openProject(id) { this.activeProjectId = id; this.render(); }
-      closeProject() { this.activeProjectId = null; this.render(); }
 
       updateProjectField(field, value) {
         const project = this.projects.find(p => p.id === this.activeProjectId);
@@ -1549,13 +1553,156 @@ const firebaseConfig = {
         }
       }
 
-      // (หมายเหตุ: คุณต้องนำเอาฟังก์ชัน renderDashboard และ renderProjectDetail 
-      // จากไฟล์เดิมของคุณมาใส่ไว้ใน Class นี้ด้วยเพื่อให้หน้าตาเหมือนเดิมครับ)
+      updateWarranty(field, value) {
+        const project = this.projects.find(p => p.id === this.activeProjectId);
+        if (project && project.warranty) {
+          project.warranty[field] = value;
+          if (project.warranty.start && project.warranty.years) {
+            const startDate = new Date(project.warranty.start);
+            startDate.setFullYear(startDate.getFullYear() + parseInt(project.warranty.years));
+            project.warranty.expiry = startDate.toISOString().split('T')[0];
+          }
+          this.saveProjects();
+        }
+      }
+
+      deleteProject(id) {
+        if (confirm('ยืนยันการลบโครงการนี้?')) {
+          this.projects = this.projects.filter(p => p.id !== id);
+          this.activeProjectId = null;
+          this.saveProjects();
+        }
+      }
+
+      openProject(id) { this.activeProjectId = id; this.render(); }
+      closeProject() { this.activeProjectId = null; this.render(); }
+
+      handleSearch(event) {
+        this.searchQuery = event.target.value;
+        this.render();
+      }
+
+      // --- ฟังก์ชันแสดงผลหน้าหลัก (ดึงมาจากไฟล์ 1,500 บรรทัดของคุณ) ---
+      renderDashboard() {
+        const filtered = this.projects.filter(p => 
+          p.name.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          (p.customerName && p.customerName.toLowerCase().includes(this.searchQuery.toLowerCase()))
+        );
+
+        return `
+          <div class="max-w-7xl mx-auto p-4 md:p-8 fade-in">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+              <div>
+                <h1 class="text-3xl font-black text-gray-900 tracking-tight">โครงการ JES</h1>
+                <p class="text-gray-500 mt-1">จัดการข้อมูลแบบ Real-time (Cloud Storage)</p>
+              </div>
+              <div class="flex flex-col sm:flex-row w-full md:w-auto gap-3">
+                <div class="relative w-full sm:w-64">
+                  <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                  <input type="text" placeholder="ค้นหาโครงการ..." 
+                         class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500"
+                         value="${this.searchQuery}" oninput="appManager.handleSearch(event)">
+                </div>
+                <button onclick="appManager.createNewProject()" class="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-bold transition-all shadow-sm">
+                  <i data-lucide="plus" class="w-5 h-5"></i>
+                  <span>สร้างโครงการ</span>
+                </button>
+              </div>
+            </header>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              ${filtered.map(p => `
+                <div onclick="appManager.openProject('${p.id}')" class="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group">
+                  <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                      <i data-lucide="folder" class="w-6 h-6"></i>
+                    </div>
+                  </div>
+                  <h3 class="text-xl font-bold text-gray-900 mb-2">${p.name}</h3>
+                  <div class="flex items-center gap-2 text-gray-500 text-sm mb-4">
+                    <i data-lucide="user" class="w-4 h-4"></i>
+                    <span class="line-clamp-1">${p.customerName || 'ยังไม่ระบุลูกค้า'}</span>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>`;
+      }
+
+      // --- ฟังก์ชันแสดงรายละเอียด (ดึงมาจากไฟล์ 1,500 บรรทัดของคุณ) ---
+      renderProjectDetail() {
+        const project = this.projects.find(p => p.id === this.activeProjectId);
+        if (!project) return '';
+
+        return `
+          <div class="max-w-5xl mx-auto p-4 md:p-8 fade-in">
+            <nav class="flex justify-between items-center mb-8">
+              <button onclick="appManager.closeProject()" class="flex items-center gap-2 text-gray-500 hover:text-gray-900 font-bold transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i> กลับหน้าหลัก
+              </button>
+              <button onclick="appManager.deleteProject('${project.id}')" class="flex items-center gap-2 text-red-500 hover:bg-red-50 px-4 py-2 rounded-xl transition-all">
+                <i data-lucide="trash-2" class="w-5 h-5"></i> ลบโครงการ
+              </button>
+            </nav>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div class="lg:col-span-2 space-y-8">
+                <section class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+                  <h2 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i data-lucide="info" class="text-blue-600"></i> ข้อมูลเบื้องต้น
+                  </h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                      <label class="text-sm font-bold text-gray-500 ml-1">ชื่อโครงการ</label>
+                      <input type="text" value="${project.name}" onchange="appManager.updateProjectField('name', this.value)" 
+                             class="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-bold text-gray-500 ml-1">ชื่อลูกค้า</label>
+                      <input type="text" value="${project.customerName}" onchange="appManager.updateProjectField('customerName', this.value)" 
+                             class="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                    </div>
+                  </div>
+                </section>
+
+                <section class="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+                  <h2 class="text-xl font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i data-lucide="shield-check" class="text-emerald-600"></i> ข้อมูลการรับประกัน
+                  </h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                      <label class="text-sm font-bold text-gray-500 ml-1">วันที่เริ่มรับประกัน</label>
+                      <input type="date" value="${project.warranty?.start || ''}" onchange="appManager.updateWarranty('start', this.value)" 
+                             class="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                    </div>
+                    <div class="space-y-2">
+                      <label class="text-sm font-bold text-gray-500 ml-1">ระยะเวลา (ปี)</label>
+                      <select onchange="appManager.updateWarranty('years', this.value)" 
+                              class="w-full px-5 py-3.5 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                        <option value="1" ${project.warranty?.years == 1 ? 'selected' : ''}>1 ปี</option>
+                        <option value="2" ${project.warranty?.years == 2 ? 'selected' : ''}>2 ปี</option>
+                        <option value="3" ${project.warranty?.years == 3 ? 'selected' : ''}>3 ปี</option>
+                        <option value="5" ${project.warranty?.years == 5 ? 'selected' : ''}>5 ปี</option>
+                      </select>
+                    </div>
+                  </div>
+                  ${project.warranty?.expiry ? `
+                    <div class="mt-6 p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex justify-between items-center">
+                      <span class="text-emerald-700 font-bold">วันสิ้นสุดการรับประกัน:</span>
+                      <span class="text-emerald-700 font-black text-lg">${project.warranty.expiry}</span>
+                    </div>
+                  ` : ''}
+                </section>
+              </div>
+            </div>
+          </div>`;
+      }
 
       render() {
         const appElement = document.getElementById('app');
-        appElement.innerHTML = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
-        lucide.createIcons();
+        if (appElement) {
+          appElement.innerHTML = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
+          lucide.createIcons();
+        }
       }
     }
 
