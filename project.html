@@ -1486,7 +1486,6 @@ removePart5Contractor(idx) {
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // --- Firebase Config ของคุณ ---
     const firebaseConfig = {
       apiKey: "AIzaSyBo0comaBXhHtuxiiNUGFldu-8ZcxtdQ7A",
       authDomain: "work-jes.firebaseapp.com",
@@ -1507,18 +1506,19 @@ removePart5Contractor(idx) {
         this.initRealtimeData();
       }
 
-      // ฟังข้อมูลจาก Cloud: เมื่อเครื่องใดบันทึก ทุกเครื่องจะเปลี่ยนตามทันที
+      // ฟังข้อมูลจาก Cloud ตลอดเวลา
       initRealtimeData() {
         const docRef = doc(db, "projects", "main_data");
         onSnapshot(docRef, (snapshot) => {
           if (snapshot.exists()) {
             this.projects = snapshot.data().projectList || [];
           }
-          this.render(); 
+          this.render(); // เครื่องอื่นแก้ปุ๊บ หน้าจอนี้เปลี่ยนปั๊บ
         });
       }
 
-      async saveProjects() {
+      // บันทึกขึ้น Cloud แทน LocalStorage
+      async saveToFirebase() {
         const docRef = doc(db, "projects", "main_data");
         await setDoc(docRef, { 
           projectList: this.projects,
@@ -1533,23 +1533,19 @@ removePart5Contractor(idx) {
           customerName: '',
           projectLocation: '',
           docs: [],
-          warranty: {
-            start: '',
-            years: 1,
-            expiry: ''
-          },
+          warranty: { start: '', years: 1, expiry: '' },
           createdAt: new Date().toISOString()
         };
         this.projects.push(newProject);
         this.activeProjectId = newProject.id;
-        this.saveProjects();
+        this.saveToFirebase();
       }
 
       updateProjectField(field, value) {
         const project = this.projects.find(p => p.id === this.activeProjectId);
         if (project) {
           project[field] = value;
-          this.saveProjects();
+          this.saveToFirebase();
         }
       }
 
@@ -1557,31 +1553,26 @@ removePart5Contractor(idx) {
         const project = this.projects.find(p => p.id === this.activeProjectId);
         if (project && project.warranty) {
           project.warranty[field] = value;
-          if (project.warranty.start && project.warranty.years) {
-            const startDate = new Date(project.warranty.start);
-            startDate.setFullYear(startDate.getFullYear() + parseInt(project.warranty.years));
-            project.warranty.expiry = startDate.toISOString().split('T')[0];
+          if (project.warranty.start) {
+            const start = new Date(project.warranty.start);
+            start.setFullYear(start.getFullYear() + parseInt(project.warranty.years));
+            project.warranty.expiry = start.toISOString().split('T')[0];
           }
-          this.saveProjects();
+          this.saveToFirebase();
         }
       }
 
       deleteProject(id) {
-        if (confirm('ยืนยันการลบโครงการนี้?')) {
+        if (confirm('ยืนยันการลบโครงการ?')) {
           this.projects = this.projects.filter(p => p.id !== id);
-          this.activeProjectId = null;
-          this.saveProjects();
+          if (this.activeProjectId === id) this.activeProjectId = null;
+          this.saveToFirebase();
         }
       }
 
       openProject(id) { this.activeProjectId = id; this.render(); }
       closeProject() { this.activeProjectId = null; this.render(); }
-
-      handleSearch(event) {
-        this.searchQuery = event.target.value;
-        this.render();
-      }
-
+      handleSearch(e) { this.searchQuery = e.target.value; this.render(); }
       // --- ฟังก์ชันแสดงผลหน้าหลัก (ดึงมาจากไฟล์ 1,500 บรรทัดของคุณ) ---
     renderDashboard() {
       const filtered = this.projects
@@ -2308,7 +2299,7 @@ removePart5Contractor(idx) {
       return html;
     }
 
-      render() {
+render() {
         const appElement = document.getElementById('app');
         if (appElement) {
           appElement.innerHTML = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
@@ -2317,6 +2308,7 @@ removePart5Contractor(idx) {
       }
     }
 
+    // สำคัญ: ต้องเป็น window.appManager เพื่อให้ตรงกับ onclick ใน HTML
     window.appManager = new ProjectManager();
   </script>
  <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9e04e72135489958',t:'MTc3NDE3OTQzMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
