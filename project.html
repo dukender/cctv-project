@@ -1500,32 +1500,29 @@ const firebaseConfig = {
     const db = getFirestore(firebaseApp);
 
     class ProjectManager {
-      constructor() {
-        this.projects = [];
-        this.activeProjectId = null;
-        this.searchQuery = '';
-        this.initRealtimeData();
-      }
+	constructor() {
+	  this.projects = [];
+	  this.activeProjectId = null;
+	  this.searchQuery = '';
+	  this.initRealtimeData(); // เรียกใช้ฟังก์ชันดึงข้อมูล Cloud
+	}
+	initRealtimeData() {
+	  const docRef = doc(db, "projects", "main_data");
+	  onSnapshot(docRef, (snapshot) => {
+	    if (snapshot.exists()) {
+	      this.projects = snapshot.data().projectList || [];
+	    }
+	    this.render(); // สั่งให้หน้าเว็บวาดใหม่ทันทีเมื่อข้อมูลใน Cloud เปลี่ยน
+	  });
+	}
 
-      initRealtimeData() {
-        const docRef = doc(db, "projects", "main_data");
-        onSnapshot(docRef, (snapshot) => {
-          if (snapshot.exists()) {
-            this.projects = snapshot.data().projectList || [];
-          } else {
-            this.projects = [];
-          }
-          this.render();
-        });
-      }
-
-      async saveProjects() {
-        const docRef = doc(db, "projects", "main_data");
-        await setDoc(docRef, { 
-          projectList: this.projects,
-          lastUpdated: new Date().toISOString()
-        });
-      }
+	async saveProjects() {
+	  const docRef = doc(db, "projects", "main_data");
+	  await setDoc(docRef, { 
+	    projectList: this.projects,
+	    lastUpdated: new Date().toISOString()
+	  });
+	}
 
       createNewProject() {
         const newProject = {
