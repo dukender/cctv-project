@@ -123,13 +123,21 @@
       return styles[status] || 'bg-blue-100 text-blue-700 border-blue-300';
     }
 
-    createNewProject() {
+	createNewProject() {
       const newProject = {
         id: Date.now().toString(),
         createdAt: this.getCurrentTimestamp(),
         updatedAt: this.getCurrentTimestamp(),
         status: 'กำลังดำเนินการ',
-        part1: { received: false, receivedDate: '', customerName: '', companyName: '', projectName: '', salesName: '', channel: 'Facebook' },
+        part1: {
+          received: true,
+          receivedDate: new Date().toISOString().split('T')[0],
+          customerName: '',
+          companyName: '',
+          projectName: '',
+          salesName: '',
+          channel: 'Facebook'
+        },
         part2: { items: [] },
         part3: { items: [] },
         part4: { items: [] },
@@ -137,9 +145,16 @@
         part6: { deliveryDate: '' },
         part7: { startDate: '', durationMonths: '12' }
       };
+
       this.projects.unshift(newProject);
       this.saveProjects();
-      this.activeProjectId = newProject.id;
+      
+      // --- ส่วนที่เพิ่ม/แก้ไข ---
+      this.activeProjectId = newProject.id; // กำหนดให้โปรเจกต์นี้เป็นโปรเจกต์ที่กำลังใช้งาน
+      this.validationError = false;         // ล้างสถานะแจ้งเตือนข้อผิดพลาด
+      this.expandedSections.part1 = true;   // สั่งให้ขยายส่วนที่ 1 รอไว้เลย
+      // -----------------------
+
       this.render();
     }
 
