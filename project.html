@@ -158,16 +158,27 @@
 
 	closeProject() {
       const project = this.projects.find(p => p.id === this.activeProjectId);
+      
+      // ตรวจสอบข้อมูลส่วนที่ 1 (ถ้าไม่ครบ ให้หยุดและ render ใหม่เพื่อแสดงตัวอักษรเตือน)
       if (project && !this.validatePart1(project)) {
         this.validationError = true;
-        this.render(); // สั่ง render เพื่อแสดงข้อความเตือนสีแดงในหน้า UI
-        alert('กรุณากรอกข้อมูลในส่วนที่ 1 ให้ครบถ้วนก่อนทำการบันทึก\n(ชื่อเซลล์, ช่องทาง, ชื่อลูกค้า, บริษัท, และชื่อโครงการ)');
-        setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 100);
-        return;
+        this.render(); // สั่งวาดหน้าจอใหม่เพื่อแสดงข้อความ Error สีแดงใต้ช่อง
+        
+        // เลื่อนหน้าจอไปจุดที่ข้อมูลไม่ครบเพื่อให้ผู้ใช้เห็นตัวอักษรเตือน
+        setTimeout(() => {
+          const firstError = document.querySelector('.text-red-500');
+          if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+        return; 
       }
+      
+      // ถ้าข้อมูลครบแล้ว ทำการบันทึกตามปกติโดยไม่มีการแจ้งเตือน Pop-up
       this.validationError = false;
       this.isSaving = true;
       this.render();
+      
       setTimeout(() => {
         this.isSaving = false;
         this.activeProjectId = null;
