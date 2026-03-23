@@ -26,10 +26,30 @@
     mapToCapabilities: () => ({ recolorables: [], borderables: [], fontEditable: undefined, fontSizeable: undefined }),
     mapToEditPanelValues: () => new Map()
   });
+<script type="module">
+  // 1. นำเข้าฟังก์ชันที่จำเป็น
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  // 2. ค่าคอนฟิกของคุณ
+  const firebaseConfig = {
+    apiKey: "AIzaSyBo0comaBXhHtuxiiNUGFldu-8ZcxtdQ7A",
+    authDomain: "work-jes.firebaseapp.com",
+    projectId: "work-jes",
+    storageBucket: "work-jes.firebasestorage.app",
+    messagingSenderId: "112074428386",
+    appId: "1:112074428386:web:0c2be99dc00fbda47173bb"
+  };
+
+  // 3. เริ่มต้น Firebase
+  const firebaseApp = initializeApp(firebaseConfig);
+  const db = getFirestore(firebaseApp);
+
+  // --- ต่อด้วย Class ProjectManager เดิมของคุณ ---
   class ProjectManager {
     constructor() {
-	  this.projects = this.loadProjects();
+	  this.projects = []; // เริ่มต้นเป็นว่าง
+	  this.fetchProjectsFromFirebase(); // เรียกใช้ฟังก์ชันดึงข้อมูล (ที่จะสร้างเพิ่มด้านล่าง)
       this.sharedDocOptions = this.loadDocOptions();
       this.activeProjectId = null;
       this.searchQuery = '';
@@ -1478,6 +1498,18 @@ removePart5Contractor(idx) {
       app.innerHTML = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
       lucide.createIcons();
     }
+	async fetchProjectsFromFirebase() {
+    try {
+      const querySnapshot = await getDocs(collection(db, "projects"));
+      this.projects = querySnapshot.docs.map(doc => ({
+        ...doc.data(),
+        id: doc.id // ใช้ id จาก Firebase
+      }));
+      this.render(); // เมื่อข้อมูลมาถึงแล้ว ให้วาดหน้าจอใหม่
+    } catch (error) {
+      console.error("Error fetching projects: ", error);
+    }
+  }
   }
 
   const app = new ProjectManager();
