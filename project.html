@@ -1378,6 +1378,11 @@
       const app = document.getElementById('app');
       app.innerHTML = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
       lucide.createIcons();
+		    }
+
+    handleSearchInput(query) {
+      this.searchQuery = query;
+      this.render();
     }
   }
 
