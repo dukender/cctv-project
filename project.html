@@ -123,7 +123,7 @@
       return styles[status] || 'bg-blue-100 text-blue-700 border-blue-300';
     }
 
-createNewProject() {
+	createNewProject() {
       const newProject = {
         id: Date.now().toString(),
         createdAt: this.getCurrentTimestamp(),
@@ -149,10 +149,11 @@ createNewProject() {
       this.projects.unshift(newProject);
       this.saveProjects();
 
-      // กำหนด ID ให้เป็นงานปัจจุบัน เพื่อให้เด้งไปหน้า Detail
+      // บังคับเปลี่ยนหน้าไปที่โครงการใหม่
       this.activeProjectId = newProject.id;
       
-      // บังคับให้ขยายเฉพาะส่วนที่ 1 และปิดส่วนอื่นๆ ทั้งหมด (แก้ปัญหาค้างที่ส่วนที่ 5)
+      // --- จุดสำคัญ: บังคับรีเซ็ตสถานะการกาง (Expanded) ทุกส่วนใหม่หมด ---
+      // กำหนดให้ part1 เป็น true และส่วนที่เหลือ (2-7) เป็น false ทั้งหมด
       this.expandedSections = {
         part1: true,
         part2: false,
@@ -166,6 +167,7 @@ createNewProject() {
       this.validationError = false;
       this.render();
     }
+	  
     deleteProject(id) {
       const projectToDelete = this.projects.find(p => p.id === id);
       if (projectToDelete && confirm(`ต้องการลบโครงการ "${projectToDelete.part1.projectName || 'ไม่ระบุชื่อ'}" ใช่หรือไม่?`)) {
