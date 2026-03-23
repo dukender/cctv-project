@@ -156,10 +156,12 @@
       this.render();
     }
 
-    closeProject() {
+	closeProject() {
       const project = this.projects.find(p => p.id === this.activeProjectId);
       if (project && !this.validatePart1(project)) {
         this.validationError = true;
+        this.render(); // สั่ง render เพื่อแสดงข้อความเตือนสีแดงในหน้า UI
+        alert('กรุณากรอกข้อมูลในส่วนที่ 1 ให้ครบถ้วนก่อนทำการบันทึก\n(ชื่อเซลล์, ช่องทาง, ชื่อลูกค้า, บริษัท, และชื่อโครงการ)');
         setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 100);
         return;
       }
