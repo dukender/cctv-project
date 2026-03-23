@@ -156,20 +156,13 @@
       this.render();
     }
 
-   closeProject() {
+    closeProject() {
       const project = this.projects.find(p => p.id === this.activeProjectId);
-      // ตรวจสอบข้อมูลส่วนที่ 1
       if (project && !this.validatePart1(project)) {
         this.validationError = true;
-        this.render(); // สั่งเรนเดอร์ใหม่เพื่อแสดงข้อความเตือนใต้ช่อง
-        // เลื่อนหน้าจอขึ้นไปบนสุดเพื่อให้เห็นจุดที่ต้องแก้
-        setTimeout(() => {
-          const firstError = document.querySelector('.text-red-500');
-          if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
+        setTimeout(() => window.scrollTo({top: 0, behavior: 'smooth'}), 100);
         return;
       }
-      
       this.validationError = false;
       this.isSaving = true;
       this.render();
@@ -997,17 +990,11 @@
                         ${p.part1.receivedDate ? `<span class="text-[10px] text-slate-400 italic ml-auto">${this.formatDisplayTime(p.part1.receivedDate)}</span>` : ''}
                       </div>
                       <div class="space-y-4">
-						<div class="space-y-2">
-						  <label class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ชื่อเซลล์</label>
-						  <input 
-							type="text" 
-							value="${p.part1.salesName || ''}" 
-							oninput="app.updateProject(proj => ({...proj, part1: {...proj.part1, salesName: this.value}}))"
-							placeholder="ระบุชื่อเซลล์"
-							class="w-full px-4 py-3 bg-white border ${this.validationError && !p.part1.salesName ? 'border-red-500 bg-red-50' : 'border-slate-200'} rounded-xl text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all"
-						  />
-						  ${this.validationError && !p.part1.salesName ? `<p class="text-red-500 text-xs mt-1 animate-pulse">* กรุณากรอกชื่อเซลล์</p>` : ''}
-						</div>
+                        <div>
+                          <label class="text-[10px] font-bold text-slate-400 mb-1 block">ชื่อเซลล์ผู้รับผิดชอบ</label>
+                          <input type="text" placeholder="ระบุชื่อเซลล์ *" class="w-full bg-transparent border-b text-sm py-1 outline-none transition-colors ${this.validationError && !p.part1.salesName ? 'border-red-400 placeholder-red-300' : 'border-slate-200'}" value="${p.part1.salesName}" 
+                            onchange="app.updateProject(proj => ({...proj, part1: {...proj.part1, salesName: this.value}}))" />
+                        </div>
                         <div>
                            <label class="text-[10px] font-bold text-slate-400 mb-1 block">ช่องทางการขาย</label>
                            <select onchange="app.updateProject(proj => ({...proj, part1: {...proj.part1, channel: this.value}}))" class="w-full bg-transparent border-b border-slate-200 text-sm py-1 outline-none">
