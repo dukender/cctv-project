@@ -122,24 +122,6 @@
       });
     }
 
-    loadProjects() {
-      const saved = localStorage.getItem('multi_project_v11');
-      return saved ? JSON.parse(saved) : [];
-    }
-
-    loadDocOptions() {
-      const saved = localStorage.getItem('doc_options_v11');
-      return saved ? JSON.parse(saved) : ["BOQ", "Datasheet", "Price list", "PO", "PR"];
-    }
-
-    saveProjects() {
-      localStorage.setItem('multi_project_v11', JSON.stringify(this.projects));
-    }
-
-    saveDocOptions() {
-      localStorage.setItem('doc_options_v11', JSON.stringify(this.sharedDocOptions));
-    }
-
     getCurrentTimestamp() {
       return new Date().toISOString();
     }
