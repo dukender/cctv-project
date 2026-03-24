@@ -1304,23 +1304,46 @@
             </button>
           </div>
 
-          <!-- Tab Navigation -->
-          <div class="bg-white border-b sticky top-16 z-40 px-4 md:px-6 overflow-x-auto">
-            <div class="flex gap-1">
-              ${['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7'].map(tab => {
-                const tabLabels = {
-                  part1: '1. การรับงาน',
-                  part2: '2. การดำเนินการ',
-                  part3: '3. การแก้ไข',
-                  part4: '4. การส่งข้อมูล',
-                  part5: '5. การติดตั้ง',
-                  part6: '6. การส่งมอบงาน',
-                  part7: '7. การรับประกัน'
+          <!-- Tab Navigation (Professional Stepper Design) -->
+          <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-[72px] md:top-[76px] z-40 px-4 md:px-6 py-5 overflow-x-auto shadow-sm">
+            <div class="flex justify-between items-start min-w-[700px] max-w-4xl mx-auto relative">
+              ${['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7'].map((tab, index, arr) => {
+                const tabInfo = {
+                  part1: { text: 'การรับงาน' },
+                  part2: { text: 'การดำเนินการ' },
+                  part3: { text: 'การแก้ไข' },
+                  part4: { text: 'การส่งข้อมูล' },
+                  part5: { text: 'การติดตั้ง' },
+                  part6: { text: 'การส่งมอบงาน' },
+                  part7: { text: 'การรับประกัน' }
                 };
+                const isActive = this.activeTab === tab;
+                const activeIndex = arr.indexOf(this.activeTab);
+                const isPast = index < activeIndex;
+                const isLast = index === arr.length - 1;
+                const num = tab.replace('part', '');
+                
                 return `
-                  <button onclick="app.activeTab = '${tab}'; app.render()" class="px-4 py-3 font-bold text-sm border-b-2 transition-all whitespace-nowrap ${this.activeTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-600 hover:text-slate-800'}">
-                    ${tabLabels[tab]}
-                  </button>
+                  <div class="relative flex flex-col items-center flex-1 group cursor-pointer" onclick="app.activeTab = '${tab}'; app.render()">
+                    <!-- Connecting Line -->
+                    ${!isLast ? `
+                      <div class="absolute top-4 left-[50%] w-full h-[2px] transition-all duration-300 ease-in-out ${isPast ? 'bg-blue-600' : 'bg-slate-200'}"></div>
+                    ` : ''}
+
+                    <!-- Circle -->
+                    <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ease-in-out
+                      ${isActive ? 'bg-white border-[3px] border-blue-600 text-blue-700 shadow-md' : 
+                        isPast ? 'bg-blue-600 border-2 border-blue-600 text-white shadow-sm' : 
+                        'bg-white border-2 border-slate-200 text-slate-400 group-hover:border-blue-400 group-hover:text-blue-500'}">
+                      <span class="text-[13px] font-black flex items-center justify-center">${isPast ? '<i data-lucide="check" style="width:16px;height:16px;stroke-width:3px"></i>' : num}</span>
+                    </div>
+
+                    <!-- Label -->
+                    <div class="mt-3 text-[11px] font-bold text-center transition-all duration-300 w-full px-1
+                      ${isActive ? 'text-blue-700 tracking-wide' : isPast ? 'text-slate-800' : 'text-slate-400 group-hover:text-blue-500'}">
+                      ${tabInfo[tab].text}
+                    </div>
+                  </div>
                 `;
               }).join('')}
             </div>
