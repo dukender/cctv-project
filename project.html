@@ -19,10 +19,9 @@
  <body class="h-full bg-white">
   <div id="app" class="h-full w-full bg-white overflow-auto"></div>
   
-  <!-- เปลี่ยนเป็น script type="module" และรวมร่างโค้ด -->
   <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, deleteDoc, getDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
   // --- Firebase Config ของคุณ ---
   const firebaseConfig = {
@@ -39,7 +38,6 @@
 
   class ProjectManager {
     constructor() {
-      // ตั้งค่าเริ่มต้น (ไม่ต้องดึงจาก LocalStorage แล้ว)
       this.projects = [];
       this.sharedDocOptions = ["BOQ", "Datasheet", "Price list", "PO", "PR"];
       this.activeProjectId = null;
@@ -57,53 +55,87 @@
       this.undoState = null;
       this.undoTimer = null;
       
-      this.isOnline = navigator.onLine; // เพิ่มตัวแปรเช็คสถานะอินเทอร์เน็ต
-      this.isNewProject = false; // ตัวแปรเช็คว่าเป็นการกดสร้างงานใหม่หรือไม่
+      this.isOnline = navigator.onLine; 
+      this.isNewProject = false; 
       
       this.setupEventListeners();
-      // เรียกใช้ข้อมูลแบบ Realtime จาก Firebase ทันทีที่เปิดเว็บ
       this.initRealtimeData(); 
     }
 
-    // 1. ฟังข้อมูลจาก Cloud Realtime (อัปเดตอัตโนมัติเมื่อเครื่องอื่นกดเซฟ)
-    initRealtimeData() {
-      const docRef = doc(db, "projects", "main_data");
-      onSnapshot(docRef, (snapshot) => {
-        console.log("✅ เชื่อมต่อ Firebase สำเร็จและดึงข้อมูลแบบ Realtime แล้ว!"); // เพิ่ม log ให้เช็ค
-        if (snapshot.exists()) {
-          const data = snapshot.data();
-          this.projects = data.projectList || [];
-          if (data.docOptions) {
-            this.sharedDocOptions = data.docOptions;
+    // 1. ระบบจัดการและฟังข้อมูลแบบแยกไฟล์ (กรณีที่ 1: 1 Doc = 1 Project)
+    async initRealtimeData() {
+      // --- ขั้นตอนที่ 1: ดึงข้อมูลเก่ามาแตกไฟล์ (Auto Migration) ---
+      try {
+        const oldRef = doc(db, "projects", "main_data");
+        const oldSnap = await getDoc(oldRef);
+        if (oldSnap.exists()) {
+          const data = oldSnap.data();
+          if (data.projectList && data.projectList.length > 0) {
+            console.log("กำลังย้ายข้อมูลโปรเจกต์เดิมแยกเป็นไฟล์ย่อย...");
+            for (const p of data.projectList) {
+              await setDoc(doc(db, "projects", p.id), p);
+            }
+            // เขียนทับเพื่อลบ array เดิมทิ้ง (ป้องกันการย้ายซ้ำ)
+            await setDoc(oldRef, { docOptions: data.docOptions || this.sharedDocOptions, migrated: true });
+            console.log("ย้ายข้อมูลสำเร็จ!");
           }
         }
-        this.render(); 
+      } catch (error) {
+        console.error("Migration error:", error);
+      }
+
+      // --- ขั้นตอนที่ 2: ฟังข้อมูลการตั้งค่า (DocOptions) ---
+      const settingsRef = doc(db, "system", "settings");
+      onSnapshot(settingsRef, (snapshot) => {
+        if (snapshot.exists() && snapshot.data().docOptions) {
+          this.sharedDocOptions = snapshot.data().docOptions;
+        } else {
+          setDoc(settingsRef, { docOptions: this.sharedDocOptions });
+        }
+        this.render();
+      });
+
+      // --- ขั้นตอนที่ 3: ฟังข้อมูลโปรเจกต์แบบรายตัวจาก Collection ---
+      const projectsColRef = collection(db, "projects");
+      onSnapshot(projectsColRef, (snapshot) => {
+        console.log("✅ เชื่อมต่อ Firebase สำเร็จและอัปเดตข้อมูล Realtime แล้ว");
+        const loadedProjects = [];
+        snapshot.forEach((docSnap) => {
+          // ไม่เอาไฟล์เก่าที่เป็นกล่องรวมมาแสดงซ้ำ
+          if (docSnap.id !== 'main_data') {
+            loadedProjects.push(docSnap.data());
+          }
+        });
+        
+        // เรียงลำดับตามวันที่อัปเดต (ใหม่ไปเก่า)
+        this.projects = loadedProjects.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+        this.render();
       });
     }
 
-    // 2. ฟังก์ชันหลักสำหรับดันข้อมูลขึ้น Cloud Firestore
-    async saveToFirebase() {
-      try {
-        const docRef = doc(db, "projects", "main_data");
-        await setDoc(docRef, { 
-          projectList: this.projects,
-          docOptions: this.sharedDocOptions,
-          lastUpdated: new Date().toISOString()
-        });
-        console.log("☁️ บันทึกข้อมูลขึ้น Firebase สำเร็จ!"); // เพิ่ม log ให้เช็คเวลาเซฟข้อมูล
-      } catch (error) {
-        console.error("Error saving to Firebase: ", error);
-      }
+    // ---------------------------------------------------------
+    // ฟังก์ชันจัดการฐานข้อมูลแบบใหม่ (แยกทีละไฟล์)
+    // ---------------------------------------------------------
+    saveProjectToDB(project) {
+      if (!project || !project.id) return;
+      const docRef = doc(db, "projects", project.id);
+      setDoc(docRef, project).catch(err => console.error("Error saving project:", err));
     }
 
-    // 3. แทนที่ฟังก์ชัน save เดิม ให้เรียกใช้ Firebase แทน LocalStorage
-    saveProjects() { 
-      this.saveToFirebase(); 
+    deleteProjectFromDB(id) {
+      const docRef = doc(db, "projects", id);
+      deleteDoc(docRef).catch(err => console.error("Error deleting project:", err));
     }
 
-    saveDocOptions() { 
-      this.saveToFirebase(); 
+    saveDocOptions() {
+      const settingsRef = doc(db, "system", "settings");
+      setDoc(settingsRef, { docOptions: this.sharedDocOptions }).catch(err => console.error("Error saving doc options:", err));
     }
+
+    // ฟังก์ชันเดิมทิ้งไว้เพื่อไม่ให้โค้ดเก่า Error (แต่จะไม่ทำการเซฟรวมอีกต่อไป)
+    saveProjects() {}
+    saveToFirebase() {}
+    // ---------------------------------------------------------
 
     setupEventListeners() {
       document.addEventListener('click', (e) => {
@@ -111,22 +143,14 @@
           const projectId = e.target.closest('[data-toggle-lost-job]').dataset.projectId;
           this.toggleLostJob(projectId);
         }
-        // Close month picker when clicking outside
         const monthPickerContainer = document.getElementById('monthPickerContainer');
         if (monthPickerContainer && !monthPickerContainer.contains(e.target)) {
           this.closeMonthPicker();
         }
       });
 
-      // --- เพิ่มระบบดักจับสถานะอินเทอร์เน็ต (Online/Offline) ---
-      window.addEventListener('online', () => { 
-        this.isOnline = true; 
-        this.render(); 
-      });
-      window.addEventListener('offline', () => { 
-        this.isOnline = false; 
-        this.render(); 
-      });
+      window.addEventListener('online', () => { this.isOnline = true; this.render(); });
+      window.addEventListener('offline', () => { this.isOnline = false; this.render(); });
     }
 
     getCurrentTimestamp() {
@@ -142,8 +166,15 @@
     calculateAutoStatus(project) {
       if (project.status === 'ไม่ได้งาน') return 'ไม่ได้งาน';
       
+      let p6Time = 0;
+      if (project.part6?.deliveryDate) p6Time = new Date(project.part6.deliveryDate).getTime();
+      if (project.part6?.items?.length > 0) {
+        const validDates = project.part6.items.filter(i => i.deliveryDate).map(i => new Date(i.deliveryDate).getTime());
+        if (validDates.length > 0) p6Time = Math.max(...validDates);
+      }
+
       const timestamps = [
-        { status: 'ได้งานแล้ว', time: project.part6?.deliveryDate ? new Date(project.part6.deliveryDate).getTime() : 0 },
+        { status: 'ได้งานแล้ว', time: p6Time },
         { status: 'กำลังติดตั้ง', time: (project.part5?.installDate || project.part5?.internalStaff?.length > 0 || project.part5?.contractors?.length > 0) ? new Date().getTime() : 0 },
         { status: 'ส่งข้อมูลให้ลูกค้าแล้ว', time: Math.max(0, ...project.part4.items.map(i => new Date(i.timestamp).getTime())) },
         { status: 'กำลังแก้ไข', time: Math.max(0, ...project.part3.items.map(i => new Date(i.timestamp).getTime())) },
@@ -154,7 +185,7 @@
       const latest = [...timestamps].sort((a, b) => b.time - a.time)[0];
       
       if (latest.time === 0) {
-        if (project.part6?.deliveryDate) return 'ได้งานแล้ว';
+        if (p6Time > 0) return 'ได้งานแล้ว';
         if (project.part5?.installDate) return 'กำลังติดตั้ง';
         if (project.part4?.items?.length > 0) return 'ส่งข้อมูลให้ลูกค้าแล้ว';
         if (project.part3?.items?.length > 0) return 'กำลังแก้ไข';
@@ -189,40 +220,27 @@
           projectName: '',
           salesName: '',
           channel: 'Line',
-          jobDetails: '' // เพิ่มฟิลด์รายละเอียดงานเบื้องต้น
+          jobDetails: '' 
         },
         part2: { items: [] },
         part3: { items: [] },
         part4: { items: [] },
         part5: { internalStaff: [], contractors: [], installDate: '' },
-        part6: { deliveryDate: '' },
-        part7: { startDate: '', durationMonths: '12' }
+        part6: { items: [{ id: Date.now().toString(), detail: '', deliveryDate: '' }] },
+        part7: { items: [{ id: Date.now().toString(), detail: '', startDate: '', durationMonths: '12' }] }
       };
 
       this.projects.unshift(newProject);
+      this.saveProjectToDB(newProject); // บันทึกไฟล์ใหม่ลง Firestore ทันที
       
-      // เอาคำสั่ง this.saveProjects(); ออกจากตรงนี้ เพื่อไม่ให้เกิดแถวว่างในฐานข้อมูลทันทีที่กดปุ่ม
-
-      // บังคับเปลี่ยนหน้าไปที่โครงการใหม่
       this.activeProjectId = newProject.id;
-      this.isNewProject = true; // แฟล็กไว้ว่านี่คือการเพิ่มงานใหม่ (ยังไม่สมบูรณ์)
+      this.isNewProject = true; 
       
-      // กำหนดให้ part1 เป็น true และส่วนที่เหลือ (2-7) เป็น false ทั้งหมด
-      this.expandedSections = {
-        part1: true,
-        part2: false,
-        part3: false,
-        part4: false,
-        part5: false,
-        part6: false,
-        part7: false
-      };
-
+      this.expandedSections = { part1: true, part2: false, part3: false, part4: false, part5: false, part6: false, part7: false };
       this.validationError = false;
       this.render();
     }
 
-    // --- ระบบแจ้งเตือนยืนยันลบ และ เลิกทำ (Undo) ---
     showConfirm(message, executeFn, undoType, undoDataObj) {
       this.confirmModalState = { message, executeFn, undoType, undoDataObj };
       this.render();
@@ -252,7 +270,7 @@
 
       if (type === 'project') {
         this.projects.splice(data.index, 0, data.item);
-        this.saveProjects();
+        this.saveProjectToDB(data.item); // เอาไฟล์กลับเข้าฐานข้อมูล
       } else {
         this.updateProject(p => {
           if (type === 'part2') p.part2.items.splice(data.index, 0, data.item);
@@ -260,6 +278,8 @@
           if (type === 'part4') p.part4.items.splice(data.index, 0, data.item);
           if (type === 'part5_internal') p.part5.internalStaff.splice(data.index, 0, data.item);
           if (type === 'part5_contractor') p.part5.contractors.splice(data.index, 0, data.item);
+          if (type === 'part6_item') p.part6.items.splice(data.index, 0, data.item);
+          if (type === 'part7_item') p.part7.items.splice(data.index, 0, data.item);
           return p;
         });
       }
@@ -314,7 +334,7 @@
           `คุณต้องการลบโครงการ "${projectToDelete.part1.projectName || 'ไม่ระบุชื่อ'}" ใช่หรือไม่?`,
           () => {
             this.projects.splice(index, 1);
-            this.saveProjects();
+            this.deleteProjectFromDB(projectToDelete.id); // ลบจากฐานข้อมูล
           },
           'project',
           { item: projectToDelete, index: index }
@@ -324,27 +344,23 @@
 
     openProject(id) {
       this.activeProjectId = id;
-      this.isNewProject = false; // ยืนยันว่าเป็นการเปิดงานเก่า ไม่ใช่การสร้างใหม่
+      this.isNewProject = false;
       this.validationError = false;
       this.render();
     }
 
-    // --- เพิ่มฟังก์ชันเปลี่ยนแท็บและเลื่อนจอขึ้น ---
     goToNextTab(nextTabId) {
       this.activeTab = nextTabId;
       this.render();
-      window.scrollTo({ top: 0, behavior: 'smooth' }); // เลื่อนจอขึ้นบนสุดอย่างนุ่มนวล
+      window.scrollTo({ top: 0, behavior: 'smooth' }); 
     }
 
-    // --- ฟังก์ชันสำหรับการกดย้อนกลับโดยไม่สนการเช็คเงื่อนไข ---
     goBack() {
-      // หากกดย้อนกลับในขณะที่อยู่ในโหมด "สร้างงานใหม่" ให้ลบข้อมูลร่างทิ้งทันที
       if (this.isNewProject) {
         this.projects = this.projects.filter(p => p.id !== this.activeProjectId);
-        this.saveProjects(); // อัปเดตลบออกจากฐานข้อมูล (ในกรณีที่มีการพิมพ์ข้อความลงไปแล้ว)
+        this.deleteProjectFromDB(this.activeProjectId); // ลบไฟล์ร่างทิ้ง
         this.isNewProject = false;
       }
-      
       this.activeProjectId = null;
       this.validationError = false;
       this.render();
@@ -352,13 +368,9 @@
 
 	closeProject() {
       const project = this.projects.find(p => p.id === this.activeProjectId);
-      
-      // ตรวจสอบข้อมูลส่วนที่ 1 (ถ้าไม่ครบ ให้หยุดและ render ใหม่เพื่อแสดงตัวอักษรเตือน)
       if (project && !this.validatePart1(project)) {
         this.validationError = true;
-        this.render(); // สั่งวาดหน้าจอใหม่เพื่อแสดงข้อความ Error สีแดงใต้ช่อง
-        
-        // เลื่อนหน้าจอไปจุดที่ข้อมูลไม่ครบเพื่อให้ผู้ใช้เห็นตัวอักษรเตือน
+        this.render(); 
         setTimeout(() => {
           const firstError = document.querySelector('.text-red-500');
           if (firstError) {
@@ -368,8 +380,7 @@
         return; 
       }
       
-      // ถ้าข้อมูลครบแล้ว ทำการบันทึกตามปกติโดยไม่มีการแจ้งเตือน Pop-up
-      this.isNewProject = false; // บันทึกข้อมูลสำเร็จแล้ว ยกเลิกสถานะงานใหม่
+      this.isNewProject = false; 
       this.validationError = false;
       this.isSaving = true;
       this.render();
@@ -390,11 +401,12 @@
     toggleLostJob(projectId) {
       this.projects = this.projects.map(p => {
         if (p.id === projectId) {
-          return { ...p, status: p.status === 'ไม่ได้งาน' ? 'กำลังดำเนินการ' : 'ไม่ได้งาน' };
+          const updated = { ...p, status: p.status === 'ไม่ได้งาน' ? 'กำลังดำเนินการ' : 'ไม่ได้งาน' };
+          this.saveProjectToDB(updated); // อัปเดตเฉพาะโปรเจกต์
+          return updated;
         }
         return p;
       });
-      this.saveProjects();
       this.render();
     }
 
@@ -576,7 +588,6 @@
       });
     }
 
-// --- ส่วนที่ 2: ลบรายการ (พร้อม Confirm & Undo) ---
     removePart2Item(idx) {
       const p = this.projects.find(proj => proj.id === this.activeProjectId);
       if (p) {
@@ -693,7 +704,6 @@
       });
     }
 
-// --- ส่วนที่ 3: ลบรายการ (พร้อม Confirm & Undo) ---
     removePart3Item(idx) {
       const p = this.projects.find(proj => proj.id === this.activeProjectId);
       if (p) {
@@ -717,10 +727,19 @@
             id: Date.now(),
             checked: false,
             docType: this.sharedDocOptions[0] || 'BOQ',
-            timestamp: this.getCurrentTimestamp()
+            timestamp: this.getCurrentTimestamp(),
+            detail: '' // เพิ่มฟิลด์ detail ไว้รวมกับข้อมูลเวลาเพิ่มรายการใหม่
           }]
         }
       }));
+    }
+
+    updatePart4ItemDetail(idx, value) {
+      this.updateProject(p => {
+        if (!p.part4.items) p.part4.items = [];
+        p.part4.items[idx].detail = value;
+        return p;
+      });
     }
 
     togglePart4Item(idx) {
@@ -790,7 +809,6 @@
       this.render();
     }
 
-// --- ส่วนที่ 4: ลบรายการ (พร้อม Confirm & Undo) ---
     removePart4Item(idx) {
       const p = this.projects.find(proj => proj.id === this.activeProjectId);
       if (p) {
@@ -882,17 +900,96 @@
       }
     }
 
+    // Part 6 Methods
+    addPart6Item() {
+      this.updateProject(p => ({
+        ...p,
+        part6: { ...p.part6, items: [...(p.part6.items || []), { id: Date.now(), detail: '', deliveryDate: '' }] }
+      }));
+    }
+
+    updatePart6ItemDetail(idx, value) {
+      this.updateProject(p => {
+        if (!p.part6.items) p.part6.items = [];
+        p.part6.items[idx].detail = value;
+        return p;
+      });
+    }
+
+    updatePart6ItemDate(idx, value) {
+      this.updateProject(p => {
+        if (!p.part6.items) p.part6.items = [];
+        p.part6.items[idx].deliveryDate = value;
+        return p;
+      });
+    }
+
+    removePart6Item(idx) {
+      const p = this.projects.find(proj => proj.id === this.activeProjectId);
+      if (p) {
+        this.showConfirm(
+          'คุณต้องการลบรายการส่งมอบงาน ใช่หรือไม่?',
+          () => { this.updateProject(proj => { proj.part6.items.splice(idx, 1); return proj; }); },
+          'part6_item', { item: p.part6.items[idx], index: idx }
+        );
+      }
+    }
+
+    // Part 7 Methods
+    addPart7Item() {
+      this.updateProject(p => ({
+        ...p,
+        part7: { ...p.part7, items: [...(p.part7.items || []), { id: Date.now(), detail: '', startDate: '', durationMonths: '12' }] }
+      }));
+    }
+
+    updatePart7ItemDetail(idx, value) {
+      this.updateProject(p => {
+        if (!p.part7.items) p.part7.items = [];
+        p.part7.items[idx].detail = value;
+        return p;
+      });
+    }
+
+    updatePart7ItemStartDate(idx, value) {
+      this.updateProject(p => {
+        if (!p.part7.items) p.part7.items = [];
+        p.part7.items[idx].startDate = value;
+        return p;
+      });
+    }
+
+    updatePart7ItemDuration(idx, value) {
+      this.updateProject(p => {
+        if (!p.part7.items) p.part7.items = [];
+        p.part7.items[idx].durationMonths = value;
+        return p;
+      });
+    }
+
+    removePart7Item(idx) {
+      const p = this.projects.find(proj => proj.id === this.activeProjectId);
+      if (p) {
+        this.showConfirm(
+          'คุณต้องการลบรายการรับประกัน ใช่หรือไม่?',
+          () => { this.updateProject(proj => { proj.part7.items.splice(idx, 1); return proj; }); },
+          'part7_item', { item: p.part7.items[idx], index: idx }
+        );
+      }
+    }
+
+    // อัปเดตข้อมูลและส่งเข้า DB
     updateProject(updater) {
       this.projects = this.projects.map(p => {
         if (p.id === this.activeProjectId) {
-          const updated = updater(p);
+          const updated = updater({ ...p });
           updated.status = this.calculateAutoStatus(updated);
           updated.updatedAt = this.getCurrentTimestamp();
+          this.saveProjectToDB(updated); // บันทึกลงฐานข้อมูลทันที
           return updated;
         }
         return p;
       });
-      this.saveProjects();
       this.render();
     }
 
@@ -916,7 +1013,6 @@
         return;
       }
       
-      // ใส่ BOM (Byte Order Mark) เพื่อให้ Excel อ่านภาษาไทยได้ถูกต้อง
       let csvContent = "\uFEFF"; 
       csvContent += "สถานะ,ชื่อโครงการ,ลูกค้า,บริษัท,ช่องทาง,ชื่อเซลล์,วันที่รับงาน,อัปเดตล่าสุด\n";
       
@@ -946,7 +1042,6 @@
     exportToPDF() {
       if (!this.currentFilteredProjects || this.currentFilteredProjects.length === 0) return;
       
-      // ดึงไลบรารี html2pdf มาทำงานแบบ Dynamic (ไม่ต้องแก้ <head>)
       if (!window.html2pdf) {
           const script = document.createElement('script');
           script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
@@ -961,7 +1056,6 @@
         const element = document.getElementById('projectTableContainer');
         if(!element) return;
         
-        // ซ่อนคอลัมน์จัดการ (ปุ่มลบ/แก้ไข) เพื่อไม่ให้ออกมาใน PDF
         const actionCols = element.querySelectorAll('.action-col');
         actionCols.forEach(el => el.style.display = 'none');
 
@@ -973,7 +1067,6 @@
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
         };
 
-        // สร้าง PDF และคืนค่าปุ่มจัดการให้กลับมาแสดงเหมือนเดิม
         html2pdf().set(opt).from(element).save().then(() => {
             actionCols.forEach(el => el.style.display = '');
         });
@@ -994,7 +1087,6 @@
         })
         .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
-      // เก็บค่าที่ถูกกรองไว้ใช้สำหรับ Export
       this.currentFilteredProjects = filtered;
 
       const statusCounts = {
@@ -1023,7 +1115,6 @@
                   </h1>
                 </div>
                 
-                <!-- ปุ่มเพิ่มงานใหม่ (นำกลับมาใหญ่เหมือนเดิม) -->
                 <button onclick="app.createNewProject()" class="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transition-all w-full md:w-auto justify-center text-lg">
                   <i data-lucide="plus" style="width:24px;height:24px"></i> เพิ่มงานใหม่
                 </button>
@@ -1160,7 +1251,6 @@
                     </button>
                   </div>
                   <div class="grid grid-cols-3 gap-2" id="monthGrid">
-                    <!-- Generated by JavaScript -->
                   </div>
                   <button 
                     onclick="app.filterDate = ''; app.closeMonthPicker(); document.getElementById('monthPickerDisplay').textContent = 'เลือกเดือน/ปี'; app.render();"
@@ -1180,15 +1270,13 @@
 
             <!-- กล่องข้อมูลจำนวนโปรเจกต์ และควบคุม Export Data ให้อยู่เหนือตาราง -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 mb-3">
-              <!-- ข้อมูลจำนวน (ซ้าย) -->
               <div class="bg-white border border-slate-200 px-4 py-2.5 rounded-lg font-bold flex items-center gap-2 shadow-sm text-xs text-slate-600">
                 <i data-lucide="layers" style="width:14px;height:14px" class="text-slate-400"></i>
                 <span>รวมทั้งหมด <span class="text-green-600 text-base mx-0.5">${this.projects.length}</span> โครงการ</span>
                 <span class="text-slate-300">|</span>
-                <span>รวมจำนวน <span class="text-red-600 text-base mx-0.5">${filtered.length}</span> โครงการ ตามตัวกรอง</span>
+                <span>รวมจำนวน <span class="text-red-600 text-base mx-0.5">${filtered.length}</span> ตรงกับตัวกรอง</span>
               </div>
               
-              <!-- ปุ่ม Export (ขวา) -->
               <div class="flex items-center gap-2 w-full md:w-auto justify-end">
                 <button onclick="app.exportToExcel()" class="bg-white text-green-700 border border-green-200 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1.5 hover:bg-green-50 transition-all shadow-sm text-xs">
                   <i data-lucide="file-spreadsheet" style="width:14px;height:14px"></i> Export Excel
@@ -1225,35 +1313,26 @@
                     </tr>
                   ` : filtered.map(p => `
                     <tr class="hover:bg-blue-50/40 transition-colors group">
-                      <!-- สถานะ -->
                       <td class="p-4 align-top md:align-middle">
                         <div class="px-2 py-1 rounded-md border text-[10px] font-black inline-flex items-center gap-1.5 ${this.getStatusStyle(p.status)}">
                           <div class="w-1.5 h-1.5 rounded-full bg-current"></div>
                           ${p.status}
                         </div>
                       </td>
-                      
-                      <!-- ชื่อโครงการ -->
                       <td class="p-4 align-top md:align-middle">
                         <div class="font-black text-slate-900 text-sm md:text-base leading-tight">
                           ${p.part1.projectName || "-"}
                         </div>
                       </td>
-                      
-                      <!-- ลูกค้า / บริษัท -->
                       <td class="p-4 align-top md:align-middle">
                         <div class="flex flex-col gap-1">
                           <span class="text-xs font-bold text-slate-700 flex items-center gap-1"><i data-lucide="user" style="width:12px;height:12px" class="text-slate-400"></i> ${p.part1.customerName || "-"}</span>
                           <span class="text-[11px] text-slate-500 flex items-center gap-1"><i data-lucide="building-2" style="width:12px;height:12px" class="text-slate-400"></i> ${p.part1.companyName || "-"}</span>
                         </div>
                       </td>
-                      
-                      <!-- อัปเดตล่าสุด -->
                       <td class="p-4 align-top md:align-middle text-[11px] font-bold text-slate-600">
                         ${this.formatDisplayTime(p.updatedAt).split(' ')[0]}
                       </td>
-                      
-                      <!-- ปุ่มจัดการ -->
                       <td class="p-4 align-top md:align-middle text-center action-col">
                         <div class="flex items-center justify-center gap-2">
                           <button onclick="app.openProject('${p.id}')" class="bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-lg font-bold text-[11px] hover:bg-blue-600 hover:text-white transition-all flex items-center gap-1">
@@ -1280,7 +1359,7 @@
       const p = this.projects.find(proj => proj.id === this.activeProjectId);
       if (!p) return '';
 
-      const warranty = this.getWarrantyStatus(p.part7.startDate, p.part7.durationMonths);
+      const warranty = this.getWarrantyStatus(p.part7?.startDate, p.part7?.durationMonths);
       const isDisabled = p.status === 'ไม่ได้งาน';
       this.activeTab = this.activeTab || 'part1';
 
@@ -1288,7 +1367,6 @@
         <div class="min-h-screen bg-slate-50 pb-20 font-sans w-full flex flex-col">
           <div class="bg-white border-b sticky top-0 z-50 px-4 md:px-6 py-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-              <!-- เปลี่ยน onclick จาก app.closeProject() เป็น app.goBack() -->
               <button onclick="app.goBack()" class="p-2 hover:bg-slate-100 rounded-full text-slate-500 transition-colors shrink-0">
                 <i data-lucide="arrow-left" style="width:20px;height:20px"></i>
               </button>
@@ -1309,7 +1387,7 @@
             </button>
           </div>
 
-          <!-- Tab Navigation (Professional Stepper Design) -->
+          <!-- Tab Navigation -->
           <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-[72px] md:top-[76px] z-40 px-4 md:px-6 py-5 overflow-x-auto shadow-sm">
             <div class="flex justify-between items-start min-w-[700px] max-w-4xl mx-auto relative">
               ${['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part7'].map((tab, index, arr) => {
@@ -1330,20 +1408,15 @@
                 
                 return `
                   <div class="relative flex flex-col items-center flex-1 group cursor-pointer" onclick="app.activeTab = '${tab}'; app.render()">
-                    <!-- Connecting Line -->
                     ${!isLast ? `
                       <div class="absolute top-4 left-[50%] w-full h-[2px] transition-all duration-300 ease-in-out ${isPast ? 'bg-blue-600' : 'bg-slate-200'}"></div>
                     ` : ''}
-
-                    <!-- Circle -->
                     <div class="relative z-10 flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 ease-in-out
                       ${isActive ? 'bg-white border-[3px] border-blue-600 text-blue-700 shadow-md' : 
                         isPast ? 'bg-blue-600 border-2 border-blue-600 text-white shadow-sm' : 
                         'bg-white border-2 border-slate-200 text-slate-400 group-hover:border-blue-400 group-hover:text-blue-500'}">
                       <span class="text-[13px] font-black flex items-center justify-center">${isPast ? '<i data-lucide="check" style="width:16px;height:16px;stroke-width:3px"></i>' : num}</span>
                     </div>
-
-                    <!-- Label -->
                     <div class="mt-3 text-[11px] font-bold text-center transition-all duration-300 w-full px-1
                       ${isActive ? 'text-blue-700 tracking-wide' : isPast ? 'text-slate-800' : 'text-slate-400 group-hover:text-blue-500'}">
                       ${tabInfo[tab].text}
@@ -1415,15 +1488,13 @@
                     </div>
                   </div>
 
-                  <!-- เพิ่มกรอบรายละเอียดงาน (Job Details) -->
                   <div class="mt-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
                      <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2">รายละเอียดงาน</label>
-                     <textarea id="jobDetailsTextarea" placeholder="ระบุรายละเอียดงาน, ความต้องการเบื้องต้น, หรือข้อมูลอื่นๆ ที่จำเป็น..." class="w-full bg-white border border-slate-200 rounded-xl text-sm p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-50 transition-all min-h-[100px] resize-none overflow-hidden" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" onchange="app.updateProject(proj => ({...proj, part1: {...proj.part1, jobDetails: this.value}}))">${p.part1.jobDetails || ''}</textarea>
+                     <textarea id="jobDetailsTextarea" placeholder="ระบุรายละเอียดงาน, ความต้องการเบื้องต้น, หรือข้อมูลอื่นๆ ที่จำเป็น..." class="w-full bg-white border border-slate-200 rounded-xl text-sm p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-50 transition-all min-h-[100px] auto-resize-textarea resize-none overflow-hidden" oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" onchange="app.updateProject(proj => ({...proj, part1: {...proj.part1, jobDetails: this.value}}))">${p.part1.jobDetails || ''}</textarea>
                   </div>
 
                 </div>
 
-                <!-- ปุ่มนำทางถัดไป (ส่วนที่ 1) -->
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.goToNextTab('part2')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
                     ไปที่ส่วนที่ 2: การดำเนินการ <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
@@ -1477,7 +1548,8 @@
                         </div>
                         <span class="text-[10px] text-slate-400 flex items-center gap-1 ml-auto"><i data-lucide="clock" style="width:12px;height:12px"></i> อัปเดตเมื่อ: ${this.formatDisplayTime(item.lastUpdated)}</span>
                       </div>
-                      <textarea placeholder="รายละเอียดงานหรือความต้องการลูกค้า..." class="w-full text-xs p-3 bg-white border border-slate-100 rounded-xl mb-4 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50 transition-all" 
+                      <textarea placeholder="รายละเอียดงานหรือความต้องการลูกค้า..." class="w-full text-xs p-3 bg-white border border-slate-100 rounded-xl mb-4 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50 transition-all auto-resize-textarea resize-none overflow-hidden" 
+                        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                         onchange="app.updatePart2Requirement(${idx}, this.value)">${item.customerRequirement}</textarea>
 
                       <div class="ml-4 md:ml-8 space-y-4 border-l-2 border-blue-100 pl-4 md:pl-6">
@@ -1492,7 +1564,8 @@
                             <div class="space-y-2">
                                <input type="text" placeholder="ระบุชื่อผู้รับงาน (Staff)..." class="w-full text-xs p-2 bg-white border border-blue-100 rounded-lg outline-none font-bold focus:border-blue-400" value="${item.isSelf?.staffName || ''}" 
                                  onchange="app.updatePart2SelfStaff(${idx}, this.value)" />
-                               <textarea placeholder="รายละเอียดการดำเนินงานภายใน..." class="w-full text-xs p-2 bg-white border border-blue-100 rounded-lg outline-none focus:border-blue-400" 
+                               <textarea placeholder="รายละเอียดการดำเนินงานภายใน..." class="w-full text-xs p-2 bg-white border border-blue-100 rounded-lg outline-none focus:border-blue-400 auto-resize-textarea resize-none overflow-hidden" 
+                                 oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                                  onchange="app.updatePart2SelfDetail(${idx}, this.value)">${item.isSelf?.detail || ''}</textarea>
                             </div>
                           ` : ''}
@@ -1508,7 +1581,8 @@
                             <div class="space-y-2">
                               <input type="text" placeholder="ระบุชื่อผู้รับงาน..." class="w-full text-xs p-2 bg-white border border-blue-100 rounded-lg outline-none font-bold focus:border-blue-400" value="${item.isForward?.targetName || ''}" 
                                 onchange="app.updatePart2ForwardName(${idx}, this.value)" />
-                              <textarea placeholder="รายละเอียดการส่งงาน..." class="w-full text-xs p-2 bg-white border border-blue-100 rounded-lg outline-none focus:border-blue-400" 
+                              <textarea placeholder="รายละเอียดการส่งงาน..." class="w-full text-xs p-2 bg-white border border-blue-100 rounded-lg outline-none focus:border-blue-400 auto-resize-textarea resize-none overflow-hidden" 
+                                oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                                 onchange="app.updatePart2ForwardDetail(${idx}, this.value)">${item.isForward?.detail || ''}</textarea>
                             </div>
                           ` : ''}
@@ -1521,7 +1595,6 @@
                   `).join('')}
                 </div>
                 
-                <!-- ปุ่มนำทางถัดไป (ส่วนที่ 2) -->
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.goToNextTab('part3')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
                     ไปที่ส่วนที่ 3: การแก้ไข <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
@@ -1573,7 +1646,8 @@
                         </div>
                         <span class="text-[10px] text-slate-400 ml-auto flex items-center gap-1"><i data-lucide="clock" style="width:12px;height:12px"></i> ${this.formatDisplayTime(item.timestamp)}</span>
                       </div>
-                      <textarea placeholder="สาเหตุหรือจุดที่ต้องแก้ไข..." class="w-full text-xs p-3 bg-slate-50 border border-slate-100 rounded-xl mb-4 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50 transition-all" 
+                      <textarea placeholder="สาเหตุหรือจุดที่ต้องแก้ไข..." class="w-full text-xs p-3 bg-slate-50 border border-slate-100 rounded-xl mb-4 outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50 transition-all auto-resize-textarea resize-none overflow-hidden" 
+                        oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                         onchange="app.updatePart3Description(${index}, this.value)">${item.description}</textarea>
                       
                       <div class="ml-4 md:ml-8 space-y-4 border-l-2 border-blue-200 pl-4 md:pl-6 mb-2">
@@ -1588,7 +1662,8 @@
                             <div class="space-y-2">
                                <input type="text" placeholder="ระบุชื่อผู้แก้ไข (Staff)..." class="w-full text-xs p-2 bg-slate-50 border border-blue-100 rounded-lg outline-none font-bold focus:border-blue-400" value="${item.isSelf?.staffName || ''}" 
                                  onchange="app.updatePart3SelfStaff(${index}, this.value)" />
-                               <textarea placeholder="รายละเอียดการแก้ไขภายใน..." class="w-full text-xs p-2 bg-slate-50 border border-blue-100 rounded-lg outline-none focus:border-blue-400" 
+                               <textarea placeholder="รายละเอียดการแก้ไขภายใน..." class="w-full text-xs p-2 bg-slate-50 border border-blue-100 rounded-lg outline-none focus:border-blue-400 auto-resize-textarea resize-none overflow-hidden" 
+                                 oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                                  onchange="app.updatePart3SelfDetail(${index}, this.value)">${item.isSelf?.detail || ''}</textarea>
                             </div>
                           ` : ''}
@@ -1604,7 +1679,8 @@
                             <div class="space-y-2">
                               <input type="text" placeholder="ระบุชื่อผู้รับแก้ไข..." class="w-full text-xs p-2 bg-slate-50 border border-blue-100 rounded-lg outline-none font-bold focus:border-blue-400" value="${item.isForward?.targetName || ''}" 
                                 onchange="app.updatePart3ForwardName(${index}, this.value)" />
-                              <textarea placeholder="รายละเอียดการส่งแก้ไข..." class="w-full text-xs p-2 bg-slate-50 border border-blue-100 rounded-lg outline-none focus:border-blue-400" 
+                              <textarea placeholder="รายละเอียดการส่งแก้ไข..." class="w-full text-xs p-2 bg-slate-50 border border-blue-100 rounded-lg outline-none focus:border-blue-400 auto-resize-textarea resize-none overflow-hidden" 
+                                oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                                 onchange="app.updatePart3ForwardDetail(${index}, this.value)">${item.isForward?.detail || ''}</textarea>
                             </div>
                           ` : ''}
@@ -1618,7 +1694,6 @@
                   `).join('')}
                 </div>
                 
-                <!-- ปุ่มนำทางถัดไป (ส่วนที่ 3) -->
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.goToNextTab('part4')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
                     ไปที่ส่วนที่ 4: การส่งข้อมูล <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
@@ -1635,49 +1710,66 @@
                   </h3>
                   <button onclick="app.addPart4Item()" class="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all active:scale-95">+ เพิ่มรายการส่งงาน</button>
                 </div>
-                <div class="space-y-3">
+                
+                <div class="space-y-4">
+                  ${p.part4.items.length === 0 ? `
+                    <div class="text-center p-8 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm font-bold">
+                      ยังไม่มีรายการส่งข้อมูล กด "+ เพิ่มรายการส่งงาน" เพื่อเริ่มสร้าง
+                    </div>
+                  ` : ''}
                   ${p.part4.items.map((item, idx) => `
-                    <div class="flex items-center gap-4 bg-white p-4 rounded-2xl border border-blue-100 group shadow-sm hover:border-blue-300 transition-colors">
-                      <button onclick="app.togglePart4Item(${idx})" class="flex-shrink-0">
-                        <i data-lucide="${item.checked ? 'check-circle-2' : 'circle'}" style="width:22px;height:22px" class="${item.checked ? 'text-blue-500' : 'text-slate-300'}"></i>
-                      </button>
-                      <div class="relative flex-1">
-                        <input 
-                          type="text" 
-                          class="w-full px-3 py-1.5 text-sm font-bold bg-slate-50 border border-slate-100 rounded-lg shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all outline-none"
-                          value="${item.docType}"
-                          placeholder="เลือกหรือพิมพ์เอกสาร..."
-                          onchange="app.updatePart4DocType(${idx}, this.value)"
-                          oninput="app.showPart4Suggestions(${idx}, this.value)"
-                          onblur="setTimeout(() => app.hidePart4Suggestions(${idx}), 200)"
-                          onfocus="app.showPart4Suggestions(${idx}, this.value)"
-                          data-part4-input="${idx}"
-                        />
-                        <div id="suggestions-part4-${idx}" class="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto hidden z-50">
-                          ${this.sharedDocOptions.map((opt, i) => `
-                            <div class="flex items-center justify-between px-3 py-2 hover:bg-blue-50 group text-sm">
-                              <div class="cursor-pointer flex-1" onclick="app.selectPart4Doc(${idx}, '${opt}')">
-                                ${opt}
+                    <div class="bg-slate-50 p-5 rounded-2xl border border-blue-100 group shadow-sm relative flex flex-col gap-3">
+                      
+                      <!-- ส่วนบน: เช็คบ็อกซ์ + Dropdown เลือกเอกสาร + เวลาอัปเดต -->
+                      <div class="flex flex-wrap items-center gap-3 pr-6">
+                        <button onclick="app.togglePart4Item(${idx})" class="flex-shrink-0">
+                          <i data-lucide="${item.checked ? 'check-circle-2' : 'circle'}" style="width:24px;height:24px" class="${item.checked ? 'text-blue-500' : 'text-slate-300'}"></i>
+                        </button>
+                        <div class="relative flex-1 group min-w-[200px]">
+                          <input 
+                            type="text" 
+                            class="w-full px-3 py-2 text-sm font-bold bg-white border border-slate-200 rounded-lg shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all outline-none"
+                            value="${item.docType}"
+                            placeholder="เลือกหรือพิมพ์เอกสาร..."
+                            onchange="app.updatePart4DocType(${idx}, this.value)"
+                            oninput="app.showPart4Suggestions(${idx}, this.value)"
+                            onblur="setTimeout(() => app.hidePart4Suggestions(${idx}), 200)"
+                            onfocus="app.showPart4Suggestions(${idx}, this.value)"
+                            data-part4-input="${idx}"
+                          />
+                          <div id="suggestions-part4-${idx}" class="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg mt-1 max-h-40 overflow-y-auto hidden z-50">
+                            ${this.sharedDocOptions.map((opt, i) => `
+                              <div class="flex items-center justify-between px-3 py-2 hover:bg-blue-50 group text-sm">
+                                <div class="cursor-pointer flex-1" onclick="app.selectPart4Doc(${idx}, '${opt}')">
+                                  ${opt}
+                                </div>
+                                <button onclick="app.deleteDocOption('${opt}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-1">
+                                  <i data-lucide="x" style="width:14px;height:14px"></i>
+                                </button>
                               </div>
-                              <button onclick="app.deleteDocOption('${opt}')" class="opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-500 transition-all p-1">
-                                <i data-lucide="x" style="width:14px;height:14px"></i>
-                              </button>
+                            `).join('')}
+                            <div class="border-t border-slate-100 px-3 py-2 bg-blue-50/30 hover:bg-blue-50 cursor-pointer text-sm font-bold text-blue-600" onclick="app.addNewDocOption('part4', ${idx})">
+                              + เพิ่มตัวเลือกใหม่
                             </div>
-                          `).join('')}
-                          <div class="border-t border-slate-100 px-3 py-2 bg-blue-50/30 hover:bg-blue-50 cursor-pointer text-sm font-bold text-blue-600" onclick="app.addNewDocOption('part4', ${idx})">
-                            + เพิ่มตัวเลือกใหม่
                           </div>
                         </div>
+                        <span class="text-[10px] text-slate-400 flex items-center gap-1 ml-auto"><i data-lucide="clock" style="width:12px;height:12px"></i> ${this.formatDisplayTime(item.timestamp)}</span>
                       </div>
-                      <span class="text-[10px] text-slate-400 ml-auto flex items-center gap-1"><i data-lucide="clock" style="width:10px;height:10px"></i> ${this.formatDisplayTime(item.timestamp)}</span>
-                      <button onclick="app.removePart4Item(${idx})" class="text-slate-300 hover:text-red-500 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                      
+                      <!-- ส่วนล่าง: ช่องกรอกรายละเอียด (ขยายอัตโนมัติ) -->
+                      <div class="pl-0 md:pl-9 w-full">
+                          <textarea placeholder="ระบุรายละเอียดข้อมูลที่ส่งให้ลูกค้า หรือ หมายเหตุเพิ่มเติม..." class="w-full text-xs p-3 bg-white border border-slate-200 rounded-xl outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-50 transition-all auto-resize-textarea resize-none overflow-hidden" 
+                            oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
+                            onchange="app.updatePart4ItemDetail(${idx}, this.value)">${item.detail || ''}</textarea>
+                      </div>
+
+                      <button onclick="app.removePart4Item(${idx})" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 md:opacity-0 group-hover:opacity-100 transition-opacity">
                         <i data-lucide="trash-2" style="width:16px;height:16px"></i>
                       </button>
                     </div>
                   `).join('')}
                 </div>
                 
-                <!-- ปุ่มนำทางถัดไป (ส่วนที่ 4) -->
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.goToNextTab('part5')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
                     ไปที่ส่วนที่ 5: การติดตั้ง <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
@@ -1707,7 +1799,8 @@
                               <i data-lucide="trash-2" style="width:16px;height:16px"></i>
                             </button>
                           </div>
-                          <textarea placeholder="รายละเอียดการดำเนินงานภายใน..." class="w-full p-2 bg-white border border-slate-100 rounded-lg text-xs outline-none focus:border-blue-400" 
+                          <textarea placeholder="รายละเอียดการดำเนินงานภายใน..." class="w-full p-2 bg-white border border-slate-100 rounded-lg text-xs outline-none focus:border-blue-400 auto-resize-textarea resize-none overflow-hidden" 
+                            oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                             onchange="app.updatePart5InternalStaffDetail(${idx}, this.value)">${staff.detail}</textarea>
                         </div>
                       `).join('')}
@@ -1728,7 +1821,8 @@
                               <i data-lucide="trash-2" style="width:16px;height:16px"></i>
                             </button>
                           </div>
-                          <textarea placeholder="รายละเอียดการสั่งงาน..." class="w-full p-2 bg-white border border-slate-100 rounded-lg text-xs outline-none focus:border-blue-400" 
+                          <textarea placeholder="รายละเอียดการสั่งงาน..." class="w-full p-2 bg-white border border-slate-100 rounded-lg text-xs outline-none focus:border-blue-400 auto-resize-textarea resize-none overflow-hidden" 
+                            oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
                             onchange="app.updatePart5ContractorDetail(${idx}, this.value)">${contractor.detail}</textarea>
                         </div>
                       `).join('')}
@@ -1741,7 +1835,6 @@
                   </div>
                 </div>
                 
-                <!-- ปุ่มนำทางถัดไป (ส่วนที่ 5) -->
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.goToNextTab('part6')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
                     ไปที่ส่วนที่ 6: การส่งมอบงาน <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
@@ -1753,16 +1846,44 @@
               <!-- Part 6: การส่งมอบ -->
               ${this.activeTab === 'part6' ? `
               <section class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm relative">
-                <h3 class="text-lg font-bold flex items-center gap-2 text-blue-600 mb-6">
-                  <i data-lucide="package-check" style="width:20px;height:20px"></i> ส่วนที่ 6: การส่งมอบงาน
-                </h3>
-                <div class="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm">
-                  <label class="text-[10px] font-black text-blue-600 uppercase ml-1 block mb-2">วันที่ส่งมอบงานสำเร็จ</label>
-                  <input type="date" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all" value="${p.part6.deliveryDate}"
-                    onchange="app.updateProject(proj => ({...proj, part6: {...proj.part6, deliveryDate: this.value}}))" />
+                <div class="flex justify-between items-center mb-6">
+                  <h3 class="text-lg font-bold flex items-center gap-2 text-blue-600">
+                    <i data-lucide="package-check" style="width:20px;height:20px"></i> ส่วนที่ 6: การส่งมอบงาน
+                  </h3>
+                  <button onclick="app.addPart6Item()" class="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all active:scale-95">+ เพิ่มรายการส่งมอบงาน</button>
                 </div>
                 
-                <!-- ปุ่มนำทางถัดไป (ส่วนที่ 6) -->
+                <div class="space-y-4 mb-6">
+                  ${(p.part6.items || []).length === 0 ? `
+                    <div class="text-center p-8 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm font-bold">
+                      ยังไม่มีรายการส่งมอบงาน กด "+ เพิ่มรายการส่งมอบงาน" เพื่อเริ่มสร้าง
+                    </div>
+                  ` : ''}
+                  ${(p.part6.items || []).map((item, idx) => `
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-blue-100 group relative shadow-sm">
+                      <div class="flex justify-between items-center mb-4">
+                        <label class="text-[11px] font-black text-slate-600 uppercase tracking-wider bg-white px-3 py-1 rounded-md border border-slate-200 shadow-sm">รายการส่งงาน #${idx + 1}</label>
+                        <button onclick="app.removePart6Item(${idx})" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 bg-white rounded-md border border-slate-200 shadow-sm hover:border-red-200 hover:bg-red-50">
+                          <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+                        </button>
+                      </div>
+                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2 ml-1">รายละเอียดการส่งมอบ</label>
+                          <textarea placeholder="ระบุรายละเอียดการส่งมอบงาน..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all auto-resize-textarea resize-none overflow-hidden" 
+                            oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
+                            onchange="app.updatePart6ItemDetail(${idx}, this.value)">${item.detail || ''}</textarea>
+                        </div>
+                        <div>
+                          <label class="text-[10px] font-bold text-blue-600 uppercase block mb-2 ml-1">วันที่ส่งมอบงานสำเร็จ</label>
+                          <input type="date" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all text-slate-700" value="${item.deliveryDate || ''}"
+                            onchange="app.updatePart6ItemDate(${idx}, this.value)" />
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+                
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.goToNextTab('part7')" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2 active:scale-95">
                     ไปที่ส่วนที่ 7: การรับประกัน <i data-lucide="arrow-right" style="width:18px;height:18px"></i>
@@ -1774,43 +1895,73 @@
 	${this.activeTab === 'part7' ? `
               <section class="bg-white rounded-3xl p-6 md:p-8 border border-slate-200 shadow-sm relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-48 h-48 bg-blue-500 rounded-full blur-[80px] opacity-5 -mr-20 -mt-20"></div>
-                <h3 class="text-lg font-bold flex items-center gap-2 text-blue-600 relative z-10 mb-8">
-                  <i data-lucide="shield-check" style="width:20px;height:20px"></i> ส่วนที่ 7: การรับประกัน
-                </h3>
-                <div class="relative z-10">
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-6">
-                      <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-bold ml-1 mb-2 block tracking-wider">วันที่เริ่มการรับประกัน</label>
-                        <input type="date" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all" value="${p.part7.startDate}" 
-                          onchange="app.updateProject(proj => ({...proj, part7: {...proj.part7, startDate: this.value}}))" />
+                <div class="flex justify-between items-center mb-8 relative z-10">
+                  <h3 class="text-lg font-bold flex items-center gap-2 text-blue-600">
+                    <i data-lucide="shield-check" style="width:20px;height:20px"></i> ส่วนที่ 7: การรับประกัน
+                  </h3>
+                  <button onclick="app.addPart7Item()" class="text-xs font-bold bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 shadow-md shadow-blue-100 transition-all active:scale-95">+ เพิ่มรายการรับประกัน</button>
+                </div>
+
+                <div class="space-y-6 mb-8 relative z-10">
+                  ${(p.part7.items || []).length === 0 ? `
+                    <div class="text-center p-8 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-slate-400 text-sm font-bold">
+                      ยังไม่มีรายการรับประกัน กด "+ เพิ่มรายการรับประกัน" เพื่อเริ่มสร้าง
+                    </div>
+                  ` : ''}
+                  ${(p.part7.items || []).map((item, idx) => {
+                    const itemWarranty = this.getWarrantyStatus(item.startDate, item.durationMonths);
+                    return `
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-blue-100 group relative shadow-sm">
+                      <div class="flex justify-between items-center mb-4">
+                        <label class="text-[11px] font-black text-slate-600 uppercase tracking-wider bg-white px-3 py-1 rounded-md border border-slate-200 shadow-sm">รายการรับประกัน #${idx + 1}</label>
+                        <button onclick="app.removePart7Item(${idx})" class="text-slate-400 hover:text-red-500 transition-colors p-1.5 bg-white rounded-md border border-slate-200 shadow-sm hover:border-red-200 hover:bg-red-50">
+                          <i data-lucide="trash-2" style="width:14px;height:14px"></i>
+                        </button>
                       </div>
-                      <div>
-                        <label class="text-[10px] text-slate-400 uppercase font-bold ml-1 mb-2 block tracking-wider">ระยะเวลารับประกัน (จำนวนเดือน)</label>
-                        <div class="flex gap-2 items-center mb-3">
-                          <input type="number" placeholder="ตัวอย่าง: 12" class="flex-1 p-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all" value="${p.part7.durationMonths}" 
-                            onchange="app.updateProject(proj => ({...proj, part7: {...proj.part7, durationMonths: this.value}}))" />
-                          <span class="text-slate-500 font-bold text-sm">เดือน</span>
+
+                      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                          <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-2 ml-1">รายละเอียดการรับประกัน</label>
+                            <textarea placeholder="ระบุรายละเอียดอุปกรณ์หรืองานที่รับประกัน..." class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all auto-resize-textarea resize-none overflow-hidden" 
+                              oninput="this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';"
+                              onchange="app.updatePart7ItemDetail(${idx}, this.value)">${item.detail || ''}</textarea>
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label class="text-[10px] text-slate-500 uppercase font-bold block mb-2 tracking-wider ml-1">เริ่มรับประกัน</label>
+                              <input type="date" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm outline-none text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all" value="${item.startDate || ''}" 
+                                onchange="app.updatePart7ItemStartDate(${idx}, this.value)" />
+                            </div>
+                            <div>
+                              <label class="text-[10px] text-slate-500 uppercase font-bold block mb-2 tracking-wider ml-1">ระยะเวลา (เดือน)</label>
+                              <div class="flex gap-2 items-center">
+                                <input type="number" placeholder="เช่น 12" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm outline-none text-slate-700 focus:border-blue-400 focus:ring-2 focus:ring-blue-50 transition-all" value="${item.durationMonths || ''}" 
+                                  onchange="app.updatePart7ItemDuration(${idx}, this.value)" />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="flex flex-wrap gap-2 pt-1">
+                            ${['6','12','24','36'].map(m => `
+                              <button onclick="app.updatePart7ItemDuration(${idx}, '${m}')" 
+                                class="text-[10px] px-3 py-1.5 rounded-lg border font-black transition-all ${item.durationMonths === m ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100' : 'border-slate-200 text-slate-400 hover:border-blue-300 hover:text-blue-600 bg-white'}">
+                                ${m} เดือน
+                              </button>
+                            `).join('')}
+                          </div>
                         </div>
-                        <div class="flex flex-wrap gap-2">
-                          ${['6','12','24','36'].map(m => `
-                            <button onclick="app.updateProject(proj => ({...proj, part7: {...proj.part7, durationMonths: '${m}'}}))" 
-                              class="text-[10px] px-4 py-1.5 rounded-lg border font-black transition-all ${p.part7.durationMonths === m ? 'bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-100' : 'border-slate-200 text-slate-400 hover:border-blue-300 hover:text-blue-600 bg-white'}">
-                              ${m} ด.
-                            </button>
-                          `).join('')}
+
+                        <div class="bg-blue-50/50 backdrop-blur-sm p-5 rounded-2xl border border-blue-100 flex flex-col items-center justify-center text-center h-full">
+                          <div class="px-4 py-1.5 rounded-full text-[10px] font-black mb-3 uppercase tracking-widest ${itemWarranty.color}">${itemWarranty.text}</div>
+                          <div class="text-[10px] text-slate-500 mb-1 font-bold uppercase tracking-tighter">วันหมดอายุประกัน</div>
+                          <div class="text-3xl text-blue-600 font-black tracking-tight">${itemWarranty.expiry}</div>
                         </div>
                       </div>
                     </div>
-                    <div class="bg-blue-50/50 backdrop-blur-sm p-6 rounded-2xl border border-blue-100 flex flex-col items-center justify-center text-center">
-                      <div class="px-4 py-1.5 rounded-full text-[10px] font-black mb-4 uppercase tracking-widest ${warranty.color}">${warranty.text}</div>
-                      <div class="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-tighter">วันหมดอายุประกัน</div>
-                      <div class="text-3xl text-blue-600 font-black tracking-tight">${warranty.expiry}</div>
-                    </div>
-                  </div>
+                    `;
+                  }).join('')}
                 </div>
                 
-                <!-- ขั้นตอนสุดท้าย: ปุ่มบันทึก -->
                 <div class="mt-8 flex justify-end pt-6 border-t border-slate-100">
                   <button onclick="app.closeProject()" class="bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl font-black text-base shadow-lg transition-all flex items-center gap-2 active:scale-95">
                     <i data-lucide="save" style="width:20px;height:20px"></i> บันทึกข้อมูลและเสร็จสิ้น
@@ -1825,7 +1976,6 @@
       return html;
     }
 
-    // --- เพิ่มฟังก์ชันวาด UI แถบสถานะอินเทอร์เน็ต ---
     renderNetworkStatus() {
       return `
         <div class="fixed top-3 right-4 md:right-8 z-[9999] flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full shadow-sm border ${this.isOnline ? 'border-green-200' : 'border-red-200'} transition-all">
@@ -1840,7 +1990,6 @@
       if (appElement) {
         let html = this.activeProjectId ? this.renderProjectDetail() : this.renderDashboard();
         
-        // แทรกสถานะ Network, Modal และ Toast เข้าไปใน HTML ก่อน Render เสมอ
         html += this.renderNetworkStatus();
         if (this.confirmModalState) html += this.renderConfirmModal();
         if (this.undoState) html += this.renderUndoToast();
@@ -1848,17 +1997,15 @@
         appElement.innerHTML = html;
         lucide.createIcons();
 
-        // โค้ดสำหรับปรับขนาดกล่องรายละเอียดงานอัตโนมัติ (เมื่อมีการโหลดข้อมูลที่มีอยู่แล้ว)
-        const jobDetailsTx = document.getElementById('jobDetailsTextarea');
-        if (jobDetailsTx) {
-          jobDetailsTx.style.height = 'auto';
-          jobDetailsTx.style.height = jobDetailsTx.scrollHeight + 'px';
-        }
+        const autoTextareas = document.querySelectorAll('.auto-resize-textarea');
+        autoTextareas.forEach(tx => {
+          tx.style.height = 'auto';
+          tx.style.height = tx.scrollHeight + 'px';
+        });
       }
     }
   }
 
-  // จุดสำคัญ: ต้องเปลี่ยนเป็น window.app เพื่อให้ HTML หาฟังก์ชันเจอเมื่อใช้ type="module"
   window.app = new ProjectManager();
   </script>
 </body>
