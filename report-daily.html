@@ -1092,7 +1092,9 @@
 
             // ชื่อเดือนภาษาไทย
             const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            monthYearText.innerHTML = `<i data-lucide="calendar" class="w-6 h-6 text-[#5b5fc7]"></i> ${monthNames[month]} ${year + 543}`;
+            
+            // เพิ่มปี ค.ศ. ไว้ในวงเล็บด้วยสีและรูปแบบเดียวกับ พ.ศ. พร้อมจัดช่องไฟ
+            monthYearText.innerHTML = `<i data-lucide="calendar" class="w-6 h-6 text-[#5b5fc7]"></i> ${monthNames[month]} ${year + 543} (${year})`;
 
             const firstDay = new Date(year, month, 1).getDay(); // วันแรกของเดือน (0=อาทิตย์, 6=เสาร์)
             const daysInMonth = new Date(year, month + 1, 0).getDate(); // จำนวนวันในเดือนนี้
@@ -1333,7 +1335,9 @@
                     const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`;
                     timeData.counts[monthKey] = (timeData.counts[monthKey] || 0) + 1;
                 } else {
-                    const weekKey = `W${getWeekNumber(d)} ${d.getFullYear()}`;
+                    // เปลี่ยนจากการใช้วันที่สัปดาห์ของปี เป็น "สัปดาห์ของเดือน"
+                    const weekOfMonth = Math.ceil(d.getDate() / 7);
+                    const weekKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-W${weekOfMonth}`;
                     timeData.counts[weekKey] = (timeData.counts[weekKey] || 0) + 1;
                 }
 
@@ -1383,6 +1387,32 @@
                 const sortedTimeKeys = Object.keys(timeData.counts).sort();
                 const timeDataValues = sortedTimeKeys.map(k => timeData.counts[k]);
                 
+                // --- ส่วนที่ปรับปรุง: เปลี่ยนรูปแบบข้อความแกน X ให้มีคำว่า "เดือน" นำหน้า ---
+                const thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+                const displayTimeLabels = sortedTimeKeys.map(k => {
+                    if (dashTimeView === 'month') {
+                        // แยก ปี และ เดือน ออกจากรูปแบบ YYYY-MM
+                        const parts = k.split('-');
+                        if (parts.length === 2) {
+                            const monthIndex = parseInt(parts[1], 10) - 1;
+                            // คืนค่าเป็น Array เพื่อให้แสดง 2 บรรทัด (เดือน และ ปี ค.ศ.)
+                            return [thaiMonthNames[monthIndex], `(${parts[0]})`];
+                        }
+                    } else if (dashTimeView === 'week') {
+                        // แยก ปี, เดือน, สัปดาห์ ออกจากรูปแบบ YYYY-MM-Ww
+                        const parts = k.split('-');
+                        if (parts.length === 3) {
+                            const year = parseInt(parts[0], 10);
+                            const monthIndex = parseInt(parts[1], 10) - 1;
+                            const weekNum = parts[2].replace('W', '');
+                            // คืนค่าเป็น Array 2 บรรทัด (เปลี่ยนจาก พ.ศ. เป็น ค.ศ.)
+                            return [`สัปดาห์ที่ ${weekNum}`, `(${thaiMonthNames[monthIndex]} ${year})`];
+                        }
+                    }
+                    return k; // กรณีเป็นรูปแบบอื่น
+                });
+                // ------------------------------------------------------------------
+
                 // คำนวณหาค่า Max แกน Y ให้เป็นหลักสิบ (ขั้นต่ำ 10)
                 const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0;
                 const timeYAxisMax = Math.max(10, Math.ceil(maxTimeVal / 10) * 10);
@@ -1391,7 +1421,7 @@
                 chartInstances['time'] = new Chart(ctxTime, {
                     type: 'bar',
                     data: {
-                        labels: sortedTimeKeys,
+                        labels: displayTimeLabels, // เปลี่ยนมาใช้ Label ที่แปลงข้อความแล้ว
                         datasets: [{
                             label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์'})`,
                             data: timeDataValues,
