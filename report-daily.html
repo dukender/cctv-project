@@ -111,11 +111,11 @@
                     </div>
                 </div>
 
-                <!-- 3. กราฟสัดส่วนผู้รับผิดชอบ -->
+                <!-- 3. กราฟสัดส่วนตามประเภทงาน (ย้ายมาอันดับ 3 และปรับหัวข้อชิดซ้าย) -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามชื่อผู้รับผิดชอบ</h3>
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
                     <div class="relative h-64 w-full flex justify-center">
-                        <canvas id="chart-responsible"></canvas>
+                        <canvas id="chart-tasktype"></canvas>
                     </div>
                 </div>
 
@@ -127,9 +127,17 @@
                     </div>
                 </div>
 
-                <!-- 5. กราฟสัดส่วนการมอบหมาย (ให้อยู่ตรงกลางเด่นๆ ถ้าจอใหญ่) -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
-                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 justify-center"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
+                <!-- 5. กราฟสัดส่วนผู้รับผิดชอบ (ย้ายมาอันดับ 5) -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามชื่อผู้รับผิดชอบ</h3>
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="chart-responsible"></canvas>
+                    </div>
+                </div>
+
+                <!-- 6. กราฟสัดส่วนการมอบหมาย (ย้ายมาอันดับ 6 และปรับหัวข้อชิดซ้าย) -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
                     <div class="relative h-64 w-full flex justify-center">
                         <canvas id="chart-assignment"></canvas>
                     </div>
@@ -542,8 +550,8 @@
         let allTaskTypes = [];
         let selectedTaskTypes = []; // เก็บประเภทงานที่ถูกเลือกหลายอัน (Array of strings)
 
-        // ตัวแปรเก็บ Instance ของ Chart.js เพื่อทำลายก่อนวาดใหม่
-        let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null };
+        // ตัวแปรเก็บ Instance ของ Chart.js เพื่อทำลายก่อนวาดใหม่ (เพิ่ม tasktype)
+        let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         let dashCurrentYear = new Date().getFullYear().toString(); // ค่าเริ่มต้นปีปัจจุบัน
         let dashTimeView = 'month'; // 'month' หรือ 'week'
 
@@ -1234,7 +1242,8 @@
 
             // 3. เตรียมข้อมูล
             const timeData = { counts: {} };
-            const counts = { responsible: {}, customer: {}, assignment: {}, project: {} };
+            // เพิ่ม taskType สำหรับเก็บสัดส่วนประเภทงาน
+            const counts = { responsible: {}, customer: {}, assignment: {}, project: {}, taskType: {} };
 
             dashTasks.forEach(t => {
                 if (!t.receiveDate) return;
@@ -1262,6 +1271,19 @@
                 // นับแยกตามโครงการ
                 const proj = t.projectName || 'ไม่ได้ระบุโครงการ';
                 counts.project[proj] = (counts.project[proj] || 0) + 1;
+
+                // นับแยกตามประเภทงาน (รองรับกรณีเลือกหลายประเภท)
+                let tTypes = [];
+                if (Array.isArray(t.taskType)) {
+                    tTypes = t.taskType;
+                } else if (t.taskType && typeof t.taskType === 'string') {
+                    tTypes = [t.taskType];
+                }
+                if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
+                
+                tTypes.forEach(type => {
+                    counts.taskType[type] = (counts.taskType[type] || 0) + 1;
+                });
             });
 
             // ฟังก์ชันช่วยทำลายกราฟเก่าก่อนวาดใหม่
@@ -1280,6 +1302,12 @@
                 destroyChart('time');
                 // เรียงคีย์เวลาให้ถูกต้อง
                 const sortedTimeKeys = Object.keys(timeData.counts).sort();
+                const timeDataValues = sortedTimeKeys.map(k => timeData.counts[k]);
+                
+                // คำนวณหาค่า Max แกน Y ให้เป็นหลักสิบ (ขั้นต่ำ 10)
+                const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0;
+                const timeYAxisMax = Math.max(10, Math.ceil(maxTimeVal / 10) * 10);
+
                 const ctxTime = timeCanvas.getContext('2d');
                 chartInstances['time'] = new Chart(ctxTime, {
                     type: 'bar',
@@ -1287,12 +1315,24 @@
                         labels: sortedTimeKeys,
                         datasets: [{
                             label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์'})`,
-                            data: sortedTimeKeys.map(k => timeData.counts[k]),
+                            data: timeDataValues,
                             backgroundColor: '#6366f1', // Indigo
                             borderRadius: 6
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: timeYAxisMax, // กำหนดค่าสูงสุดที่คำนวณได้
+                                ticks: {
+                                    stepSize: 1 // บังคับให้ขีดสเกลเพิ่มทีละ 1 เสมอ (ไม่แสดงทศนิยม)
+                                }
+                            }
+                        }
+                    }
                 });
                 
                 const timeLabel = document.getElementById('dash-time-label');
@@ -1308,6 +1348,12 @@
                     .sort((a,b) => counts.project[b] - counts.project[a])
                     .slice(0, 10);
                 
+                const projDataValues = sortedProjKeys.map(k => counts.project[k]);
+                
+                // คำนวณหาค่า Max แกน X ให้เป็นหลักสิบ (ขั้นต่ำ 10)
+                const maxProjVal = projDataValues.length > 0 ? Math.max(...projDataValues) : 0;
+                const projXAxisMax = Math.max(10, Math.ceil(maxProjVal / 10) * 10);
+
                 const ctxProj = projCanvas.getContext('2d');
                 chartInstances['project'] = new Chart(ctxProj, {
                     type: 'bar',
@@ -1315,7 +1361,7 @@
                         labels: sortedProjKeys,
                         datasets: [{
                             label: 'จำนวนงาน',
-                            data: sortedProjKeys.map(k => counts.project[k]),
+                            data: projDataValues,
                             backgroundColor: '#14b8a6', // Teal
                             borderRadius: 6
                         }]
@@ -1324,7 +1370,16 @@
                         responsive: true, 
                         maintainAspectRatio: false,
                         indexAxis: 'y', // ทำให้เป็นแท่งแนวนอน
-                        plugins: { legend: { display: false } }
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                max: projXAxisMax, // กำหนดค่าสูงสุดที่คำนวณได้
+                                ticks: {
+                                    stepSize: 1 // บังคับให้ขีดสเกลเพิ่มทีละ 1 เสมอ
+                                }
+                            }
+                        }
                     }
                 });
             }
@@ -1362,6 +1417,8 @@
             drawPieChart('customer', counts.customer, 'ลูกค้า');
             // 5. กราฟการมอบหมาย
             drawPieChart('assignment', counts.assignment, 'การมอบหมาย');
+            // 6. กราฟประเภทงาน (เพิ่มใหม่)
+            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน');
         }
 
         // ===== จัดการ Event ของตัวเลือกบน Dashboard =====
