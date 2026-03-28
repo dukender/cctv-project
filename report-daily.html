@@ -78,13 +78,29 @@
         <div id="view-dashboard" class="hidden">
             <!-- ส่วนควบคุมแดชบอร์ด (ตัวกรองปี & โหมดเวลา) -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
-                <div class="flex items-center gap-3">
-                    <label class="font-bold text-gray-700 text-sm flex items-center gap-2">
-                        <i data-lucide="filter" class="w-4 h-4 text-[#5b5fc7]"></i> กรองตามปี:
+                <div class="flex items-center gap-2 flex-wrap">
+                    <label class="font-bold text-gray-700 text-sm flex items-center gap-1">
+                        <i data-lucide="filter" class="w-4 h-4 text-[#5b5fc7]"></i> กรองตาม
                     </label>
-                    <select id="dash-year-select" class="px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[150px]">
+                    <select id="dash-year-select" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[120px]">
                         <option value="all">ทุกปีทั้งหมด</option>
                         <!-- ตัวเลือกปีจะถูกสร้างด้วย JavaScript -->
+                    </select>
+
+                    <select id="dash-month-select" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[140px]">
+                        <option value="all">ทุกเดือนทั้งหมด</option>
+                        <option value="01">มกราคม</option>
+                        <option value="02">กุมภาพันธ์</option>
+                        <option value="03">มีนาคม</option>
+                        <option value="04">เมษายน</option>
+                        <option value="05">พฤษภาคม</option>
+                        <option value="06">มิถุนายน</option>
+                        <option value="07">กรกฎาคม</option>
+                        <option value="08">สิงหาคม</option>
+                        <option value="09">กันยายน</option>
+                        <option value="10">ตุลาคม</option>
+                        <option value="11">พฤศจิกายน</option>
+                        <option value="12">ธันวาคม</option>
                     </select>
                 </div>
                 <div class="flex items-center bg-gray-100 p-1 rounded-lg">
@@ -553,6 +569,7 @@
         // ตัวแปรเก็บ Instance ของ Chart.js เพื่อทำลายก่อนวาดใหม่ (เพิ่ม tasktype)
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         let dashCurrentYear = new Date().getFullYear().toString(); // ค่าเริ่มต้นปีปัจจุบัน
+        let dashCurrentMonth = 'all'; // ค่าเริ่มต้นเดือน
         let dashTimeView = 'month'; // 'month' หรือ 'week'
 
         const statusEl = document.getElementById('user-status');
@@ -1234,10 +1251,14 @@
                 }
             }
 
-            // 2. กรองข้อมูลเฉพาะปีที่เลือก
+            // 2. กรองข้อมูลเฉพาะปีและเดือนที่เลือก
             let dashTasks = allTasks;
             if (dashCurrentYear !== 'all') {
-                dashTasks = allTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
+                dashTasks = dashTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
+            }
+            if (dashCurrentMonth !== 'all') {
+                // receiveDate อยู่ในรูปแบบ YYYY-MM-DD ตัดเอาเฉพาะตำแหน่งเดือนมาเปรียบเทียบ
+                dashTasks = dashTasks.filter(t => t.receiveDate && t.receiveDate.substring(5, 7) === dashCurrentMonth);
             }
 
             // 3. เตรียมข้อมูล
@@ -1455,6 +1476,11 @@
         document.getElementById('dash-year-select')?.addEventListener('change', (e) => {
             dashCurrentYear = e.target.value;
             renderDashboard(); // อัปเดตกราฟใหม่ทันทีเมื่อเปลี่ยนปี
+        });
+
+        document.getElementById('dash-month-select')?.addEventListener('change', (e) => {
+            dashCurrentMonth = e.target.value;
+            renderDashboard(); // อัปเดตกราฟใหม่ทันทีเมื่อเปลี่ยนเดือน
         });
 
         document.getElementById('btn-view-month')?.addEventListener('click', () => {
