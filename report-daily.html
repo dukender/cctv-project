@@ -1339,29 +1339,41 @@
                 if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
             }
 
-            // 2. กราฟโครงการ (แท่งแนวนอน Horizontal Bar)
+            // 2. กราฟโครงการ (แท่งแนวนอน Horizontal Bar) - จัดกลุ่ม Top 10 + โครงการอื่นๆ
             const projCanvas = document.getElementById('chart-project');
             if (projCanvas) {
                 destroyChart('project');
-                // ดึง 10 อันดับแรกที่มีงานมากสุด
-                const sortedProjKeys = Object.keys(counts.project)
-                    .sort((a,b) => counts.project[b] - counts.project[a])
-                    .slice(0, 10);
                 
-                const projDataValues = sortedProjKeys.map(k => counts.project[k]);
+                // จัดเรียงโครงการทั้งหมดจากมากไปน้อย
+                const allProjKeys = Object.keys(counts.project).sort((a,b) => counts.project[b] - counts.project[a]);
+                let finalProjKeys = [];
+                let finalProjValues = [];
+
+                // ถ้ามีเกิน 10 โครงการ ให้เอา 9 อันดับแรก และที่เหลือมัดรวมเป็น "โครงการอื่นๆ"
+                if (allProjKeys.length > 10) {
+                    finalProjKeys = allProjKeys.slice(0, 9);
+                    finalProjValues = finalProjKeys.map(k => counts.project[k]);
+                    
+                    const othersCount = allProjKeys.slice(9).reduce((sum, key) => sum + counts.project[key], 0);
+                    finalProjKeys.push('โครงการอื่นๆ');
+                    finalProjValues.push(othersCount);
+                } else {
+                    finalProjKeys = allProjKeys;
+                    finalProjValues = finalProjKeys.map(k => counts.project[k]);
+                }
                 
                 // คำนวณหาค่า Max แกน X ให้เป็นหลักสิบ (ขั้นต่ำ 10)
-                const maxProjVal = projDataValues.length > 0 ? Math.max(...projDataValues) : 0;
+                const maxProjVal = finalProjValues.length > 0 ? Math.max(...finalProjValues) : 0;
                 const projXAxisMax = Math.max(10, Math.ceil(maxProjVal / 10) * 10);
 
                 const ctxProj = projCanvas.getContext('2d');
                 chartInstances['project'] = new Chart(ctxProj, {
                     type: 'bar',
                     data: {
-                        labels: sortedProjKeys,
+                        labels: finalProjKeys,
                         datasets: [{
                             label: 'จำนวนงาน',
-                            data: projDataValues,
+                            data: finalProjValues,
                             backgroundColor: '#14b8a6', // Teal
                             borderRadius: 6
                         }]
@@ -1384,19 +1396,37 @@
                 });
             }
 
-            // ฟังก์ชันช่วยวาด Pie/Doughnut Chart ชุดสีใหม่
-            const drawPieChart = (canvasId, dataObj, titleStr) => {
+            // ฟังก์ชันช่วยวาด Pie/Doughnut Chart ชุดสีใหม่ พร้อมระบบจัดกลุ่ม "อื่นๆ"
+            const drawPieChart = (canvasId, dataObj, titleStr, maxItems = 6, othersLabel = 'อื่นๆ') => {
                 const canvas = document.getElementById(`chart-${canvasId}`);
                 if (!canvas) return;
                 destroyChart(canvasId);
-                const sortedKeys = Object.keys(dataObj).sort((a, b) => dataObj[b] - dataObj[a]).slice(0, 6); // เอา Top 6
+                
+                // จัดเรียงข้อมูลทั้งหมดจากมากไปน้อย
+                const allKeys = Object.keys(dataObj).sort((a, b) => dataObj[b] - dataObj[a]);
+                let finalKeys = [];
+                let finalValues = [];
+
+                // ถ้ามีเกินจำนวนที่กำหนด ให้แยกและจัดกลุ่ม "อื่นๆ"
+                if (allKeys.length > maxItems) {
+                    finalKeys = allKeys.slice(0, maxItems - 1); // เอา (Max - 1) อันดับแรก
+                    finalValues = finalKeys.map(k => dataObj[k]);
+                    
+                    const othersCount = allKeys.slice(maxItems - 1).reduce((sum, key) => sum + dataObj[key], 0);
+                    finalKeys.push(othersLabel);
+                    finalValues.push(othersCount);
+                } else {
+                    finalKeys = allKeys;
+                    finalValues = finalKeys.map(k => dataObj[k]);
+                }
+
                 const ctx = canvas.getContext('2d');
                 chartInstances[canvasId] = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: sortedKeys,
+                        labels: finalKeys,
                         datasets: [{
-                            data: sortedKeys.map(k => dataObj[k]),
+                            data: finalValues,
                             backgroundColor: modernColors,
                             borderWidth: 0,
                             hoverOffset: 4
