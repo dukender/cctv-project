@@ -185,6 +185,24 @@
                                     </div>
                                 </div>
 
+                                <!-- เพิ่มช่องชื่อโครงการ (Dropdown แบบพิมพ์เพิ่ม/ลบได้ในตัว) -->
+                                <div class="pl-9 mt-2">
+                                    <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">
+                                        <i data-lucide="folder" class="w-4 h-4"></i> ชื่อโครงการ
+                                    </label>
+                                    <div class="relative w-full" id="project-dropdown-wrapper">
+                                        <div class="flex items-center w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
+                                            <input type="text" id="projectNameInput" class="flex-1 bg-transparent outline-none text-sm w-full" placeholder="พิมพ์เพื่อค้นหา หรือพิมพ์ใหม่เพื่อเพิ่ม..." autocomplete="off">
+                                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600 transition-colors" id="project-dropdown-btn"></i>
+                                        </div>
+                                        <div id="project-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden">
+                                            <ul class="max-h-48 overflow-y-auto py-1 text-sm" id="project-options-ul">
+                                                <!-- ตัวเลือกจะถูกสร้างด้วย JavaScript -->
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pl-9">
                                     
                                     <!-- วันรับงาน -->
@@ -237,9 +255,28 @@
                                 <!-- รายละเอียด (Notes / Checklist) -->
                                 <div class="pl-9 mt-4">
                                     <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                                        <i data-lucide="list-checks" class="w-4 h-4"></i> บันทึกย่อ / รายละเอียด
+                                        <i data-lucide="tag" class="w-4 h-4"></i> ประเภทงานที่ทำ (เลือกได้หลายรายการ)
                                     </label>
-                                    <div class="bg-gray-50 border border-gray-200 rounded-md p-4">
+                                    
+                                    <!-- เปลี่ยนเป็น Multi-select Tags -->
+                                    <div class="relative w-full mb-4" id="tasktype-dropdown-wrapper">
+                                        <div class="flex flex-wrap items-center gap-1.5 w-full px-2 py-1.5 min-h-[42px] bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text" id="tasktype-input-area">
+                                            <div id="tasktype-chips-container" class="flex flex-wrap gap-1.5">
+                                                <!-- Tags จะถูกสร้างด้วย JavaScript -->
+                                            </div>
+                                            <input type="text" id="taskTypeInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="พิมพ์เพื่อค้นหา หรือเพิ่มใหม่..." autocomplete="off">
+                                        </div>
+                                        <div id="tasktype-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden">
+                                            <ul class="max-h-48 overflow-y-auto py-1 text-sm" id="tasktype-options-ul">
+                                                <!-- ตัวเลือกจะถูกสร้างด้วย JavaScript -->
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div id="notes-container" class="hidden bg-gray-50 border border-gray-200 rounded-md p-4 transition-all">
+                                        <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
+                                            <i data-lucide="list-checks" class="w-4 h-4"></i> บันทึกย่อ / รายละเอียด
+                                        </label>
                                         <div id="notes-list" class="space-y-3">
                                             <!-- Checklist items will be rendered here by JS -->
                                         </div>
@@ -299,11 +336,13 @@
                     <table class="w-full text-left text-sm whitespace-nowrap" id="tasks-table">
                         <thead class="bg-white border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wider">
                             <tr>
-                                <th class="px-6 py-4 font-semibold">วันรับงาน</th>
+                                <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
                                 <th class="px-6 py-4 font-semibold">ชื่องาน</th>
+                                <th class="px-6 py-4 font-semibold">ชื่อโครงการ</th>
                                 <th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th>
                                 <th class="px-6 py-4 font-semibold">ลูกค้า</th>
                                 <th class="px-6 py-4 font-semibold">สถานที่</th>
+                                <th class="px-6 py-4 font-semibold">ประเภทงาน</th>
                                 <th class="px-6 py-4 font-semibold text-right action-cell">จัดการ</th>
                             </tr>
                         </thead>
@@ -468,6 +507,11 @@
         let currentNotes = []; // ตัวแปรเก็บรายการ Checklist ย่อย
         let allHolidays = []; // ตัวแปรเก็บข้อมูลวันหยุด
         let unsubscribeHolidays = null;
+        
+        // เพิ่มตัวแปรสำหรับระบบ Dropdown แบบใหม่
+        let allProjects = [];
+        let allTaskTypes = [];
+        let selectedTaskTypes = []; // เก็บประเภทงานที่ถูกเลือกหลายอัน (Array of strings)
 
         // ตัวแปรเก็บ Instance ของ Chart.js เพื่อทำลายก่อนวาดใหม่
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null };
@@ -578,11 +622,7 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                if (statusEl) {
-                    statusEl.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-green-300"></i> พร้อมใช้งาน`;
-                    statusEl.classList.replace('bg-[#4a4e9e]', 'bg-[#3d4080]');
-                }
-                lucide.createIcons();
+                updateNetworkStatus(); // อัปเดตสถานะพร้อมใช้งาน
                 
                 // ตั้งค่าวันที่ปัจจุบันให้ช่อง "วันรับงาน"
                 const recDate = document.getElementById('receiveDate');
@@ -590,12 +630,298 @@
                 
                 loadTasks();
                 loadHolidays(); // โหลดข้อมูลวันหยุด
+                loadOptions();  // โหลดข้อมูล Dropdown โครงการและประเภทงาน
             } else {
                 currentUser = null;
+                updateNetworkStatus(); // อัปเดตสถานะเชื่อมต่อ
                 if(unsubscribeTasks) unsubscribeTasks();
                 if(unsubscribeHolidays) unsubscribeHolidays();
             }
         }); // แก้ไขเพิ่มวงเล็บปิดของ onAuthStateChanged ที่หายไปกลับมาให้ถูกต้อง
+
+        // ===== ฟังก์ชันเช็คสถานะอินเทอร์เน็ต =====
+        function updateNetworkStatus() {
+            const statusEl = document.getElementById('user-status');
+            if (!statusEl) return;
+            
+            if (navigator.onLine) {
+                if (currentUser) {
+                    statusEl.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-green-300"></i> พร้อมใช้งาน`;
+                    statusEl.className = "text-xs px-3 py-1.5 rounded flex items-center gap-2 bg-[#3d4080] text-white transition-colors";
+                } else {
+                    statusEl.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-white"></i> กำลังเชื่อมต่อ...`;
+                    statusEl.className = "text-xs px-3 py-1.5 rounded flex items-center gap-2 bg-[#4a4e9e] text-white transition-colors";
+                }
+            } else {
+                statusEl.innerHTML = `<i data-lucide="wifi-off" class="w-4 h-4 text-red-600"></i> ไม่พร้อมใช้งาน`;
+                statusEl.className = "text-xs px-3 py-1.5 rounded flex items-center gap-2 bg-red-100 text-red-700 font-bold border border-red-200 transition-colors shadow-sm";
+            }
+            lucide.createIcons();
+        }
+
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+        // ทำการเรียกครั้งแรกเพื่อตั้งค่า UI ให้ตรงกับสถานะล่าสุด
+        updateNetworkStatus();
+
+        // ===== ฟังก์ชันโหลดข้อมูล Dropdown Options (โครงการ & ประเภทงาน) =====
+        function loadOptions() {
+            if (!currentUser) return;
+            
+            // โหลดรายการโครงการ
+            const projCol = collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects');
+            onSnapshot(projCol, (snapshot) => {
+                allProjects = [];
+                snapshot.forEach(doc => allProjects.push({id: doc.id, ...doc.data()}));
+                allProjects.sort((a,b) => a.createdAt - b.createdAt);
+            }, (error) => console.error(error));
+
+            // โหลดประเภทงาน
+            const typeCol = collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types');
+            onSnapshot(typeCol, (snapshot) => {
+                allTaskTypes = [];
+                snapshot.forEach(doc => allTaskTypes.push({id: doc.id, ...doc.data()}));
+                allTaskTypes.sort((a,b) => a.createdAt - b.createdAt);
+            }, (error) => console.error(error));
+        }
+
+        // ===== ระบบ Custom Dropdown: ชื่อโครงการ (Single Select + Creatable) =====
+        const projInput = document.getElementById('projectNameInput');
+        const projList = document.getElementById('project-dropdown-list');
+        const projUl = document.getElementById('project-options-ul');
+        const projWrapper = document.getElementById('project-dropdown-wrapper');
+        const projBtn = document.getElementById('project-dropdown-btn');
+
+        function renderProjectDropdown(query = '') {
+            if(!projUl) return;
+            projUl.innerHTML = '';
+            const q = query.toLowerCase().trim();
+            const filtered = allProjects.filter(p => p.name.toLowerCase().includes(q));
+            
+            // ถ้ามีรายการค้นหา ให้แสดงตัวเลือกเพิ่ม
+            if (q && !allProjects.some(p => p.name.toLowerCase() === q)) {
+                projUl.innerHTML += `
+                    <li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectProject('${q}')">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"
+                    </li>
+                `;
+            }
+
+            if (filtered.length === 0 && !q) {
+                projUl.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อเพิ่มรายการใหม่...</li>`;
+            } else {
+                filtered.forEach(p => {
+                    projUl.innerHTML += `
+                        <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group">
+                            <span class="flex-1 truncate" onmousedown="selectProject('${p.name}')">${p.name}</span>
+                            <button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_projects', '${p.id}')" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </li>
+                    `;
+                });
+            }
+            lucide.createIcons();
+            projList.classList.remove('hidden');
+        }
+
+        projInput?.addEventListener('focus', () => renderProjectDropdown(projInput.value));
+        projInput?.addEventListener('input', (e) => renderProjectDropdown(e.target.value));
+        projBtn?.addEventListener('click', () => {
+            projInput.focus();
+            renderProjectDropdown('');
+        });
+
+        // ซ่อน dropdown เมื่อคลิกที่อื่น
+        document.addEventListener('mousedown', (e) => {
+            if (projWrapper && !projWrapper.contains(e.target)) {
+                projList?.classList.add('hidden');
+            }
+            if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) {
+                taskTypeList?.classList.add('hidden');
+            }
+        });
+
+        window.selectProject = (name) => {
+            if(projInput) projInput.value = name;
+            projList?.classList.add('hidden');
+        };
+
+        window.addAndSelectProject = async (name) => {
+            if(!currentUser || !name) return;
+            try {
+                projInput.value = 'กำลังเพิ่ม...';
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), { name: name, createdAt: Date.now() });
+                selectProject(name);
+                showNotification(`เพิ่มโครงการ "${name}" แล้ว`);
+            } catch (e) {
+                console.error(e);
+                showNotification("เกิดข้อผิดพลาดในการเพิ่มโครงการ", "error");
+                projInput.value = '';
+            }
+        };
+
+        // ===== ระบบ Custom Multi-Select: ประเภทงาน (Multi Select + Creatable) =====
+        const taskTypeInputArea = document.getElementById('tasktype-input-area');
+        const taskTypeInput = document.getElementById('taskTypeInput');
+        const taskTypeList = document.getElementById('tasktype-dropdown-list');
+        const taskTypeUl = document.getElementById('tasktype-options-ul');
+        const taskTypeWrapper = document.getElementById('tasktype-dropdown-wrapper');
+        const taskTypeChipsContainer = document.getElementById('tasktype-chips-container');
+
+        // อัปเดตการแสดงผล Tags (Chips)
+        function renderTaskTypeChips() {
+            if(!taskTypeChipsContainer) return;
+            taskTypeChipsContainer.innerHTML = '';
+            selectedTaskTypes.forEach(tag => {
+                taskTypeChipsContainer.innerHTML += `
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#eef1ff] text-[#5b5fc7] border border-[#d2dbfb] text-sm font-medium">
+                        ${tag}
+                        <button type="button" onclick="removeTaskType('${tag}')" class="text-[#5b5fc7] hover:text-red-500 transition-colors focus:outline-none">
+                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </span>
+                `;
+            });
+            lucide.createIcons();
+            toggleNotesContainer(); // อัปเดตการแสดงผลกล่องบันทึกย่อ
+        }
+
+        window.removeTaskType = (tag) => {
+            selectedTaskTypes = selectedTaskTypes.filter(t => t !== tag);
+            renderTaskTypeChips();
+        };
+
+        function renderTaskTypeDropdown(query = '') {
+            if(!taskTypeUl) return;
+            taskTypeUl.innerHTML = '';
+            const q = query.toLowerCase().trim();
+            
+            // กรองประเภทงานที่ยังไม่ได้ถูกเลือก
+            const availableTypes = allTaskTypes.filter(t => !selectedTaskTypes.includes(t.name));
+            const filtered = availableTypes.filter(t => t.name.toLowerCase().includes(q));
+            
+            if (q && !allTaskTypes.some(t => t.name.toLowerCase() === q)) {
+                taskTypeUl.innerHTML += `
+                    <li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectTaskType('${q}')">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"
+                    </li>
+                `;
+            }
+
+            if (filtered.length === 0 && !q) {
+                if(availableTypes.length === 0) {
+                    taskTypeUl.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว... (พิมพ์เพื่อเพิ่มใหม่)</li>`;
+                } else {
+                    taskTypeUl.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+                }
+            } else {
+                filtered.forEach(t => {
+                    taskTypeUl.innerHTML += `
+                        <li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group">
+                            <span class="flex-1 truncate" onmousedown="selectTaskType('${t.name}')">${t.name}</span>
+                            <button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_task_types', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </li>
+                    `;
+                });
+            }
+            lucide.createIcons();
+            taskTypeList.classList.remove('hidden');
+        }
+
+        // ทำให้กดที่กรอบ input area แล้วไปโฟกัสที่ช่องพิมพ์
+        taskTypeInputArea?.addEventListener('click', () => taskTypeInput?.focus());
+
+        taskTypeInput?.addEventListener('focus', () => renderTaskTypeDropdown(taskTypeInput.value));
+        taskTypeInput?.addEventListener('input', (e) => renderTaskTypeDropdown(e.target.value));
+
+        window.selectTaskType = (name) => {
+            if (!selectedTaskTypes.includes(name)) {
+                selectedTaskTypes.push(name);
+                renderTaskTypeChips();
+            }
+            if(taskTypeInput) taskTypeInput.value = '';
+            renderTaskTypeDropdown(''); // รีเฟรชลิสต์เพื่อลบตัวที่เลือกไปแล้วออก
+            taskTypeInput?.focus(); // รักษาโฟกัสไว้เพื่อให้เลือกต่อได้ง่าย
+        };
+
+        window.addAndSelectTaskType = async (name) => {
+            if(!currentUser || !name) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), { name: name, createdAt: Date.now() });
+                selectTaskType(name);
+                showNotification(`เพิ่มประเภทงาน "${name}" แล้ว`);
+            } catch (e) {
+                console.error(e);
+                showNotification("เกิดข้อผิดพลาดในการเพิ่มประเภทงาน", "error");
+            }
+        };
+
+        // ฟังก์ชันลบตัวเลือกออกจากฐานข้อมูลกลาง (ใช้ร่วมกันทั้งโครงการและประเภทงาน) พร้อมระบบ Undo
+        window.deleteOptionData = async (collectionName, docId) => {
+            if(!currentUser) return;
+
+            // 1. หาข้อมูลเก่าก่อนลบ เพื่อเก็บไว้สำหรับระบบ Undo
+            let itemToRestore = null;
+            if (collectionName === 'daily_projects') {
+                itemToRestore = allProjects.find(p => p.id === docId);
+            } else if (collectionName === 'daily_task_types') {
+                itemToRestore = allTaskTypes.find(t => t.id === docId);
+            }
+
+            if (!itemToRestore) return; // ถ้าไม่พบข้อมูลให้หยุดทำงาน
+
+            // 2. แยก id ออก เก็บไว้แค่ข้อมูล (name, createdAt)
+            const { id, ...itemData } = itemToRestore;
+
+            try {
+                // สั่งลบข้อมูลจาก Firebase
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId));
+                
+                // แสดง Notification พร้อมปุ่ม ย้อนกลับ (undoCallback)
+                showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => {
+                    try {
+                        // กู้คืนข้อมูลกลับไปที่ Path เดิม ด้วย ID เดิม
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData);
+                        showNotification("ย้อนกลับการลบสำเร็จ", "success");
+                        
+                        // รีเฟรช Dropdown ให้แสดงข้อมูลที่กู้คืนทันที (ถ้าช่องยังเปิดอยู่)
+                        if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || '');
+                        if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
+                    } catch (restoreError) {
+                        console.error("Error restoring option:", restoreError);
+                        showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error");
+                    }
+                });
+                
+                // รีเฟรช Dropdown ที่กำลังเปิดอยู่ (ให้รายการที่ลบหายไป)
+                if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || '');
+                if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
+            } catch(e) {
+                console.error(e);
+                showNotification("เกิดข้อผิดพลาดในการลบ", "error");
+            }
+        };
+
+        // เช็คการแสดงผลกรอบ "บันทึกย่อ / รายละเอียด"
+        window.toggleNotesContainer = () => {
+            const container = document.getElementById('notes-container');
+            if(!container) return;
+            
+            // ถ้ามีการเลือกประเภทงานไว้อย่างน้อย 1 อัน ให้แสดงกรอบรายละเอียด
+            if(selectedTaskTypes.length > 0) {
+                container.classList.remove('hidden');
+                // หากเพิ่งถูกเปิดและไม่มีรายการให้สร้างช่องว่างอัตโนมัติ 1 ช่อง
+                if(currentNotes.length === 0) {
+                    currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
+                    renderNotes();
+                }
+            } else {
+                container.classList.add('hidden');
+            }
+        };
 
         // ฟังก์ชันโหลดข้อมูลวันหยุด (แก้ไขให้อ่านจากข้อมูลส่วนรวมสาธารณะ)
         function loadHolidays() {
@@ -982,9 +1308,14 @@
             const exportData = filteredTasks.map(t => {
                 // สรุป Note
                 let notesStr = t.notes ? t.notes.map(n => n.text).filter(text => text.trim() !== '').join(' | ') : '';
+                // จัดการประเภทงานแบบ Array ให้เป็น String 
+                let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || '-');
+                
                 return {
                     'วันรับงาน': formatDate(t.receiveDate),
                     'ชื่องาน': t.taskName || '-',
+                    'ชื่อโครงการ': t.projectName || '-',
+                    'ประเภทงาน': typeStr,
                     'ผู้รับผิดชอบ': t.responsibleName || '-',
                     'การมอบหมาย': t.assignment || '-',
                     'ชื่อลูกค้า': t.customerName || '-',
@@ -1059,20 +1390,28 @@
             emptyState.classList.add('hidden');
             tableBody.innerHTML = '';
             
-            tasks.forEach(task => {
+            // เพิ่ม index เพื่อใช้ทำคอลัมน์ "ลำดับ"
+            tasks.forEach((task, index) => {
                 const initial = task.responsibleName ? task.responsibleName.charAt(0).toUpperCase() : '?';
                 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
                 
+                // แปลงข้อมูล Array ประเภทงานให้มีเครื่องหมาย "-" นำหน้าและขึ้นบรรทัดใหม่
+                let typeArray = Array.isArray(task.taskType) ? task.taskType : (task.taskType ? [task.taskType] : []);
+                let displayTaskTypeHtml = typeArray.length > 0 
+                    ? typeArray.map(t => `<div class="whitespace-nowrap">- ${t}</div>`).join('') 
+                    : '-';
+                
                 tr.innerHTML = `
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-gray-100 text-gray-700">
-                            <i data-lucide="calendar" class="w-3.5 h-3.5"></i> ${formatDate(task.receiveDate)}
-                        </span>
+                    <td class="px-4 py-4 text-center text-gray-500 font-medium">
+                        ${index + 1}
                     </td>
                     <td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">
                         ${task.taskName}
+                    </td>
+                    <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">
+                        ${task.projectName || '-'}
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-2">
@@ -1087,6 +1426,9 @@
                     </td>
                     <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.workLocation || '-'}">
                         ${task.workLocation || '-'}
+                    </td>
+                    <td class="px-6 py-4 text-gray-600 text-sm">
+                        ${displayTaskTypeHtml}
                     </td>
                     <td class="px-6 py-4 text-right action-cell">
                         <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1123,6 +1465,8 @@
 
             const taskData = {
                 taskName: document.getElementById('taskName')?.value || '',
+                projectName: document.getElementById('projectNameInput')?.value || '', // อ่านค่าจาก input โดยตรง
+                taskType: selectedTaskTypes, // ส่งข้อมูลแบบ Array 
                 receiveDate: document.getElementById('receiveDate')?.value || '',
                 responsibleName: document.getElementById('responsibleName')?.value || '',
                 assignment: document.getElementById('assignment')?.value || '',
@@ -1173,12 +1517,20 @@
             if (taskForm) taskForm.reset();
             currentEditTaskId = null;
             
+            // ล้างค่า Dropdown Custom
+            const projInputEl = document.getElementById('projectNameInput');
+            if(projInputEl) projInputEl.value = '';
+            
+            selectedTaskTypes = [];
+            renderTaskTypeChips();
+            
             const recDate = document.getElementById('receiveDate');
             if (recDate) recDate.valueAsDate = new Date();
             
             // รีเซ็ต Checklist ให้เหลือช่องว่าง 1 ช่อง
             currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
             renderNotes();
+            toggleNotesContainer(); // เช็คซ่อน/แสดง กรอบบันทึกย่อ ตามค่าตั้งต้น (ซ่อนไว้ก่อน)
             
             const submitBtn = document.getElementById('submit-btn');
             if (submitBtn) {
@@ -1310,6 +1662,20 @@
                 const el = document.getElementById(field);
                 if (el) el.value = task[field] || '';
             });
+            
+            // โหลดข้อมูลเข้า Custom Dropdown โครงการ
+            const projInputEl = document.getElementById('projectNameInput');
+            if (projInputEl) projInputEl.value = task.projectName || '';
+
+            // โหลดข้อมูลเข้า Custom Multi-select ประเภทงาน (รองรับทั้งแบบ Array ใหม่ และ String เก่า)
+            if (Array.isArray(task.taskType)) {
+                selectedTaskTypes = [...task.taskType];
+            } else if (task.taskType && typeof task.taskType === 'string') {
+                selectedTaskTypes = [task.taskType];
+            } else {
+                selectedTaskTypes = [];
+            }
+            renderTaskTypeChips(); // จะเรียก toggleNotesContainer อัตโนมัติ
             
             // นำเข้าข้อมูล Checklist (รองรับข้อมูลเก่าที่เป็น String ให้กลายเป็น Checklist อัตโนมัติ)
             if (task.notes && Array.isArray(task.notes)) {
