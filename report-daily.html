@@ -543,6 +543,12 @@
 
         // ฟังก์ชันช่วยสลับแท็บเพื่อลดความซ้ำซ้อนของโค้ด
         function switchTab(activeTabId) {
+            // เพิ่มระบบตรวจสอบ: หากกำลังออกจากหน้า "เพิ่ม/แก้ไขงาน" ไปยังแท็บเมนูอื่น ให้ยกเลิกการแก้ไขและเคลียร์ฟอร์มทิ้งทันที
+            const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
+            if (isLeavingManage) {
+                resetFormToAddMode();
+            }
+
             // ซ่อนทุก view ก่อน โดยเช็คว่ามี Element อยู่จริง
             viewDashboard?.classList.add('hidden'); viewDashboard?.classList.remove('block');
             viewCalendar?.classList.add('hidden'); viewCalendar?.classList.remove('block');
