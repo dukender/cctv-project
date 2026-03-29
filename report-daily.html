@@ -518,7 +518,7 @@
                                             <input type="checkbox" id="enable-notes-checkbox" class="rounded border-gray-300 text-[#5b5fc7] focus:ring-[#5b5fc7] w-4 h-4 transition-colors cursor-pointer">
                                             <i data-lucide="list-checks" class="w-4 h-4 text-gray-500 group-hover:text-[#5b5fc7] transition-colors"></i> เพิ่มบันทึกย่อ / รายละเอียด
                                         </label>
-                                        <div id="notes-container" class="hidden bg-gray-50 border border-gray-200 rounded-md p-4 transition-all">
+                                        <div id="notes-container" class="opacity-50 pointer-events-none bg-gray-50 border border-gray-200 rounded-md p-4 transition-all">
                                             <div id="notes-list" class="space-y-3"></div>
                                         </div>
                                     </div>
@@ -1255,14 +1255,14 @@
         document.getElementById('enable-notes-checkbox')?.addEventListener('change', (e) => {
             const container = document.getElementById('notes-container');
             if (e.target.checked) {
-                container.classList.remove('hidden');
+                container.classList.remove('opacity-50', 'pointer-events-none');
                 if(currentNotes.length === 0) {
                     currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
                 }
-                renderNotes();
             } else {
-                container.classList.add('hidden');
+                container.classList.add('opacity-50', 'pointer-events-none');
             }
+            renderNotes();
         });
 
         function renderNotes() {
@@ -1270,23 +1270,25 @@
             if(!list) return;
             list.innerHTML = '';
             
+            const isEnabled = document.getElementById('enable-notes-checkbox')?.checked;
+            
             currentNotes.forEach((note, index) => {
                 const isLast = index === currentNotes.length - 1;
                 const timeHtml = note.completedAt ? `<span class="text-[10px] text-gray-400 font-medium whitespace-nowrap"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${note.completedAt}</span>` : '';
                 
                 list.innerHTML += `
                     <div class="flex items-start gap-3 group/note">
-                        <button type="button" onclick="toggleNote(${note.id})" class="mt-1 w-5 h-5 rounded flex items-center justify-center border transition-colors ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-300 hover:border-[#5b5fc7] bg-white'}">
+                        <button type="button" onclick="toggleNote(${note.id})" class="mt-1 w-5 h-5 rounded flex items-center justify-center border transition-colors ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-300 hover:border-[#5b5fc7] bg-white'}" ${!isEnabled ? 'disabled' : ''}>
                             ${note.completed ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
                         </button>
                         <div class="flex-1 flex flex-col gap-1">
                             <div class="flex items-center gap-2">
-                                <input type="text" value="${note.text}" oninput="updateNoteText(${note.id}, this.value)" placeholder="กรอกรายละเอียดงานย่อย หรือบันทึกข้อความ..." class="flex-1 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-[#5b5fc7] focus:ring-0 px-0 py-1 text-sm ${note.completed ? 'text-gray-400' : 'text-gray-700'} transition-colors" ${note.completed ? 'readonly' : ''}>
+                                <input type="text" value="${note.text}" oninput="updateNoteText(${note.id}, this.value)" placeholder="กรอกรายละเอียดงานย่อย หรือบันทึกข้อความ..." class="flex-1 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-[#5b5fc7] focus:ring-0 px-0 py-1 text-sm ${note.completed ? 'text-gray-400' : 'text-gray-700'} transition-colors" ${note.completed || !isEnabled ? 'readonly' : ''} tabindex="${!isEnabled ? '-1' : '0'}">
                                 ${timeHtml}
                             </div>
                         </div>
                         ${!isLast ? `
-                        <button type="button" onclick="removeNote(${note.id})" class="mt-1 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1">
+                        <button type="button" onclick="removeNote(${note.id})" class="mt-1 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1" ${!isEnabled ? 'disabled' : ''}>
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                         ` : '<div class="w-6"></div>'}
@@ -1774,12 +1776,13 @@
             const recDate = document.getElementById('receiveDate');
             if (recDate) recDate.value = getThaiDateString();
             currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
-            renderNotes();
             
             // รีเซ็ตสถานะ Checkbox ให้ซ่อนกล่องข้อความ
             const checkbox = document.getElementById('enable-notes-checkbox');
             if(checkbox) checkbox.checked = false;
-            document.getElementById('notes-container')?.classList.add('hidden');
+            document.getElementById('notes-container')?.classList.add('opacity-50', 'pointer-events-none');
+            
+            renderNotes();
             
             document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่";
             document.getElementById('submit-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`;
@@ -1867,11 +1870,11 @@
             if (task.notes && task.notes.length > 0) {
                 currentNotes = JSON.parse(JSON.stringify(task.notes));
                 if(checkbox) checkbox.checked = true;
-                if(notesContainer) notesContainer.classList.remove('hidden');
+                if(notesContainer) notesContainer.classList.remove('opacity-50', 'pointer-events-none');
             } else {
                 currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
                 if(checkbox) checkbox.checked = false;
-                if(notesContainer) notesContainer.classList.add('hidden');
+                if(notesContainer) notesContainer.classList.add('opacity-50', 'pointer-events-none');
             }
             
             renderNotes();
