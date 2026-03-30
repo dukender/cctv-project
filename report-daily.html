@@ -126,6 +126,10 @@
                         <button id="tab-list" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน
                         </button>
+                        <!-- เพิ่มแท็บสรุปโครงการ -->
+                        <button id="tab-project-summary" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
+                            <i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ
+                        </button>
                         <!-- เพิ่มแท็บจัดการผู้ใช้ (Admin Only) -->
                         <button id="tab-users" class="hidden px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only">
                             <i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้
@@ -257,108 +261,52 @@
                     </div>
                 </div>
 
-                <!-- 1. ส่วนแสดงปฏิทิน -->
-                <div id="view-calendar" class="block animate-fade-in">
+                <!-- 5. ส่วนแสดงสรุปรายชื่อโครงการ (Project Summary View) -->
+                <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                            <div class="flex items-center gap-4">
-                                <h2 id="calendar-month-year" class="text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2>
-                            </div>
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-2">
-                                    <i data-lucide="calendar-off" class="w-4 h-4"></i> เพิ่มวันหยุด/ลา
-                                </button>
-                                <button id="prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                                <button id="today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button>
-                                <button id="next-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
-                            </div>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                <i data-lucide="layout-list" class="w-6 h-6 text-[#5b5fc7]"></i> สรุปรายชื่อโครงการทั้งหมด
+                            </h2>
                         </div>
                         
-                        <div class="grid grid-cols-7 gap-px mb-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            <div class="text-red-500 py-2">อา.</div>
-                            <div class="py-2">จ.</div>
-                            <div class="py-2">อ.</div>
-                            <div class="py-2">พ.</div>
-                            <div class="py-2">พฤ.</div>
-                            <div class="py-2">ศ.</div>
-                            <div class="text-indigo-500 py-2">ส.</div>
-                        </div>
-                        <div id="calendar-grid" class="grid grid-cols-7 gap-2">
-                            <!-- JS จะใส่ข้อมูลที่นี่ -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. ส่วนแสดงรายการตาราง List View -->
-                <div id="view-list" class="hidden animate-fade-in">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
-                            <div>
-                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                    <i data-lucide="list-todo" class="w-5 h-5 text-[#5b5fc7]"></i> รายการงานทั้งหมด
-                                </h2>
-                                <p class="text-sm text-gray-500 mt-1">แสดงข้อมูลทั้งหมด <span id="task-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 text-center">
+                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p>
+                                <p class="text-2xl font-bold text-gray-800" id="summary-total">0</p>
                             </div>
-                            
-                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                                <div class="relative flex-1 min-w-[150px]">
-                                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                    <input type="text" id="search-input" placeholder="ค้นหาข้อความ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
-                                </div>
-                                
-                                <select id="search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white">
-                                    <option value="day">รายวัน</option>
-                                    <option value="month">รายเดือน</option>
-                                    <option value="year">รายปี</option>
-                                </select>
-                                
-                                <input type="date" id="search-date" title="ค้นหาตามวันที่" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
-                                <input type="month" id="search-month" title="ค้นหาตามเดือน" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
-                                <select id="search-year" title="ค้นหาตามปี" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]">
-                                    <option value="">ทุกปีทั้งหมด</option>
-                                </select>
-                                
-                                <button id="btn-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors" title="รีเซ็ตการค้นหา">
-                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
-                                </button>
-
-                                <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                    <button id="btn-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative" title="Export to Excel">
-                                        <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
-                                        <span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span>
-                                    </button>
-                                    <button id="btn-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative" title="Export to PDF">
-                                        <i data-lucide="file-text" class="w-5 h-5"></i>
-                                        <span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span>
-                                    </button>
-                                </div>
+                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
+                                <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p>
+                                <p class="text-2xl font-bold text-blue-700" id="summary-progress">0</p>
+                            </div>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
+                                <p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p>
+                                <p class="text-2xl font-bold text-green-700" id="summary-won">0</p>
+                            </div>
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-100 text-center">
+                                <p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p>
+                                <p class="text-2xl font-bold text-red-700" id="summary-lost">0</p>
                             </div>
                         </div>
-                        <div class="overflow-x-auto min-h-[400px]">
-                            <table class="w-full text-left text-sm whitespace-nowrap" id="tasks-table">
-                                <thead class="bg-white border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wider">
+
+                        <!-- Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
+                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
                                     <tr>
                                         <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
-                                        <th class="px-6 py-4 font-semibold">ชื่องาน</th>
+                                        <th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงาน</th>
                                         <th class="px-6 py-4 font-semibold">ชื่อโครงการ</th>
-                                        <th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th>
-                                        <th class="px-6 py-4 font-semibold">ลูกค้า</th>
-                                        <th class="px-6 py-4 font-semibold">สถานที่</th>
-                                        <th class="px-6 py-4 font-semibold">ประเภทงาน</th>
-                                        <th class="px-6 py-4 font-semibold text-right action-cell">จัดการ</th>
+                                        <th class="px-4 py-4 font-semibold text-center w-32">กำลังดำเนินการ</th>
+                                        <th class="px-4 py-4 font-semibold text-center w-32">ได้งาน</th>
+                                        <th class="px-4 py-4 font-semibold text-center w-32">ไม่ได้งาน</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tasks-table-body" class="divide-y divide-gray-100">
-                                    <!-- รายการข้อมูลจะถูกแสดงที่นี่ -->
+                                <tbody id="projects-summary-body" class="divide-y divide-gray-100">
+                                    <!-- JS Populates -->
                                 </tbody>
                             </table>
-                            <div id="tasks-empty-state" class="hidden text-center py-20 text-gray-400">
-                                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <i data-lucide="inbox" class="w-8 h-8 text-gray-300"></i>
-                                </div>
-                                <p class="text-lg font-medium text-gray-600">ยังไม่มีรายการงาน</p>
-                                <p class="text-sm mt-1">เริ่มเพิ่มงานใหม่เพื่อบันทึกข้อมูลของคุณ</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -742,6 +690,7 @@
         const viewDashboard = document.getElementById('view-dashboard');
         const viewCalendar = document.getElementById('view-calendar');
         const viewList = document.getElementById('view-list');
+        const viewProjectSummary = document.getElementById('view-project-summary');
         const viewManage = document.getElementById('view-manage');
         const viewUsers = document.getElementById('view-users');
 
@@ -754,6 +703,7 @@
             viewDashboard?.classList.add('hidden'); viewDashboard?.classList.remove('block');
             viewCalendar?.classList.add('hidden'); viewCalendar?.classList.remove('block');
             viewList?.classList.add('hidden'); viewList?.classList.remove('block');
+            viewProjectSummary?.classList.add('hidden'); viewProjectSummary?.classList.remove('block');
             viewManage?.classList.add('hidden'); viewManage?.classList.remove('block');
             viewUsers?.classList.add('hidden'); viewUsers?.classList.remove('block');
             
@@ -763,6 +713,8 @@
             document.getElementById('tab-calendar')?.classList.add('text-gray-500', 'border-transparent');
             document.getElementById('tab-list')?.classList.remove('text-[#5b5fc7]', 'border-[#5b5fc7]');
             document.getElementById('tab-list')?.classList.add('text-gray-500', 'border-transparent');
+            document.getElementById('tab-project-summary')?.classList.remove('text-[#5b5fc7]', 'border-[#5b5fc7]');
+            document.getElementById('tab-project-summary')?.classList.add('text-gray-500', 'border-transparent');
             document.getElementById('tab-manage')?.classList.remove('text-[#5b5fc7]', 'border-[#5b5fc7]');
             document.getElementById('tab-manage')?.classList.add('text-gray-500', 'border-transparent');
             document.getElementById('tab-users')?.classList.remove('text-[#5b5fc7]', 'border-[#5b5fc7]');
@@ -782,6 +734,11 @@
                 viewList?.classList.remove('hidden'); viewList?.classList.add('block');
                 document.getElementById('tab-list')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]');
                 document.getElementById('tab-list')?.classList.remove('text-gray-500', 'border-transparent');
+            } else if (activeTabId === 'project-summary') {
+                viewProjectSummary?.classList.remove('hidden'); viewProjectSummary?.classList.add('block');
+                document.getElementById('tab-project-summary')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]');
+                document.getElementById('tab-project-summary')?.classList.remove('text-gray-500', 'border-transparent');
+                renderProjectSummary();
             } else if (activeTabId === 'manage') {
                 viewManage?.classList.remove('hidden'); viewManage?.classList.add('block');
                 document.getElementById('tab-manage')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]');
@@ -803,6 +760,7 @@
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
+        document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
         
         // เพิ่มการ Reset ฟอร์มเพื่อให้กล่องบันทึกย่อแสดงขึ้นมาทุกครั้งเมื่อกดแท็บ
         document.getElementById('tab-manage')?.addEventListener('click', () => {
@@ -982,6 +940,7 @@
                 allProjects = [];
                 snapshot.forEach(doc => allProjects.push({id: doc.id, ...doc.data()}));
                 allProjects.sort((a,b) => a.createdAt - b.createdAt);
+                if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
             });
 
             const typeCol = collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types');
@@ -1030,6 +989,7 @@
                 filterAndRenderTasks(); 
                 renderCalendar();   
                 if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard(); 
+                if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
 
             }, (error) => {
                 console.error("Error fetching tasks: ", error);
@@ -1110,7 +1070,7 @@
             if(!currentUser || currentUserRole === 'monitor') return;
             try {
                 projInput.value = 'กำลังเพิ่ม...';
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), { name: name, createdAt: Date.now() });
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), { name: name, createdAt: Date.now(), ownerId: currentUser.uid });
                 selectProject(name);
                 showNotification(`เพิ่มโครงการ "${name}" แล้ว`);
             } catch (e) {
@@ -1248,6 +1208,95 @@
             if (projWrapper && !projWrapper.contains(e.target)) projList?.classList.add('hidden');
             if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) taskTypeList?.classList.add('hidden');
         });
+
+        // ==============================================
+        // ระบบสรุปรายชื่อโครงการ (Project Summary)
+        // ==============================================
+        function renderProjectSummary() {
+            const tbody = document.getElementById('projects-summary-body');
+            if (!tbody) return;
+            
+            // 1. กรองข้อมูลตามสิทธิ์ (Admin/Monitor เห็นทั้งหมด, User เห็นเฉพาะโครงการของตัวเอง หรือโครงการที่มีงานของตัวเอง)
+            let visibleProjects = [];
+            if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
+                visibleProjects = [...allProjects];
+            } else {
+                const userProjectNames = new Set(allTasks.map(t => t.projectName).filter(Boolean));
+                visibleProjects = allProjects.filter(p => p.ownerId === currentUser.uid || userProjectNames.has(p.name));
+            }
+
+            // 2. หาวันที่รับงานแรกสุดของแต่ละโครงการ และเรียงลำดับ
+            const projectData = visibleProjects.map(p => {
+                // ค้นหางานทั้งหมดที่ตรงกับชื่อโครงการนี้
+                const pTasks = allTasks.filter(t => t.projectName === p.name && t.receiveDate);
+                let earliestDate = '';
+                if (pTasks.length > 0) {
+                    pTasks.sort((a, b) => a.receiveDate.localeCompare(b.receiveDate));
+                    earliestDate = pTasks[0].receiveDate;
+                }
+                return {
+                    ...p,
+                    earliestDate: earliestDate,
+                    sortDate: earliestDate || '9999-99-99' // กรณีไม่มีงาน ให้ไปอยู่ท้ายสุด
+                };
+            });
+
+            // เรียงลำดับจากเก่าไปใหม่ตามวันที่รับงาน
+            projectData.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+
+            // 3. แสดงผลตาราง และคำนวณสรุป
+            let total = projectData.length;
+            let inProgress = 0, won = 0, lost = 0;
+
+            tbody.innerHTML = '';
+            projectData.forEach((p, index) => {
+                const st = p.status || '';
+                if (st === 'in_progress') inProgress++;
+                else if (st === 'won') won++;
+                else if (st === 'lost') lost++;
+
+                const disableCheck = currentUserRole === 'monitor' ? 'disabled cursor-not-allowed opacity-50' : 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-[#5b5fc7]/30';
+                
+                const checkboxHTML = (type) => `
+                    <input type="checkbox" 
+                        ${st === type ? 'checked' : ''} 
+                        ${disableCheck}
+                        onchange="updateProjectStatus('${p.id}', '${type}', this.checked)"
+                        class="w-5 h-5 text-[#5b5fc7] border-gray-300 rounded focus:ring-[#5b5fc7] transition-all shadow-sm">
+                `;
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-4 text-center font-medium text-gray-500">${index + 1}</td>
+                        <td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td>
+                        <td class="px-6 py-4 font-bold text-gray-800">${p.name}</td>
+                        <td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td>
+                        <td class="px-4 py-4 text-center">${checkboxHTML('won')}</td>
+                        <td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('summary-total').textContent = total;
+            document.getElementById('summary-progress').textContent = inProgress;
+            document.getElementById('summary-won').textContent = won;
+            document.getElementById('summary-lost').textContent = lost;
+            lucide.createIcons();
+        }
+
+        window.updateProjectStatus = async (projectId, statusType, isChecked) => {
+            if (currentUserRole === 'monitor') return;
+            const newStatus = isChecked ? statusType : ''; 
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), {
+                    status: newStatus
+                });
+            } catch (e) {
+                console.error("Error updating project status", e);
+                showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error");
+                renderProjectSummary(); 
+            }
+        };
 
         // ==============================================
         // ระบบ Checklist & Notes (แก้ไขเป็นบังคับติ๊กรายบรรทัด)
