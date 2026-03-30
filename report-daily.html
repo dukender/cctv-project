@@ -51,7 +51,6 @@
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-[#8b5cf6]"></div>
             
             <div class="w-16 h-16 bg-[#5b5fc7] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg rotate-3 mt-4">
-                <!-- เปลี่ยนกลับเป็นไอคอนกระดานคลิปบอร์ด (clipboard-list) ตามเดิม -->
                 <i data-lucide="clipboard-list" class="w-8 h-8 text-white -rotate-3"></i>
             </div>
             <h1 class="text-2xl font-bold text-gray-800 mb-2">เข้าสู่ระบบ (Login)</h1>
@@ -63,7 +62,7 @@
             </button>
             
             <button id="btn-login-microsoft" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors shadow-sm mb-6">
-                <!-- เปลี่ยนมาใช้โค้ด Inline SVG เพื่อป้องกันปัญหารูปลิงก์เสีย -->
+                <!-- ใช้ Inline SVG ป้องกันรูปลิงก์เสีย -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>
                 เข้าสู่ระบบด้วย Hotmail / Outlook
             </button>
@@ -258,7 +257,7 @@
                     </div>
                 </div>
 
-                <!-- 1. ส่วนแสดงปฏิทิน (ที่ถูกกู้คืนกลับมา) -->
+                <!-- 1. ส่วนแสดงปฏิทิน -->
                 <div id="view-calendar" class="block animate-fade-in">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
@@ -290,7 +289,7 @@
                     </div>
                 </div>
 
-                <!-- 2. ส่วนแสดงรายการตาราง List View (ที่ถูกกู้คืนกลับมา) -->
+                <!-- 2. ส่วนแสดงรายการตาราง List View -->
                 <div id="view-list" class="hidden animate-fade-in">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
@@ -512,13 +511,12 @@
                                         </div>
                                     </div>
 
-                                    <!-- เพิ่ม Checkbox สำหรับเปิด/ปิด กล่องใส่บันทึกย่อ -->
-                                    <div class="mt-4">
-                                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 cursor-pointer mb-3 select-none w-fit group">
-                                            <input type="checkbox" id="enable-notes-checkbox" class="rounded border-gray-300 text-[#5b5fc7] focus:ring-[#5b5fc7] w-4 h-4 transition-colors cursor-pointer">
-                                            <i data-lucide="list-checks" class="w-4 h-4 text-gray-500 group-hover:text-[#5b5fc7] transition-colors"></i> เพิ่มบันทึกย่อ / รายละเอียด
+                                    <!-- ระบบ Checklist แบบรายบรรทัด (บังคับติ๊กก่อนพิมพ์) -->
+                                    <div class="mt-4" id="notes-container">
+                                        <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3 select-none w-fit">
+                                            <i data-lucide="list-checks" class="w-4 h-4 text-[#5b5fc7]"></i> บันทึกย่อ / รายละเอียดงาน
                                         </label>
-                                        <div id="notes-container" class="opacity-50 pointer-events-none bg-gray-50 border border-gray-200 rounded-md p-4 transition-all">
+                                        <div class="bg-gray-50 border border-gray-200 rounded-md p-4 transition-all">
                                             <div id="notes-list" class="space-y-3"></div>
                                         </div>
                                     </div>
@@ -610,7 +608,7 @@
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 1. นำชุดโค้ด firebaseConfig ของคุณเอง มาวางทับตรงนี้
+        // 1. Firebase Config ของคุณ
         const firebaseConfig = {
             apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA",
             authDomain: "project-dailyreport.firebaseapp.com",
@@ -657,6 +655,7 @@
         let unsubscribeHolidays = null;
         
         let allUsers = []; 
+        let presenceInterval = null;
         
         let allProjects = [];
         let allTaskTypes = [];
@@ -817,8 +816,6 @@
         // ระบบ LOGIN และ Role-Based Access Control
         // ==============================================
 
-        let presenceInterval = null;
-
         async function updatePresence(isOnlineStatus) {
             if (!currentUser || !currentUser.email) return;
             try {
@@ -947,12 +944,10 @@
                     loadUsersList();
                 }
                 
-                // --- ระบบ Presence (สถานะออนไลน์) ---
                 updatePresence(true);
                 if (presenceInterval) clearInterval(presenceInterval);
-                presenceInterval = setInterval(() => updatePresence(true), 60000); // อัปเดตทุก 1 นาที
-                
-                // เริ่มต้นหน้าแรกที่ตารางรายการงาน
+                presenceInterval = setInterval(() => updatePresence(true), 60000); 
+
                 switchTab('list');
 
             } else {
@@ -1139,7 +1134,6 @@
                 `;
             });
             lucide.createIcons();
-            // นำ toggleNotesContainer() ออก เพื่อไม่ให้กล่องข้อความเด้งเปิดเองเวลาเลือกประเภทงาน
         }
 
         window.removeTaskType = (tag) => {
@@ -1248,47 +1242,30 @@
         });
 
         // ==============================================
-        // ระบบ Checklist & Notes
+        // ระบบ Checklist & Notes (แก้ไขเป็นบังคับติ๊กรายบรรทัด)
         // ==============================================
-        
-        // รับการทำงานจาก Checkbox เพื่อแสดง/ซ่อน กล่องข้อความ
-        document.getElementById('enable-notes-checkbox')?.addEventListener('change', (e) => {
-            const container = document.getElementById('notes-container');
-            if (e.target.checked) {
-                container.classList.remove('opacity-50', 'pointer-events-none');
-                if(currentNotes.length === 0) {
-                    currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
-                }
-            } else {
-                container.classList.add('opacity-50', 'pointer-events-none');
-            }
-            renderNotes();
-        });
 
         function renderNotes() {
             const list = document.getElementById('notes-list');
             if(!list) return;
             list.innerHTML = '';
             
-            const isEnabled = document.getElementById('enable-notes-checkbox')?.checked;
-            
             currentNotes.forEach((note, index) => {
-                const isLast = index === currentNotes.length - 1;
                 const timeHtml = note.completedAt ? `<span class="text-[10px] text-gray-400 font-medium whitespace-nowrap"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${note.completedAt}</span>` : '';
                 
                 list.innerHTML += `
                     <div class="flex items-start gap-3 group/note">
-                        <button type="button" onclick="toggleNote(${note.id})" class="mt-1 w-5 h-5 rounded flex items-center justify-center border transition-colors ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-300 hover:border-[#5b5fc7] bg-white'}" ${!isEnabled ? 'disabled' : ''}>
+                        <button type="button" onclick="toggleNote(${note.id})" class="mt-1 w-5 h-5 rounded flex items-center justify-center border transition-colors ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-300 hover:border-[#5b5fc7] bg-white'}">
                             ${note.completed ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
                         </button>
                         <div class="flex-1 flex flex-col gap-1">
                             <div class="flex items-center gap-2">
-                                <input type="text" value="${note.text}" oninput="updateNoteText(${note.id}, this.value)" placeholder="กรอกรายละเอียดงานย่อย หรือบันทึกข้อความ..." class="flex-1 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-[#5b5fc7] focus:ring-0 px-0 py-1 text-sm ${note.completed ? 'text-gray-400' : 'text-gray-700'} transition-colors" ${note.completed || !isEnabled ? 'readonly' : ''} tabindex="${!isEnabled ? '-1' : '0'}">
+                                <input type="text" value="${note.text}" oninput="updateNoteText(${note.id}, this.value)" placeholder="${note.completed ? 'กรอกรายละเอียด...' : 'คลิกเพื่อระบุเวลา และเริ่มพิมพ์รายละเอียด...'}" class="flex-1 bg-transparent border-0 border-b border-transparent hover:border-gray-200 focus:border-[#5b5fc7] focus:ring-0 px-0 py-1 text-sm ${note.completed ? 'text-gray-700' : 'text-gray-400 opacity-60'} transition-colors" ${!note.completed ? 'readonly tabindex="-1"' : ''}>
                                 ${timeHtml}
                             </div>
                         </div>
-                        ${!isLast ? `
-                        <button type="button" onclick="removeNote(${note.id})" class="mt-1 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1" ${!isEnabled ? 'disabled' : ''}>
+                        ${currentNotes.length > 1 || note.completed ? `
+                        <button type="button" onclick="removeNote(${note.id})" class="mt-1 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
                         ` : '<div class="w-6"></div>'}
@@ -1305,14 +1282,25 @@
                 if (note.completed) {
                     const now = new Date();
                     note.completedAt = `${now.toLocaleDateString('th-TH', {timeZone: 'Asia/Bangkok'})} ${now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit', timeZone: 'Asia/Bangkok'})} น.`;
+                    
+                    // เมื่อติ๊กถูก ให้สร้างกล่องว่างรอไว้ด้านล่างสุดทันที
                     const lastNote = currentNotes[currentNotes.length - 1];
-                    if (lastNote && (lastNote.text.trim() !== '' || lastNote.completed)) {
+                    if (lastNote && lastNote.id === id) {
                         currentNotes.push({ id: Date.now(), text: '', completed: false, completedAt: null });
                     }
                 } else {
                     note.completedAt = null;
                 }
                 renderNotes();
+
+                // โฟกัส Input ช่องที่เพิ่งปลดล็อคให้พิมพ์ได้ทันที
+                if (note.completed) {
+                    setTimeout(() => {
+                        const inputs = document.querySelectorAll('#notes-list input[type="text"]');
+                        const index = currentNotes.findIndex(n => n.id === id);
+                        if(inputs[index]) inputs[index].focus();
+                    }, 50);
+                }
             }
         };
 
@@ -1320,34 +1308,32 @@
             const note = currentNotes.find(n => n.id === id);
             if (note) {
                 note.text = text;
-                const lastNote = currentNotes[currentNotes.length - 1];
-                if (lastNote && lastNote.id === id && text.trim() !== '') {
-                    currentNotes.push({ id: Date.now(), text: '', completed: false, completedAt: null });
-                    renderNotes();
-                }
             }
         };
 
         window.removeNote = (id) => {
-            // ค้นหาตำแหน่งและเก็บข้อมูลตัวที่กำลังจะลบเอาไว้สำหรับย้อนกลับ
             const noteIndex = currentNotes.findIndex(n => n.id === id);
             if (noteIndex === -1) return;
             const noteToRestore = currentNotes[noteIndex];
             
             currentNotes = currentNotes.filter(n => n.id !== id);
-            if(currentNotes.length === 0) {
-                currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
+            
+            // เช็คว่าถ้าช่องสุดท้ายโดนลบไป หรือ ช่องสุดท้ายติ๊กถูกแล้ว ให้สร้างช่องใหม่ไว้รองรับ
+            if(currentNotes.length === 0 || currentNotes[currentNotes.length - 1].completed) {
+                currentNotes.push({ id: Date.now(), text: '', completed: false, completedAt: null });
             }
             renderNotes();
 
-            // แจ้งเตือนพร้อมปุ่ม Undo
             showNotification("ลบรายการบันทึกย่อแล้ว", "success", () => {
-                // ถ้ามีแค่กล่องว่างที่ถูกสร้างขึ้นมาใหม่ ให้ลบทิ้งก่อน
-                if (currentNotes.length === 1 && currentNotes[0].text === '' && !currentNotes[0].completed && currentNotes[0].id !== noteToRestore.id) {
-                    currentNotes = [];
+                // ระบบ Undo (ย้อนกลับ)
+                if (currentNotes.length > 0 && currentNotes[currentNotes.length - 1].text === '' && !currentNotes[currentNotes.length - 1].completed && currentNotes[currentNotes.length - 1].id !== noteToRestore.id) {
+                    currentNotes.pop(); // ลบช่องว่างที่สร้างไว้อัตโนมัติทิ้งก่อน
                 }
-                // แทรกข้อมูลกลับคืนไปยังตำแหน่งเดิม
-                currentNotes.splice(noteIndex, 0, noteToRestore);
+                currentNotes.splice(noteIndex, 0, noteToRestore); // แทรกข้อมูลกลับที่เดิม
+                
+                if(currentNotes.length === 0 || currentNotes[currentNotes.length - 1].completed) {
+                    currentNotes.push({ id: Date.now(), text: '', completed: false, completedAt: null });
+                }
                 renderNotes();
             });
         };
@@ -1581,8 +1567,9 @@
                         if(validNotes.length > 0) {
                             notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
                             validNotes.forEach(note => {
-                                const checked = note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-300"></i>`;
-                                const textStyle = note.completed ? 'text-gray-400 line-through' : 'text-gray-700';
+                                // เปลี่ยนจากขีดฆ่า เป็นข้อความปกติ เพราะการติ๊กถูกหมายถึงการเพิ่มงาน ไม่ใช่การทำงานเสร็จแล้ว
+                                const checked = note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`;
+                                const textStyle = 'text-gray-700'; 
                                 const timeBadge = note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : '';
                                 notesHtml += `<div class="flex items-start gap-2 text-sm"><div class="mt-0.5">${checked}</div><div class="flex-1 ${textStyle}">${note.text}</div>${timeBadge}</div>`;
                             });
@@ -1591,41 +1578,40 @@
                     }
 
                     let actionBtns = '';
-                    if (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid)) {
+                    if(currentUserRole === 'admin' || currentUserRole === 'user') {
                         actionBtns = `
-                            <button onclick="editTask('${task.id}'); document.getElementById('day-detail-modal').classList.add('hidden')" class="p-1.5 text-blue-600 hover:bg-blue-50 rounded" title="แก้ไข">
-                                <i data-lucide="edit-3" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteTask('${task.id}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded" title="ลบ">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            <div class="flex gap-2 mt-4 pt-3 border-t border-gray-100">
+                                <button onclick="editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                                    <i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข
+                                </button>
+                                <button onclick="deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i> ลบ
+                                </button>
+                            </div>
                         `;
                     }
 
                     content.innerHTML += `
-                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow transition-shadow">
-                            <div class="flex justify-between items-start gap-4">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 text-base mb-1">${idx + 1}. ${task.taskName}</h4>
-                                    <div class="grid grid-cols-2 gap-y-1 gap-x-4 text-xs text-gray-600 mt-2">
-                                        <div class="flex items-center gap-1.5"><i data-lucide="folder" class="w-3.5 h-3.5 text-gray-400"></i> ${task.projectName || '-'}</div>
-                                        <div class="flex items-center gap-1.5"><i data-lucide="tag" class="w-3.5 h-3.5 text-gray-400"></i> <span class="truncate">${taskTypeDisplay}</span></div>
-                                        <div class="flex items-center gap-1.5"><i data-lucide="user" class="w-3.5 h-3.5 text-gray-400"></i> ${task.responsibleName || '-'}</div>
-                                        <div class="flex items-center gap-1.5"><i data-lucide="briefcase" class="w-3.5 h-3.5 text-gray-400"></i> <span class="truncate">${task.customerName || '-'}</span></div>
-                                    </div>
-                                    ${notesHtml}
-                                </div>
-                                <div class="flex items-center gap-1 shrink-0 bg-gray-50 rounded-md p-1 border border-gray-100 action-cell">
-                                    ${actionBtns}
-                                </div>
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                            <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div>
+                            <h4 class="font-bold text-gray-800 text-lg mb-1 group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4>
+                            <p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p>
+                            
+                            <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100">
+                                <div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภทงาน: <span class="text-gray-800 font-medium ml-1">${taskTypeDisplay}</span></div>
+                                <div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบ: <span class="text-gray-800 font-medium ml-1">${task.responsibleName || '-'}</span></div>
+                                <div class="text-gray-500 flex items-center gap-1.5 col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ชื่อลูกค้า: <span class="text-gray-800 font-medium ml-1">${task.customerName || '-'}</span></div>
                             </div>
+                            
+                            ${notesHtml}
+                            ${actionBtns}
                         </div>
                     `;
                 });
             }
             lucide.createIcons();
-            applyRoleUI();
             modal.classList.remove('hidden');
+            modal.classList.add('flex');
         };
 
         document.getElementById('close-day-modal')?.addEventListener('click', () => {
@@ -1775,13 +1761,8 @@
             renderTaskTypeChips();
             const recDate = document.getElementById('receiveDate');
             if (recDate) recDate.value = getThaiDateString();
+            
             currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
-            
-            // รีเซ็ตสถานะ Checkbox ให้ซ่อนกล่องข้อความ
-            const checkbox = document.getElementById('enable-notes-checkbox');
-            if(checkbox) checkbox.checked = false;
-            document.getElementById('notes-container')?.classList.add('opacity-50', 'pointer-events-none');
-            
             renderNotes();
             
             document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่";
@@ -1797,9 +1778,8 @@
             submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`;
             submitBtn.disabled = true;
 
-            // บันทึกเฉพาะเมื่อมีการติ๊กถูก Checkbox ให้ใช้งานเท่านั้น
-            const isNotesEnabled = document.getElementById('enable-notes-checkbox')?.checked;
-            const notesToSave = isNotesEnabled ? currentNotes.filter(n => n.text.trim() !== '' || n.completed) : [];
+            // เซฟเฉพาะช่องที่ติ๊กถูก (เปิดใช้งาน) หรือมีการพิมพ์ข้อความทิ้งไว้
+            const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
             
             const taskData = {
                 taskName: document.getElementById('taskName')?.value || '',
@@ -1863,18 +1843,15 @@
             else selectedTaskTypes = [];
             renderTaskTypeChips();
             
-            const checkbox = document.getElementById('enable-notes-checkbox');
-            const notesContainer = document.getElementById('notes-container');
-            
-            // เช็คว่างานนี้มีบันทึกย่อหรือไม่ ถ้ามีให้ตั้งค่า Checkbox เป็นติ๊กถูกและเปิดกล่อง
+            // ดึงข้อมูล Notes จากฐานข้อมูลและเพิ่มช่องว่าง 1 ช่องต่อท้ายเพื่อให้กรอกต่อได้
             if (task.notes && task.notes.length > 0) {
                 currentNotes = JSON.parse(JSON.stringify(task.notes));
-                if(checkbox) checkbox.checked = true;
-                if(notesContainer) notesContainer.classList.remove('opacity-50', 'pointer-events-none');
+                const lastNote = currentNotes[currentNotes.length - 1];
+                if (lastNote && lastNote.completed) {
+                    currentNotes.push({ id: Date.now(), text: '', completed: false, completedAt: null });
+                }
             } else {
                 currentNotes = [{ id: Date.now(), text: '', completed: false, completedAt: null }];
-                if(checkbox) checkbox.checked = false;
-                if(notesContainer) notesContainer.classList.add('opacity-50', 'pointer-events-none');
             }
             
             renderNotes();
