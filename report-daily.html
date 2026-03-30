@@ -120,15 +120,15 @@
                         <button id="tab-dashboard" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ
                         </button>
+                        <!-- ย้ายแท็บสรุปโครงการ มาต่อจากแดชบอร์ด -->
+                        <button id="tab-project-summary" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
+                            <i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ
+                        </button>
                         <button id="tab-calendar" class="px-4 py-3 font-semibold text-[#5b5fc7] border-b-2 border-[#5b5fc7] transition-colors flex items-center gap-2 whitespace-nowrap">
                             <i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน
                         </button>
                         <button id="tab-list" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน
-                        </button>
-                        <!-- เพิ่มแท็บสรุปโครงการ -->
-                        <button id="tab-project-summary" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
-                            <i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ
                         </button>
                         <!-- เพิ่มแท็บจัดการผู้ใช้ (Admin Only) -->
                         <button id="tab-users" class="hidden px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only">
@@ -370,34 +370,72 @@
                 <!-- 5. ส่วนแสดงสรุปรายชื่อโครงการ (Project Summary View) -->
                 <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                                <i data-lucide="layout-list" class="w-6 h-6 text-[#5b5fc7]"></i> สรุปรายชื่อโครงการทั้งหมด
-                            </h2>
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <i data-lucide="layout-list" class="w-6 h-6 text-[#5b5fc7]"></i> สรุปรายชื่อโครงการทั้งหมด
+                                </h2>
+                                <p class="text-sm text-gray-500 mt-1">แสดงข้อมูล <span id="summary-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                            </div>
+                            
+                            <!-- เพิ่มช่อง Search, Date, Export ชิดขวา แบบเดียวกับ List View -->
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                <div class="relative flex-1 min-w-[150px]">
+                                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="summary-search-input" placeholder="ค้นหาชื่อโครงการ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
+                                </div>
+                                
+                                <select id="summary-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white">
+                                    <option value="day">รายวัน</option>
+                                    <option value="month">รายเดือน</option>
+                                    <option value="year">รายปี</option>
+                                </select>
+                                
+                                <input type="date" id="summary-search-date" title="ค้นหาตามวันที่รับงาน" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                <input type="month" id="summary-search-month" title="ค้นหาตามเดือนรับงาน" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                <select id="summary-search-year" title="ค้นหาตามปีรับงาน" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]">
+                                    <option value="">ทุกปีทั้งหมด</option>
+                                </select>
+                                
+                                <button id="btn-summary-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors" title="รีเซ็ตการค้นหา">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                </button>
+
+                                <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                    <button id="btn-summary-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative" title="Export to Excel">
+                                        <i data-lucide="file-spreadsheet" class="w-5 h-5"></i>
+                                        <span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span>
+                                    </button>
+                                    <button id="btn-summary-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative" title="Export to PDF">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                        <span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
-                        <!-- Summary Cards -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 text-center">
+                        <!-- Summary Cards (เพิ่ม Onclick เพื่อกรอง และการแสดงผล %) -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
+                            <div id="card-sum-all" onclick="setSummaryFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]">
                                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p>
-                                <p class="text-2xl font-bold text-gray-800" id="summary-total">0</p>
+                                <p class="text-xl font-bold text-gray-800" id="summary-total">0 ( 0% )</p>
                             </div>
-                            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
+                            <div id="card-sum-prog" onclick="setSummaryFilter('in_progress')" class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center cursor-pointer transition-all hover:shadow-md">
                                 <p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p>
-                                <p class="text-2xl font-bold text-blue-700" id="summary-progress">0</p>
+                                <p class="text-xl font-bold text-blue-700" id="summary-progress">0 ( 0% )</p>
                             </div>
-                            <div class="bg-green-50 p-4 rounded-lg border border-green-100 text-center">
+                            <div id="card-sum-won" onclick="setSummaryFilter('won')" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center cursor-pointer transition-all hover:shadow-md">
                                 <p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p>
-                                <p class="text-2xl font-bold text-green-700" id="summary-won">0</p>
+                                <p class="text-xl font-bold text-green-700" id="summary-won">0 ( 0% )</p>
                             </div>
-                            <div class="bg-red-50 p-4 rounded-lg border border-red-100 text-center">
+                            <div id="card-sum-lost" onclick="setSummaryFilter('lost')" class="bg-red-50 p-4 rounded-lg border border-red-200 text-center cursor-pointer transition-all hover:shadow-md">
                                 <p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p>
-                                <p class="text-2xl font-bold text-red-700" id="summary-lost">0</p>
+                                <p class="text-xl font-bold text-red-700" id="summary-lost">0 ( 0% )</p>
                             </div>
                         </div>
 
                         <!-- Table -->
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto min-h-[300px]">
                             <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
                                 <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
                                     <tr>
@@ -409,7 +447,7 @@
                                         <th class="px-4 py-4 font-semibold text-center w-32">ไม่ได้งาน</th>
                                     </tr>
                                 </thead>
-                                <tbody id="projects-summary-body" class="divide-y divide-gray-100">
+                                <tbody id="projects-summary-body" class="divide-y divide-gray-100 bg-white">
                                     <!-- JS Populates -->
                                 </tbody>
                             </table>
@@ -1079,6 +1117,8 @@
                 allTasks = tasks; 
                 
                 const listYearSelect = document.getElementById('search-year');
+                const summaryYearSelect = document.getElementById('summary-search-year'); // เพิ่มอัปเดตช่องปีในหน้าสรุปโครงการด้วย
+                
                 if (listYearSelect) {
                     const yearsSet = new Set();
                     tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); });
@@ -1090,6 +1130,15 @@
                         listYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
                     });
                     if(sortedYears.includes(currentVal)) listYearSelect.value = currentVal;
+                    
+                    if (summaryYearSelect) {
+                        const sumCurrentVal = summaryYearSelect.value;
+                        summaryYearSelect.innerHTML = '<option value="">ทุกปีทั้งหมด</option>';
+                        sortedYears.forEach(y => {
+                            summaryYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+                        });
+                        if(sortedYears.includes(sumCurrentVal)) summaryYearSelect.value = sumCurrentVal;
+                    }
                 }
 
                 filterAndRenderTasks(); 
@@ -1318,6 +1367,14 @@
         // ==============================================
         // ระบบสรุปรายชื่อโครงการ (Project Summary)
         // ==============================================
+        let currentSummaryFilter = 'all'; // เก็บค่าสถานะที่กำลังถูกกรอง (คลิกที่ Dashboard Cards)
+        let finalDisplayProjectData = []; // เก็บตัวแปรไว้ Export เป็น Excel/PDF
+        
+        window.setSummaryFilter = (filterType) => {
+            currentSummaryFilter = filterType;
+            renderProjectSummary();
+        };
+
         function renderProjectSummary() {
             const tbody = document.getElementById('projects-summary-body');
             if (!tbody) return;
@@ -1331,9 +1388,8 @@
                 visibleProjects = allProjects.filter(p => p.ownerId === currentUser.uid || userProjectNames.has(p.name));
             }
 
-            // 2. หาวันที่รับงานแรกสุดของแต่ละโครงการ และเรียงลำดับ
+            // 2. หาวันที่รับงานแรกสุดของแต่ละโครงการ 
             const projectData = visibleProjects.map(p => {
-                // ค้นหางานทั้งหมดที่ตรงกับชื่อโครงการนี้
                 const pTasks = allTasks.filter(t => t.projectName === p.name && t.receiveDate);
                 let earliestDate = '';
                 if (pTasks.length > 0) {
@@ -1347,46 +1403,101 @@
                 };
             });
 
-            // เรียงลำดับจากเก่าไปใหม่ตามวันที่รับงาน
-            projectData.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+            // 3. กรองข้อมูลจากช่อง Search Bar และ Date Filter
+            const searchInput = document.getElementById('summary-search-input')?.value.toLowerCase() || '';
+            const timeType = document.getElementById('summary-search-time-type')?.value || 'day';
+            const searchDate = document.getElementById('summary-search-date')?.value;
+            const searchMonth = document.getElementById('summary-search-month')?.value;
+            const searchYear = document.getElementById('summary-search-year')?.value;
 
-            // 3. แสดงผลตาราง และคำนวณสรุป
-            let total = projectData.length;
+            const searchedProjects = projectData.filter(p => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = p.earliestDate === searchDate;
+                else if (timeType === 'month' && searchMonth) matchTime = p.earliestDate && p.earliestDate.startsWith(searchMonth);
+                else if (timeType === 'year' && searchYear) matchTime = p.earliestDate && p.earliestDate.startsWith(searchYear);
+
+                const matchText = searchInput ? p.name.toLowerCase().includes(searchInput) : true;
+                return matchTime && matchText;
+            });
+
+            // เรียงลำดับจากเก่าไปใหม่ตามวันที่รับงาน
+            searchedProjects.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+
+            // 4. คำนวณสรุปตัวเลขสถานะ (Total, Progress, Won, Lost) ก่อนนำไปแสดงบน Cards
+            let total = searchedProjects.length;
             let inProgress = 0, won = 0, lost = 0;
 
-            tbody.innerHTML = '';
-            projectData.forEach((p, index) => {
+            searchedProjects.forEach(p => {
                 const st = p.status || '';
                 if (st === 'in_progress') inProgress++;
                 else if (st === 'won') won++;
                 else if (st === 'lost') lost++;
-
-                const disableCheck = currentUserRole === 'monitor' ? 'disabled cursor-not-allowed opacity-50' : 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-[#5b5fc7]/30';
-                
-                const checkboxHTML = (type) => `
-                    <input type="checkbox" 
-                        ${st === type ? 'checked' : ''} 
-                        ${disableCheck}
-                        onchange="updateProjectStatus('${p.id}', '${type}', this.checked)"
-                        class="w-5 h-5 text-[#5b5fc7] border-gray-300 rounded focus:ring-[#5b5fc7] transition-all shadow-sm">
-                `;
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-4 py-4 text-center font-medium text-gray-500">${index + 1}</td>
-                        <td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td>
-                        <td class="px-6 py-4 font-bold text-gray-800">${p.name}</td>
-                        <td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td>
-                        <td class="px-4 py-4 text-center">${checkboxHTML('won')}</td>
-                        <td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td>
-                    </tr>
-                `;
             });
 
-            document.getElementById('summary-total').textContent = total;
-            document.getElementById('summary-progress').textContent = inProgress;
-            document.getElementById('summary-won').textContent = won;
-            document.getElementById('summary-lost').textContent = lost;
+            // สูตรหาเปอร์เซ็นต์
+            const getPct = (val) => total > 0 ? Math.round((val / total) * 100) : 0;
+
+            document.getElementById('summary-total').textContent = `${total} ( 100% )`;
+            document.getElementById('summary-progress').textContent = `${inProgress} ( ${getPct(inProgress)}% )`;
+            document.getElementById('summary-won').textContent = `${won} ( ${getPct(won)}% )`;
+            document.getElementById('summary-lost').textContent = `${lost} ( ${getPct(lost)}% )`;
+
+            // 5. ปรับแต่ง UI ของกล่อง Card ให้อันที่เลือกถูกเน้นหนาขึ้น
+            const cards = [
+                { id: 'card-sum-all', match: 'all', ring: 'ring-gray-400' },
+                { id: 'card-sum-prog', match: 'in_progress', ring: 'ring-blue-500' },
+                { id: 'card-sum-won', match: 'won', ring: 'ring-green-500' },
+                { id: 'card-sum-lost', match: 'lost', ring: 'ring-red-500' }
+            ];
+
+            cards.forEach(c => {
+                const el = document.getElementById(c.id);
+                if(el) {
+                    el.classList.remove('ring-2', 'ring-offset-2', 'scale-[1.02]', 'ring-gray-400', 'ring-blue-500', 'ring-green-500', 'ring-red-500');
+                    if(currentSummaryFilter === c.match) {
+                        el.classList.add('ring-2', 'ring-offset-2', 'scale-[1.02]', c.ring);
+                    }
+                }
+            });
+
+            // 6. กรองข้อมูลอีกขั้น ตาม Card ที่ผู้ใช้คลิก
+            finalDisplayProjectData = searchedProjects.filter(p => {
+                if (currentSummaryFilter === 'all') return true;
+                return p.status === currentSummaryFilter;
+            });
+
+            document.getElementById('summary-display-count').textContent = finalDisplayProjectData.length;
+
+            // 7. Render ตาราง
+            tbody.innerHTML = '';
+            
+            if (finalDisplayProjectData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลโครงการตามเงื่อนไขที่เลือก</td></tr>`;
+            } else {
+                finalDisplayProjectData.forEach((p, index) => {
+                    const st = p.status || '';
+                    const disableCheck = currentUserRole === 'monitor' ? 'disabled cursor-not-allowed opacity-50' : 'cursor-pointer hover:ring-2 hover:ring-offset-1 hover:ring-[#5b5fc7]/30';
+                    
+                    const checkboxHTML = (type) => `
+                        <input type="checkbox" 
+                            ${st === type ? 'checked' : ''} 
+                            ${disableCheck}
+                            onchange="updateProjectStatus('${p.id}', '${type}', this.checked)"
+                            class="w-5 h-5 text-[#5b5fc7] border-gray-300 rounded focus:ring-[#5b5fc7] transition-all shadow-sm">
+                    `;
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-4 text-center font-medium text-gray-500">${index + 1}</td>
+                            <td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td>
+                            <td class="px-6 py-4 font-bold text-gray-800">${p.name}</td>
+                            <td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td>
+                            <td class="px-4 py-4 text-center">${checkboxHTML('won')}</td>
+                            <td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td>
+                        </tr>
+                    `;
+                });
+            }
             lucide.createIcons();
         }
 
@@ -1403,6 +1514,75 @@
                 renderProjectSummary(); 
             }
         };
+
+        // --- Event Listeners สำหรับการค้นหาและ Export ของ Project Summary ---
+        document.getElementById('summary-search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value;
+            const dateInput = document.getElementById('summary-search-date');
+            const monthInput = document.getElementById('summary-search-month');
+            const yearInput = document.getElementById('summary-search-year');
+            
+            if(dateInput) { if(type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+            if(monthInput) { if(type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+            if(yearInput) { if(type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+            
+            if (dateInput) dateInput.value = '';
+            if (monthInput) monthInput.value = '';
+            if (yearInput) yearInput.value = '';
+            renderProjectSummary();
+        });
+
+        document.getElementById('summary-search-input')?.addEventListener('input', renderProjectSummary);
+        document.getElementById('summary-search-date')?.addEventListener('change', renderProjectSummary);
+        document.getElementById('summary-search-month')?.addEventListener('change', renderProjectSummary);
+        document.getElementById('summary-search-year')?.addEventListener('change', renderProjectSummary);
+
+        document.getElementById('btn-summary-reset-search')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('summary-search-input');
+            const timeType = document.getElementById('summary-search-time-type');
+            if (searchInput) searchInput.value = '';
+            if (timeType) {
+                timeType.value = 'day';
+                timeType.dispatchEvent(new Event('change')); 
+            }
+            setSummaryFilter('all'); // ถ้ากดรีเซ็ต ให้กลับมาหน้า โครงการทั้งหมด ด้วย
+        });
+
+        document.getElementById('btn-summary-export-excel')?.addEventListener('click', () => {
+            if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = finalDisplayProjectData.map((p, idx) => {
+                let statusText = '-';
+                if (p.status === 'in_progress') statusText = 'กำลังดำเนินการ';
+                else if (p.status === 'won') statusText = 'ได้งาน';
+                else if (p.status === 'lost') statusText = 'ไม่ได้งาน';
+                
+                return {
+                    'ลำดับ': idx + 1,
+                    'วันที่รับงานแรกสุด': p.earliestDate ? formatDate(p.earliestDate) : '-',
+                    'ชื่อโครงการ': p.name || '-',
+                    'สถานะปัจจุบัน': statusText
+                };
+            });
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Project Summary");
+            XLSX.writeFile(workbook, `Project_Summary_${getThaiDateString()}.xlsx`);
+            showNotification("Export Excel สำเร็จ");
+        });
+
+        document.getElementById('btn-summary-export-pdf')?.addEventListener('click', () => {
+            if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            showNotification("กำลังเตรียมไฟล์ PDF...", "success");
+            const element = document.getElementById('projects-summary-table');
+            
+            html2pdf().set({
+                margin: 0.4, filename: `Project_Summary_${getThaiDateString()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            }).from(element).save().then(() => {
+                showNotification("Export PDF สำเร็จ");
+            });
+        });
 
         // ==============================================
         // ระบบ Checklist & Notes (แก้ไขเป็นบังคับติ๊กรายบรรทัด)
