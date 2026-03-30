@@ -1942,6 +1942,14 @@
 
             const totalProjectsSet = new Set();
             allTasks.forEach(t => { if(t.projectName) totalProjectsSet.add(t.projectName); });
+            
+            // แยกสิทธิ์การแสดงผลจำนวนโครงการทั้งหมด
+            if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
+                // แอดมิน/มอนิเตอร์ ให้นับรวมโครงการในระบบที่ถูกสร้างไว้ (แม้จะยังไม่มีใครลงงาน) เข้าไปด้วย
+                allProjects.forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
+            }
+            // *สำหรับ User ระบบจะใช้แค่ allTasks ด้านบน ซึ่งถูกกรองให้มีแค่งานของตัวเองอยู่แล้ว
+
             const filteredProjectsSet = new Set();
             dashTasks.forEach(t => { if(t.projectName) filteredProjectsSet.add(t.projectName); });
 
