@@ -803,11 +803,19 @@
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
-        document.getElementById('tab-manage')?.addEventListener('click', () => switchTab('manage'));
+        
+        // เพิ่มการ Reset ฟอร์มเพื่อให้กล่องบันทึกย่อแสดงขึ้นมาทุกครั้งเมื่อกดแท็บ
+        document.getElementById('tab-manage')?.addEventListener('click', () => {
+            currentEditTaskId = null;
+            resetFormToAddMode();
+            switchTab('manage');
+        });
         document.getElementById('tab-users')?.addEventListener('click', () => switchTab('users'));
         
+        // เพิ่มการ Reset ฟอร์มเพื่อให้กล่องบันทึกย่อแสดงขึ้นมาทุกครั้งเมื่อกดปุ่มเพิ่มงาน
         document.getElementById('btn-add-task-top')?.addEventListener('click', () => {
             currentEditTaskId = null;
+            resetFormToAddMode();
             switchTab('manage');
         });
 
@@ -1248,6 +1256,12 @@
         function renderNotes() {
             const list = document.getElementById('notes-list');
             if(!list) return;
+
+            // ป้องกันปัญหากล่องหายเวลาโหลดหน้าเว็บแรกสุด
+            if (!currentNotes || currentNotes.length === 0) {
+                currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
+            }
+
             list.innerHTML = '';
             
             currentNotes.forEach((note, index) => {
@@ -1255,20 +1269,22 @@
                 
                 list.innerHTML += `
                     <div class="flex items-start gap-3 group/note">
-                        <!-- เปลี่ยนมาใช้ Checkbox มาตรฐาน (Native Checkbox) เพื่อให้ตรงกับความต้องการเป๊ะๆ -->
-                        <input type="checkbox" onchange="toggleNote(${note.id})" ${note.completed ? 'checked' : ''} class="mt-1.5 w-4 h-4 text-[#5b5fc7] border-gray-300 rounded focus:ring-[#5b5fc7] cursor-pointer transition-all shadow-sm">
+                        <!-- ปุ่มที่ทำหน้าที่เป็น Checkbox แบบ Native (รับประกันว่าแสดงผล 100%) -->
+                        <button type="button" onclick="toggleNote('${note.id}')" class="mt-1.5 w-4 h-4 rounded-sm flex items-center justify-center border transition-all ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-400 hover:border-[#5b5fc7] bg-white'} shadow-sm focus:outline-none shrink-0">
+                            ${note.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 font-bold"></i>' : ''}
+                        </button>
                         
                         <div class="flex-1 flex flex-col gap-1">
                             <div class="flex items-center gap-2">
-                                <input type="text" value="${note.text}" oninput="updateNoteText(${note.id}, this.value)" placeholder="${note.completed ? 'พิมพ์รายละเอียดที่นี่...' : 'คลิกติ๊กถูกที่กล่องด้านหน้า เพื่อลงเวลาและเริ่มพิมพ์...'}" class="flex-1 bg-transparent border-0 border-b hover:border-gray-300 focus:border-[#5b5fc7] focus:ring-0 px-1 py-1 text-sm ${note.completed ? 'text-gray-800 border-gray-200' : 'text-gray-400 opacity-60 border-transparent cursor-not-allowed select-none'} transition-all" ${!note.completed ? 'readonly tabindex="-1"' : ''}>
+                                <input type="text" value="${note.text}" oninput="updateNoteText('${note.id}', this.value)" placeholder="${note.completed ? 'พิมพ์รายละเอียดที่นี่...' : 'คลิกติ๊กถูกที่กล่องด้านหน้า เพื่อลงเวลาและเริ่มพิมพ์...'}" class="flex-1 bg-transparent border-0 border-b hover:border-gray-300 focus:border-[#5b5fc7] focus:ring-0 px-1 py-1 text-sm ${note.completed ? 'text-gray-800 border-gray-200' : 'text-gray-400 opacity-60 border-transparent cursor-not-allowed select-none'} transition-all" ${!note.completed ? 'readonly tabindex="-1"' : ''}>
                                 ${timeHtml}
                             </div>
                         </div>
                         ${currentNotes.length > 1 || note.completed ? `
-                        <button type="button" onclick="removeNote(${note.id})" class="mt-1.5 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1">
+                        <button type="button" onclick="removeNote('${note.id}')" class="mt-1.5 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1 shrink-0">
                             <i data-lucide="x" class="w-4 h-4"></i>
                         </button>
-                        ` : '<div class="w-6"></div>'}
+                        ` : '<div class="w-6 shrink-0"></div>'}
                     </div>
                 `;
             });
@@ -1276,17 +1292,17 @@
         }
 
         window.toggleNote = (id) => {
-            const note = currentNotes.find(n => n.id === id);
+            const note = currentNotes.find(n => String(n.id) === String(id));
             if (note) {
                 note.completed = !note.completed;
                 if (note.completed) {
                     const now = new Date();
                     note.completedAt = `${now.toLocaleDateString('th-TH', {timeZone: 'Asia/Bangkok'})} ${now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit', timeZone: 'Asia/Bangkok'})} น.`;
                     
-                    // เมื่อติ๊กถูก ให้สร้างกล่องว่างรอไว้ด้านล่างสุดทันที (งอกอันใหม่)
+                    // สร้างกล่องว่างรอไว้ด้านล่างสุดทันที (งอกอันใหม่)
                     const lastNote = currentNotes[currentNotes.length - 1];
-                    if (lastNote && lastNote.id === id) {
-                        currentNotes.push({ id: Date.now() + Math.random(), text: '', completed: false, completedAt: null });
+                    if (String(lastNote.id) === String(id)) {
+                        currentNotes.push({ id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: '', completed: false, completedAt: null });
                     }
                 } else {
                     note.completedAt = null;
@@ -1297,7 +1313,7 @@
                 if (note.completed) {
                     setTimeout(() => {
                         const inputs = document.querySelectorAll('#notes-list input[type="text"]');
-                        const index = currentNotes.findIndex(n => n.id === id);
+                        const index = currentNotes.findIndex(n => String(n.id) === String(id));
                         if(inputs[index]) inputs[index].focus();
                     }, 50);
                 }
@@ -1305,34 +1321,34 @@
         };
 
         window.updateNoteText = (id, text) => {
-            const note = currentNotes.find(n => n.id === id);
+            const note = currentNotes.find(n => String(n.id) === String(id));
             if (note) {
                 note.text = text;
             }
         };
 
         window.removeNote = (id) => {
-            const noteIndex = currentNotes.findIndex(n => n.id === id);
+            const noteIndex = currentNotes.findIndex(n => String(n.id) === String(id));
             if (noteIndex === -1) return;
             const noteToRestore = currentNotes[noteIndex];
             
-            currentNotes = currentNotes.filter(n => n.id !== id);
+            currentNotes = currentNotes.filter(n => String(n.id) !== String(id));
             
             // เช็คว่าถ้าช่องสุดท้ายโดนลบไป หรือ ช่องสุดท้ายติ๊กถูกแล้ว ให้สร้างช่องใหม่ไว้รองรับ
             if(currentNotes.length === 0 || currentNotes[currentNotes.length - 1].completed) {
-                currentNotes.push({ id: Date.now() + Math.random(), text: '', completed: false, completedAt: null });
+                currentNotes.push({ id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: '', completed: false, completedAt: null });
             }
             renderNotes();
 
             showNotification("ลบรายการบันทึกย่อแล้ว", "success", () => {
                 // ระบบ Undo (ย้อนกลับ)
-                if (currentNotes.length > 0 && currentNotes[currentNotes.length - 1].text === '' && !currentNotes[currentNotes.length - 1].completed && currentNotes[currentNotes.length - 1].id !== noteToRestore.id) {
+                if (currentNotes.length > 0 && currentNotes[currentNotes.length - 1].text === '' && !currentNotes[currentNotes.length - 1].completed && String(currentNotes[currentNotes.length - 1].id) !== String(noteToRestore.id)) {
                     currentNotes.pop(); // ลบช่องว่างที่สร้างไว้อัตโนมัติทิ้งก่อน
                 }
                 currentNotes.splice(noteIndex, 0, noteToRestore); // แทรกข้อมูลกลับที่เดิม
                 
                 if(currentNotes.length === 0 || currentNotes[currentNotes.length - 1].completed) {
-                    currentNotes.push({ id: Date.now() + Math.random(), text: '', completed: false, completedAt: null });
+                    currentNotes.push({ id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: '', completed: false, completedAt: null });
                 }
                 renderNotes();
             });
@@ -1762,7 +1778,7 @@
             const recDate = document.getElementById('receiveDate');
             if (recDate) recDate.value = getThaiDateString();
             
-            currentNotes = [{ id: Date.now() + Math.random(), text: '', completed: false, completedAt: null }];
+            currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
             renderNotes();
             
             document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่";
@@ -1848,10 +1864,10 @@
                 currentNotes = JSON.parse(JSON.stringify(task.notes));
                 const lastNote = currentNotes[currentNotes.length - 1];
                 if (lastNote && lastNote.completed) {
-                    currentNotes.push({ id: Date.now() + Math.random(), text: '', completed: false, completedAt: null });
+                    currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null });
                 }
             } else {
-                currentNotes = [{ id: Date.now() + Math.random(), text: '', completed: false, completedAt: null }];
+                currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
             }
             
             renderNotes();
