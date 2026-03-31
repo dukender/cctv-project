@@ -1225,7 +1225,8 @@
             if(!currentUser || currentUserRole === 'monitor') return;
             try {
                 projInput.value = 'กำลังเพิ่ม...';
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), { name: name, createdAt: Date.now(), ownerId: currentUser.uid });
+                // เพิ่ม status: 'in_progress' เป็นค่าเริ่มต้นทันทีที่สร้างโครงการใหม่
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, status: 'in_progress' });
                 selectProject(name);
                 showNotification(`เพิ่มโครงการ "${name}" แล้ว`);
             } catch (e) {
@@ -1396,8 +1397,16 @@
                     pTasks.sort((a, b) => a.receiveDate.localeCompare(b.receiveDate));
                     earliestDate = pTasks[0].receiveDate;
                 }
+                
+                // กำหนดค่าเริ่มต้นเป็น 'กำลังดำเนินการ' หากข้อมูลเก่าในฐานข้อมูลยังไม่มีคอลัมน์สถานะ
+                let currentStatus = p.status;
+                if (currentStatus === undefined) {
+                    currentStatus = 'in_progress';
+                }
+
                 return {
                     ...p,
+                    status: currentStatus,
                     earliestDate: earliestDate,
                     sortDate: earliestDate || '9999-99-99' // กรณีไม่มีงาน ให้ไปอยู่ท้ายสุด
                 };
