@@ -2698,6 +2698,23 @@
                     }
                 });
                 
+                // --- เพิ่มระบบจัดเรียงลำดับ: ให้ออนไลน์ขึ้นก่อน ไม่ออนไลน์อยู่ล่างสุด ---
+                allUsers.sort((a, b) => {
+                    const now = Date.now();
+                    // เงื่อนไขเวลาเดียวกันกับที่ใช้แสดงผลจุดสีเขียว (ออนไลน์ใน 5 นาที)
+                    const aOnline = a.isOnline && (now - (a.lastActive || 0) < 5 * 60 * 1000);
+                    const bOnline = b.isOnline && (now - (b.lastActive || 0) < 5 * 60 * 1000);
+
+                    if (aOnline && !bOnline) return -1; // a ออนไลน์ ดันขึ้นบน
+                    if (!aOnline && bOnline) return 1;  // b ออนไลน์ ดันขึ้นบน
+                    
+                    // หากสถานะออนไลน์เหมือนกัน ให้เรียงตามตัวอักษร (A-Z) ของอีเมล
+                    const emailA = (a.email || '').toLowerCase();
+                    const emailB = (b.email || '').toLowerCase();
+                    return emailA.localeCompare(emailB);
+                });
+                // --------------------------------------------------------
+
                 if (currentUserRole === 'admin') {
                     renderUsersTable();
                 }
