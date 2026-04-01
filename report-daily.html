@@ -1164,7 +1164,8 @@
             onSnapshot(typeCol, (snapshot) => {
                 allTaskTypes = [];
                 snapshot.forEach(doc => allTaskTypes.push({id: doc.id, ...doc.data()}));
-                allTaskTypes.sort((a,b) => a.createdAt - b.createdAt);
+                // จัดเรียงประเภทงานตามตัวอักษร (ก-ฮ, A-Z)
+                allTaskTypes.sort((a,b) => a.name.localeCompare(b.name, 'th'));
             });
         }
 
@@ -1712,7 +1713,7 @@
                         
                         <div class="flex-1 flex flex-col gap-1">
                             <div class="flex items-center gap-2">
-                                <input type="text" value="${note.text}" oninput="updateNoteText('${note.id}', this.value)" placeholder="${note.completed ? 'พิมพ์รายละเอียดที่นี่...' : 'คลิกติ๊กถูกที่กล่องด้านหน้า เพื่อลงเวลาและเริ่มพิมพ์...'}" class="flex-1 bg-transparent border-0 border-b hover:border-gray-300 focus:border-[#5b5fc7] focus:ring-0 px-1 py-1 text-sm ${note.completed ? 'text-gray-800 border-gray-200' : 'text-gray-400 opacity-60 border-transparent cursor-not-allowed select-none'} transition-all" ${!note.completed ? 'readonly tabindex="-1"' : ''}>
+                                <textarea rows="1" oninput="updateNoteText('${note.id}', this.value); this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" placeholder="${note.completed ? 'พิมพ์รายละเอียดที่นี่...' : 'คลิกติ๊กถูกที่กล่องด้านหน้า เพื่อลงเวลาและเริ่มพิมพ์...'}" class="flex-1 bg-transparent border-0 border-b hover:border-gray-300 focus:border-[#5b5fc7] focus:ring-0 px-1 py-1 text-sm ${note.completed ? 'text-gray-800 border-gray-200' : 'text-gray-400 opacity-60 border-transparent cursor-not-allowed select-none'} transition-all resize-none overflow-hidden" ${!note.completed ? 'readonly tabindex="-1"' : ''}>${note.text}</textarea>
                                 ${timeHtml}
                             </div>
                         </div>
@@ -1725,6 +1726,15 @@
                 `;
             });
             lucide.createIcons();
+            
+            // ปรับความสูงของกล่องข้อความหลายบรรทัด (Textarea) ให้พอดีกับเนื้อหาแบบอัตโนมัติเมื่อโหลดหน้า
+            setTimeout(() => {
+                const textareas = list.querySelectorAll('textarea');
+                textareas.forEach(ta => {
+                    ta.style.height = 'auto';
+                    ta.style.height = ta.scrollHeight + 'px';
+                });
+            }, 0);
         }
 
         window.toggleNote = (id) => {
@@ -1748,9 +1758,15 @@
                 // โฟกัส Input ช่องที่เพิ่งปลดล็อคให้พิมพ์ได้ทันที
                 if (note.completed) {
                     setTimeout(() => {
-                        const inputs = document.querySelectorAll('#notes-list input[type="text"]');
+                        const inputs = document.querySelectorAll('#notes-list textarea');
                         const index = currentNotes.findIndex(n => String(n.id) === String(id));
-                        if(inputs[index]) inputs[index].focus();
+                        if(inputs[index]) {
+                            inputs[index].focus();
+                            // ย้ายเคอร์เซอร์ไปท้ายข้อความ (กรณีแก้ข้อความเดิม)
+                            const val = inputs[index].value;
+                            inputs[index].value = '';
+                            inputs[index].value = val;
+                        }
                     }, 50);
                 }
             }
