@@ -2116,7 +2116,12 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
                 
-                let typeArray = Array.isArray(task.taskType) ? task.taskType : (task.taskType ? [task.taskType] : []);
+                // คัดลอก Array ประเภทงานมาเพื่อจัดเรียง
+                let typeArray = Array.isArray(task.taskType) ? [...task.taskType] : (task.taskType ? [task.taskType] : []);
+                
+                // จัดเรียงประเภทงานตามตัวอักษร (A-Z, ก-ฮ) ก่อนแสดงผล
+                typeArray.sort((a, b) => a.localeCompare(b, 'th'));
+
                 let displayTaskTypeHtml = typeArray.length > 0 
                     ? typeArray.map(t => `<div class="whitespace-nowrap">- ${t}</div>`).join('') 
                     : '-';
