@@ -2577,7 +2577,7 @@
                 });
             }
 
-            const drawPieChart = (canvasId, dataObj, titleStr, maxItems = 6, othersLabel = 'อื่นๆ') => {
+            const drawPieChart = (canvasId, dataObj, titleStr, unitText = '', maxItems = 6, othersLabel = 'อื่นๆ') => {
                 const canvas = document.getElementById(`chart-${canvasId}`);
                 if (!canvas) return;
                 destroyChart(canvasId);
@@ -2612,27 +2612,38 @@
                             
                             // คำนวณผลรวม
                             const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const text = total.toString();
+                            const textNum = total.toString();
                             
-                            // ตั้งค่ารูปแบบตัวอักษร
                             ctx.restore();
-                            ctx.font = "bold 2.5rem Sarabun, sans-serif";
-                            ctx.fillStyle = "#5b5fc7"; // สีหลักของตีมโปรเจกต์
-                            ctx.textBaseline = "middle";
                             
-                            // วาดข้อความลงกลางโดนัท
-                            const textWidth = ctx.measureText(text).width;
-                            ctx.fillText(text, centerX - (textWidth / 2), centerY + 4);
+                            // วาดตัวเลข
+                            ctx.font = "bold 2.5rem Sarabun, sans-serif";
+                            ctx.fillStyle = "#dc2626"; // โทนสีแดงเข้ม (เพื่อให้ตัวเลขเด่นชัด)
+                            ctx.textBaseline = "middle";
+                            const textNumWidth = ctx.measureText(textNum).width;
+                            // ขยับตัวเลขขึ้นเล็กน้อยหากมีหน่วยต่อท้าย
+                            const numY = unitText ? centerY - 12 : centerY + 4;
+                            ctx.fillText(textNum, centerX - (textNumWidth / 2), numY);
+                            
+                            // วาดหน่วย (ถ้ามี)
+                            if (unitText) {
+                                ctx.font = "600 0.9rem Sarabun, sans-serif"; // ขนาดเล็กกว่าตัวเลข
+                                ctx.fillStyle = "#ef4444"; // โทนสีแดง (สว่างกว่าตัวเลขเล็กน้อยเพื่อลดความเด่นลง)
+                                const unitWidth = ctx.measureText(unitText).width;
+                                // ขยับหน่วยลงมาไว้ใต้ตัวเลข
+                                ctx.fillText(unitText, centerX - (unitWidth / 2), centerY + 20);
+                            }
+                            
                             ctx.save();
                         }
                     }]
                 });
             };
 
-            drawPieChart('responsible', counts.responsible, 'ผู้รับผิดชอบ');
-            drawPieChart('customer', counts.customer, 'ลูกค้า');
-            drawPieChart('assignment', counts.assignment, 'การมอบหมาย');
-            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน');
+            drawPieChart('responsible', counts.responsible, 'ผู้รับผิดชอบ', 'คน');
+            drawPieChart('customer', counts.customer, 'ลูกค้า', 'คน/บริษัท');
+            drawPieChart('assignment', counts.assignment, 'การมอบหมาย', 'งาน');
+            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน', 'ประเภท');
         }
 
         document.getElementById('dash-year-select')?.addEventListener('change', (e) => { dashCurrentYear = e.target.value; renderDashboard(); });
