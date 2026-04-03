@@ -2594,24 +2594,46 @@
                     finalKeys = allKeys; finalValues = finalKeys.map(k => dataObj[k]);
                 }
 
+                // สร้างชุดสีพื้นฐานตามจำนวนข้อมูลที่มี
+                const originalColors = finalValues.map((_, i) => modernColors[i % modernColors.length]);
+
                 const ctx = canvas.getContext('2d');
                 chartInstances[canvasId] = new Chart(ctx, {
                     type: 'doughnut',
-                    data: { labels: finalKeys, datasets: [{ data: finalValues, backgroundColor: modernColors, borderWidth: 0, hoverOffset: 4 }] },
+                    data: { 
+                        labels: finalKeys, 
+                        datasets: [{ 
+                            data: finalValues, 
+                            backgroundColor: [...originalColors], 
+                            borderWidth: 0, 
+                            hoverOffset: 4,
+                            offset: Array(finalValues.length).fill(0) // ค่าเริ่มต้น: ไม่มีชิ้นไหนขยับออกมา
+                        }] 
+                    },
                     options: { 
                         responsive: true, 
                         maintainAspectRatio: false, 
+                        layout: { padding: 10 }, // เพิ่มพื้นที่รอบกราฟเพื่อไม่ให้ชิ้นส่วนที่ขยับออกมาโดนตัดขอบ
                         plugins: { 
                             legend: { 
                                 position: 'right',
                                 onClick: function(e, legendItem, legend) {
                                     const chart = legend.chart;
                                     const index = legendItem.index;
+                                    const dataset = chart.data.datasets[0];
+
                                     // สลับสถานะการเลือก (ถ้ากดซ้ำให้ยกเลิกเป็น null เพื่อกลับไปโชว์ผลรวมทั้งหมด)
                                     if (chart.customSelectedIndex === index) {
                                         chart.customSelectedIndex = null; 
+                                        dataset.backgroundColor = [...originalColors];
+                                        dataset.offset = Array(finalValues.length).fill(0);
                                     } else {
                                         chart.customSelectedIndex = index; 
+                                        // ทำให้ชิ้นส่วนอื่นจางลง (Opacity ~20%) โดยเติมรหัส '33' หลังสี Hex
+                                        dataset.backgroundColor = originalColors.map((col, i) => i === index ? col : col + '33'); 
+                                        const newOffsets = Array(finalValues.length).fill(0);
+                                        newOffsets[index] = 15; // ขยับชิ้นส่วนที่เลือกออกมา 15px
+                                        dataset.offset = newOffsets;
                                     }
                                     chart.update(); // อัปเดตกราฟเพื่อเรียก beforeDraw และวาดตัวเลขใหม่
                                 }
@@ -2667,10 +2689,11 @@
                 });
             };
 
-            drawPieChart('responsible', counts.responsible, 'ผู้รับผิดชอบ', 'คน');
-            drawPieChart('customer', counts.customer, 'ลูกค้า', 'คน/บริษัท');
+            // เปลี่ยนหน่วยเป็น "งาน" ตามที่ระบุ
+            drawPieChart('responsible', counts.responsible, 'ผู้รับผิดชอบ', 'งาน');
+            drawPieChart('customer', counts.customer, 'ลูกค้า', 'งาน');
             drawPieChart('assignment', counts.assignment, 'การมอบหมาย', 'งาน');
-            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน', 'ประเภท');
+            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน', 'งาน');
         }
 
         document.getElementById('dash-year-select')?.addEventListener('change', (e) => { dashCurrentYear = e.target.value; renderDashboard(); });
