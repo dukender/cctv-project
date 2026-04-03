@@ -213,9 +213,17 @@
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                                 <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)</h3>
-                                <select id="dash-project-filter" class="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-teal-500 text-sm font-medium transition-shadow cursor-pointer min-w-[180px] max-w-full truncate">
-                                    <option value="all">ทุกโครงการทั้งหมด</option>
-                                </select>
+                                
+                                <!-- เปลี่ยนจาก select เป็น Custom Searchable Dropdown -->
+                                <div class="relative min-w-[240px] w-full sm:w-auto z-20" id="dash-project-dropdown-wrapper">
+                                    <div class="flex items-center w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus-within:ring-1 focus-within:ring-teal-500 focus-within:bg-white transition-colors cursor-text shadow-sm h-[34px]">
+                                        <input type="text" id="dash-project-input" class="flex-1 bg-transparent outline-none text-sm font-medium w-full text-gray-700 placeholder-gray-700 truncate" placeholder="ทุกโครงการทั้งหมด" autocomplete="off">
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors ml-1" id="dash-project-dropdown-btn"></i>
+                                    </div>
+                                    <div id="dash-project-dropdown-list" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden right-0">
+                                        <ul class="max-h-60 overflow-y-auto py-1 text-sm font-medium text-gray-700" id="dash-project-options-ul"></ul>
+                                    </div>
+                                </div>
                             </div>
                             <div class="relative h-80 w-full">
                                 <canvas id="chart-project"></canvas>
@@ -748,6 +756,7 @@
         let dashCurrentYear = getThaiDate().getFullYear().toString();
         let dashCurrentMonth = 'all';
         let dashCurrentProject = 'all'; // เพิ่มตัวแปรสำหรับเก็บค่าโครงการที่กรองในแดชบอร์ด
+        let dashAvailableProjects = []; // เก็บรายชื่อโครงการในแดชบอร์ดเพื่อให้ใช้ค้นหาได้
         let dashTimeView = 'month';
         
         // ตัวแปรเก็บสถานะการกรองอีเมล (ใช้ร่วมกัน 4 หน้าจอ)
@@ -1424,9 +1433,13 @@
             }
         };
 
+        const dashProjList = document.getElementById('dash-project-dropdown-list');
+        const dashProjWrapper = document.getElementById('dash-project-dropdown-wrapper');
+
         document.addEventListener('mousedown', (e) => {
             if (projWrapper && !projWrapper.contains(e.target)) projList?.classList.add('hidden');
             if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) taskTypeList?.classList.add('hidden');
+            if (dashProjWrapper && !dashProjWrapper.contains(e.target)) dashProjList?.classList.add('hidden');
         });
 
         // ==============================================
@@ -2418,8 +2431,8 @@
                 }
             }
 
-            const dashProjSelect = document.getElementById('dash-project-filter');
-            if (dashProjSelect) {
+            const dashProjInput = document.getElementById('dash-project-input');
+            if (dashProjInput) {
                 // ดึงรายการโครงการเฉพาะช่วงเวลาที่เลือก เพื่อให้ตัวเลือกสอดคล้องกับข้อมูลจริง
                 let timeFilteredTasks = tasksToUse;
                 if (dashCurrentYear !== 'all') timeFilteredTasks = timeFilteredTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
@@ -2427,17 +2440,16 @@
                 
                 const projsSet = new Set();
                 timeFilteredTasks.forEach(t => { projsSet.add(t.projectName || 'ไม่ได้ระบุโครงการ'); });
-                const sortedProjs = Array.from(projsSet).sort();
+                dashAvailableProjects = Array.from(projsSet).sort();
                 
-                const currentProjSelection = dashProjSelect.value || dashCurrentProject;
-                dashProjSelect.innerHTML = '<option value="all">ทุกโครงการทั้งหมด</option>';
-                sortedProjs.forEach(p => { dashProjSelect.innerHTML += `<option value="${p}">${p}</option>`; });
-                
-                if (currentProjSelection === 'all' || sortedProjs.includes(currentProjSelection)) {
-                    dashProjSelect.value = currentProjSelection; dashCurrentProject = currentProjSelection;
-                } else {
-                    dashProjSelect.value = 'all'; dashCurrentProject = 'all';
+                // ตรวจสอบว่าถ้า Filter ถูกกรองจนโครงการที่เคยเลือกไว้ไม่มีแล้ว ให้กลับเป็น all
+                if (dashCurrentProject !== 'all' && !dashAvailableProjects.includes(dashCurrentProject)) {
+                    dashCurrentProject = 'all';
                 }
+                
+                // อัปเดตช่องค้นหา (Input)
+                dashProjInput.value = dashCurrentProject === 'all' ? '' : dashCurrentProject;
+                dashProjInput.placeholder = dashCurrentProject === 'all' ? 'ทุกโครงการทั้งหมด' : dashCurrentProject;
             }
 
             let dashTasks = tasksToUse;
@@ -2696,15 +2708,81 @@
             drawPieChart('tasktype', counts.taskType, 'ประเภทงาน', 'งาน');
         }
 
+        // --- Custom Searchable Dropdown สำหรับหน้า Dashboard สถิติ ---
+        const dashProjInput = document.getElementById('dash-project-input');
+        const dashProjUl = document.getElementById('dash-project-options-ul');
+        const dashProjBtn = document.getElementById('dash-project-dropdown-btn');
+
+        function renderDashProjectDropdown(query = '') {
+            if(!dashProjUl) return;
+            dashProjUl.innerHTML = '';
+            const q = query.toLowerCase().trim();
+            
+            let filtered = dashAvailableProjects;
+            if (q) {
+                filtered = dashAvailableProjects.filter(p => p.toLowerCase().includes(q));
+            }
+
+            // เพิ่มตัวเลือก "ทั้งหมด" ไว้บนสุดเสมอ
+            if (!q || "ทุกโครงการทั้งหมด".includes(q)) {
+                dashProjUl.innerHTML += `
+                    <li class="px-4 py-2 hover:bg-teal-50 cursor-pointer flex justify-between items-center group ${dashCurrentProject === 'all' ? 'text-teal-600 font-bold bg-teal-50/50' : ''}" onmousedown="selectDashProject('all')">
+                        <span class="flex-1 truncate">ทุกโครงการทั้งหมด</span>
+                        ${dashCurrentProject === 'all' ? '<i data-lucide="check" class="w-4 h-4 text-teal-600"></i>' : ''}
+                    </li>
+                `;
+            }
+
+            if (filtered.length === 0 && q && !("ทุกโครงการทั้งหมด".includes(q))) {
+                dashProjUl.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">ไม่พบโครงการที่ค้นหา...</li>`;
+            } else {
+                filtered.forEach(p => {
+                    const isSelected = dashCurrentProject === p;
+                    dashProjUl.innerHTML += `
+                        <li class="px-4 py-2 hover:bg-teal-50 cursor-pointer flex justify-between items-center group ${isSelected ? 'text-teal-600 font-bold bg-teal-50/50' : ''}" onmousedown="selectDashProject('${p.replace(/'/g, "\\'")}')">
+                            <span class="flex-1 truncate">${p}</span>
+                            ${isSelected ? '<i data-lucide="check" class="w-4 h-4 text-teal-600"></i>' : ''}
+                        </li>
+                    `;
+                });
+            }
+            lucide.createIcons();
+            document.getElementById('dash-project-dropdown-list')?.classList.remove('hidden');
+        }
+
+        dashProjInput?.addEventListener('focus', () => renderDashProjectDropdown(dashProjInput.value));
+        dashProjInput?.addEventListener('input', (e) => renderDashProjectDropdown(e.target.value));
+        dashProjBtn?.addEventListener('click', () => {
+            dashProjInput?.focus();
+            renderDashProjectDropdown('');
+        });
+
+        window.selectDashProject = (name) => {
+            dashCurrentProject = name;
+            if(dashProjInput) {
+                dashProjInput.value = name === 'all' ? '' : name;
+                dashProjInput.placeholder = name === 'all' ? 'ทุกโครงการทั้งหมด' : name;
+            }
+            document.getElementById('dash-project-dropdown-list')?.classList.add('hidden');
+            renderDashboard(); // Re-render ใหม่ให้แสดงผลตามโครงการที่เลือก
+        };
+        // -------------------------------------------------------------
+
         document.getElementById('dash-year-select')?.addEventListener('change', (e) => { dashCurrentYear = e.target.value; renderDashboard(); });
         document.getElementById('dash-month-select')?.addEventListener('change', (e) => { dashCurrentMonth = e.target.value; renderDashboard(); });
-        document.getElementById('dash-project-filter')?.addEventListener('change', (e) => { dashCurrentProject = e.target.value; renderDashboard(); });
         
         document.getElementById('btn-reset-dash-filter')?.addEventListener('click', () => {
             if (document.getElementById('dash-year-select')) document.getElementById('dash-year-select').value = 'all';
             if (document.getElementById('dash-month-select')) document.getElementById('dash-month-select').value = 'all';
-            if (document.getElementById('dash-project-filter')) document.getElementById('dash-project-filter').value = 'all';
-            dashCurrentYear = 'all'; dashCurrentMonth = 'all'; dashCurrentProject = 'all'; renderDashboard();
+            
+            // รีเซ็ต Custom Searchable Dropdown ของ Dashboard
+            dashCurrentProject = 'all';
+            if (dashProjInput) {
+                dashProjInput.value = '';
+                dashProjInput.placeholder = 'ทุกโครงการทั้งหมด';
+            }
+            
+            dashCurrentYear = 'all'; dashCurrentMonth = 'all'; renderDashboard();
         });
         document.getElementById('btn-view-month')?.addEventListener('click', () => {
             dashTimeView = 'month';
