@@ -211,36 +211,12 @@
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
-                            <div class="flex flex-col md:flex-row gap-6">
-                                <div class="md:w-1/4 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 pr-0 md:pr-4">
-                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                        <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-500"></i> สถิติงานตามเวลา <span class="text-xs font-normal text-gray-500">(<span id="dash-time-label">รายเดือน</span>)</span>
-                                    </h3>
-                                    <div class="flex-1 flex flex-col justify-center gap-4">
-                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p>
-                                            <p class="text-3xl font-bold text-[#5b5fc7]" id="dash-total-projects">0</p>
-                                        </div>
-                                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
-                                            <p class="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">โครงการที่ไม่มีชื่อ</p>
-                                            <p class="text-3xl font-bold text-orange-600" id="dash-no-project">0</p>
-                                        </div>
-                                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
-                                            <p class="text-xs font-semibold text-teal-600 uppercase tracking-wider mb-1">โครงการตามตัวกรอง</p>
-                                            <p class="text-3xl font-bold text-teal-600" id="dash-filtered-projects">0</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="md:w-3/4 flex flex-col min-h-[250px]">
-                                    <div class="relative flex-1 w-full">
-                                        <canvas id="chart-time"></canvas>
-                                    </div>
-                                </div>
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                                <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)</h3>
+                                <select id="dash-project-filter" class="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-teal-500 text-sm font-medium transition-shadow cursor-pointer min-w-[180px] max-w-full truncate">
+                                    <option value="all">ทุกโครงการทั้งหมด</option>
+                                </select>
                             </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)</h3>
                             <div class="relative h-80 w-full">
                                 <canvas id="chart-project"></canvas>
                             </div>
@@ -771,6 +747,7 @@
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         let dashCurrentYear = getThaiDate().getFullYear().toString();
         let dashCurrentMonth = 'all';
+        let dashCurrentProject = 'all'; // เพิ่มตัวแปรสำหรับเก็บค่าโครงการที่กรองในแดชบอร์ด
         let dashTimeView = 'month';
         
         // ตัวแปรเก็บสถานะการกรองอีเมล (ใช้ร่วมกัน 4 หน้าจอ)
@@ -2441,9 +2418,33 @@
                 }
             }
 
+            const dashProjSelect = document.getElementById('dash-project-filter');
+            if (dashProjSelect) {
+                // ดึงรายการโครงการเฉพาะช่วงเวลาที่เลือก เพื่อให้ตัวเลือกสอดคล้องกับข้อมูลจริง
+                let timeFilteredTasks = tasksToUse;
+                if (dashCurrentYear !== 'all') timeFilteredTasks = timeFilteredTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
+                if (dashCurrentMonth !== 'all') timeFilteredTasks = timeFilteredTasks.filter(t => t.receiveDate && t.receiveDate.substring(5, 7) === dashCurrentMonth);
+                
+                const projsSet = new Set();
+                timeFilteredTasks.forEach(t => { projsSet.add(t.projectName || 'ไม่ได้ระบุโครงการ'); });
+                const sortedProjs = Array.from(projsSet).sort();
+                
+                const currentProjSelection = dashProjSelect.value || dashCurrentProject;
+                dashProjSelect.innerHTML = '<option value="all">ทุกโครงการทั้งหมด</option>';
+                sortedProjs.forEach(p => { dashProjSelect.innerHTML += `<option value="${p}">${p}</option>`; });
+                
+                if (currentProjSelection === 'all' || sortedProjs.includes(currentProjSelection)) {
+                    dashProjSelect.value = currentProjSelection; dashCurrentProject = currentProjSelection;
+                } else {
+                    dashProjSelect.value = 'all'; dashCurrentProject = 'all';
+                }
+            }
+
             let dashTasks = tasksToUse;
             if (dashCurrentYear !== 'all') dashTasks = dashTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
             if (dashCurrentMonth !== 'all') dashTasks = dashTasks.filter(t => t.receiveDate && t.receiveDate.substring(5, 7) === dashCurrentMonth);
+            // กรองข้อมูลทั้งหมดในแดชบอร์ดด้วยโครงการที่เลือก
+            if (dashCurrentProject !== 'all') dashTasks = dashTasks.filter(t => (t.projectName || 'ไม่ได้ระบุโครงการ') === dashCurrentProject);
 
             const totalProjectsSet = new Set();
             tasksToUse.forEach(t => { if(t.projectName) totalProjectsSet.add(t.projectName); });
@@ -2597,7 +2598,27 @@
                 chartInstances[canvasId] = new Chart(ctx, {
                     type: 'doughnut',
                     data: { labels: finalKeys, datasets: [{ data: finalValues, backgroundColor: modernColors, borderWidth: 0, hoverOffset: 4 }] },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } }, cutout: '65%' },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false, 
+                        plugins: { 
+                            legend: { 
+                                position: 'right',
+                                onClick: function(e, legendItem, legend) {
+                                    const chart = legend.chart;
+                                    const index = legendItem.index;
+                                    // สลับสถานะการเลือก (ถ้ากดซ้ำให้ยกเลิกเป็น null เพื่อกลับไปโชว์ผลรวมทั้งหมด)
+                                    if (chart.customSelectedIndex === index) {
+                                        chart.customSelectedIndex = null; 
+                                    } else {
+                                        chart.customSelectedIndex = index; 
+                                    }
+                                    chart.update(); // อัปเดตกราฟเพื่อเรียก beforeDraw และวาดตัวเลขใหม่
+                                }
+                            } 
+                        }, 
+                        cutout: '65%' 
+                    },
                     plugins: [{
                         id: 'centerText',
                         beforeDraw: function(chart) {
@@ -2610,9 +2631,15 @@
                             const centerX = meta.data[0].x;
                             const centerY = meta.data[0].y;
                             
-                            // คำนวณผลรวม
-                            const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const textNum = total.toString();
+                            // เช็คว่ามีการเลือก Legend ไว้หรือไม่ เพื่อนำตัวเลขของข้อมูลนั้นมาแสดง
+                            let displayNum = 0;
+                            if (chart.customSelectedIndex != null && chart.data.datasets[0].data[chart.customSelectedIndex] !== undefined) {
+                                displayNum = chart.data.datasets[0].data[chart.customSelectedIndex];
+                            } else {
+                                displayNum = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            }
+                            
+                            const textNum = displayNum.toString();
                             
                             ctx.restore();
                             
@@ -2648,10 +2675,13 @@
 
         document.getElementById('dash-year-select')?.addEventListener('change', (e) => { dashCurrentYear = e.target.value; renderDashboard(); });
         document.getElementById('dash-month-select')?.addEventListener('change', (e) => { dashCurrentMonth = e.target.value; renderDashboard(); });
+        document.getElementById('dash-project-filter')?.addEventListener('change', (e) => { dashCurrentProject = e.target.value; renderDashboard(); });
+        
         document.getElementById('btn-reset-dash-filter')?.addEventListener('click', () => {
             if (document.getElementById('dash-year-select')) document.getElementById('dash-year-select').value = 'all';
             if (document.getElementById('dash-month-select')) document.getElementById('dash-month-select').value = 'all';
-            dashCurrentYear = 'all'; dashCurrentMonth = 'all'; renderDashboard();
+            if (document.getElementById('dash-project-filter')) document.getElementById('dash-project-filter').value = 'all';
+            dashCurrentYear = 'all'; dashCurrentMonth = 'all'; dashCurrentProject = 'all'; renderDashboard();
         });
         document.getElementById('btn-view-month')?.addEventListener('click', () => {
             dashTimeView = 'month';
