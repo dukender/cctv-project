@@ -2061,7 +2061,15 @@
             const title = document.getElementById('day-detail-title');
             const content = document.getElementById('day-detail-content');
             
-            title.innerHTML = `<i data-lucide="calendar" class="w-5 h-5"></i> ${formatDate(dateString)}`;
+            const dayTasks = getTasksByFilter().filter(t => t.receiveDate === dateString);
+            
+            // --- ส่วนที่แก้ไข: เพิ่มจำนวนงานต่อท้ายวันที่ ---
+            let taskCountText = '';
+            if (dayTasks.length > 0) {
+                taskCountText = `<span class="text-red-500 ml-2 font-bold">( ${dayTasks.length} งาน )</span>`;
+            }
+
+            title.innerHTML = `<i data-lucide="calendar" class="w-5 h-5"></i> ${formatDate(dateString)} ${taskCountText}`;
             content.innerHTML = '';
 
             const dayHolidays = getHolidaysByFilter().filter(h => h.holidayDate === dateString);
@@ -2076,11 +2084,11 @@
                 content.innerHTML += `<div class="mb-5 flex flex-wrap gap-2">${holsHtml}</div>`;
             }
 
-            const dayTasks = getTasksByFilter().filter(t => t.receiveDate === dateString);
-            
             if (dayTasks.length === 0) {
                 content.innerHTML += `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในวันนี้</p></div>`;
             } else {
+                // เปลี่ยนไปใช้ Grid Layout 2 คอลัมน์ เพื่อให้รองรับกรอบที่ขยายใหญ่ขึ้น
+                let tasksGridHtml = '<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">';
                 dayTasks.forEach((task, idx) => {
                     let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
                     let notesHtml = '';
@@ -2089,7 +2097,6 @@
                         if(validNotes.length > 0) {
                             notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
                             validNotes.forEach(note => {
-                                // เปลี่ยนจากขีดฆ่า เป็นข้อความปกติ เพราะการติ๊กถูกหมายถึงการเพิ่มงาน ไม่ใช่การทำงานเสร็จแล้ว
                                 const checked = note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`;
                                 const textStyle = 'text-gray-700'; 
                                 const timeBadge = note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : '';
@@ -2113,23 +2120,29 @@
                         `;
                     }
 
-                    content.innerHTML += `
-                        <div class="bg-white border border-gray-200 rounded-lg p-4 mb-3 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                    tasksGridHtml += `
+                        <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col">
                             <div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div>
                             <h4 class="font-bold text-gray-800 text-lg mb-1 group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4>
                             <p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p>
                             
                             <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100">
-                                <div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภทงาน: <span class="text-gray-800 font-medium ml-1">${taskTypeDisplay}</span></div>
-                                <div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบ: <span class="text-gray-800 font-medium ml-1">${task.responsibleName || '-'}</span></div>
-                                <div class="text-gray-500 flex items-center gap-1.5 col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ชื่อลูกค้า: <span class="text-gray-800 font-medium ml-1">${task.customerName || '-'}</span></div>
+                                <div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div>
+                                <div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div>
+                                <div class="text-gray-500 flex items-center gap-1.5 col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div>
                             </div>
                             
-                            ${notesHtml}
-                            ${actionBtns}
+                            <div class="flex-1">
+                                ${notesHtml}
+                            </div>
+                            <div class="mt-auto">
+                                ${actionBtns}
+                            </div>
                         </div>
                     `;
                 });
+                tasksGridHtml += '</div>';
+                content.innerHTML += tasksGridHtml;
             }
             lucide.createIcons();
             modal.classList.remove('hidden');
