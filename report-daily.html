@@ -262,28 +262,28 @@
 
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
-                            <div class="relative h-64 w-full flex justify-center">
+                            <div class="relative h-64 w-full pl-4 md:pl-10">
                                 <canvas id="chart-tasktype"></canvas>
                             </div>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i> สัดส่วนตามชื่อลูกค้า</h3>
-                            <div class="relative h-64 w-full flex justify-center">
+                            <div class="relative h-64 w-full pl-4 md:pl-10">
                                 <canvas id="chart-customer"></canvas>
                             </div>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามชื่อผู้รับผิดชอบ</h3>
-                            <div class="relative h-64 w-full flex justify-center">
+                            <div class="relative h-64 w-full pl-4 md:pl-10">
                                 <canvas id="chart-responsible"></canvas>
                             </div>
                         </div>
 
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
-                            <div class="relative h-64 w-full flex justify-center">
+                            <div class="relative h-64 w-full pl-4 md:pl-10">
                                 <canvas id="chart-assignment"></canvas>
                             </div>
                         </div>
@@ -2618,8 +2618,27 @@
                     },
                     options: { 
                         responsive: true, maintainAspectRatio: false,
+                        layout: { padding: { top: 30 } }, // เพิ่มพื้นที่ด้านบนสำหรับตัวเลขบนแท่งกราฟ
                         scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } }
-                    }
+                    },
+                    plugins: [{
+                        id: 'barLabels',
+                        afterDatasetsDraw(chart) {
+                            const { ctx, data } = chart;
+                            ctx.save();
+                            chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
+                                const value = data.datasets[0].data[index];
+                                if (value > 0) {
+                                    ctx.font = 'bold 14px Sarabun, sans-serif';
+                                    ctx.fillStyle = '#4f46e5'; 
+                                    ctx.textAlign = 'center';
+                                    ctx.textBaseline = 'bottom';
+                                    ctx.fillText(value, datapoint.x, datapoint.y - 6);
+                                }
+                            });
+                            ctx.restore();
+                        }
+                    }]
                 });
                 const timeLabel = document.getElementById('dash-time-label');
                 if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
