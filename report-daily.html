@@ -2230,7 +2230,6 @@
             
             paginatedTasks.forEach((task, index) => {
                 const globalIndex = startIndex + index + 1; // ลำดับอิงจากทั้งหมด
-                const initial = task.responsibleName ? task.responsibleName.charAt(0).toUpperCase() : '?';
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
                 
@@ -2260,12 +2259,7 @@
                     <td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td>
                     <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 rounded-full bg-indigo-100 text-[#5b5fc7] flex items-center justify-center text-[10px] font-bold shrink-0 border border-indigo-200">${initial}</div>
-                            <span class="text-gray-600 text-sm truncate max-w-[120px]">${task.responsibleName || '-'}</span>
-                        </div>
-                    </td>
+                    <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td>
                     <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td>
                     <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td>
                     <td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td>
