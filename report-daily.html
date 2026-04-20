@@ -112,36 +112,36 @@
 
         <!-- Main Content Area (Scrollable) -->
         <main class="flex-1 overflow-y-auto w-full">
-            <div class="max-w-[1400px] mx-auto px-4 py-6">
+            <div class="max-w-[1400px] mx-auto px-2 sm:px-4 py-4 sm:py-6">
                 
                 <!-- แท็บระบบสำหรับสลับหน้า (Tabs) และปุ่มเพิ่มงานด้านขวา -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 border-b border-gray-200 gap-4 sm:gap-0">
-                    <div class="flex gap-6 px-2 overflow-x-auto no-scrollbar w-full sm:w-auto">
-                        <button id="tab-dashboard" class="px-4 py-3 font-semibold text-[#5b5fc7] border-b-2 border-[#5b5fc7] transition-colors flex items-center gap-2 whitespace-nowrap">
+                    <div class="flex gap-2 sm:gap-6 px-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-2 sm:pb-0">
+                        <button id="tab-dashboard" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-[#5b5fc7] border-b-2 border-[#5b5fc7] transition-colors flex items-center gap-2 whitespace-nowrap">
                             <i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ
                         </button>
                         <!-- ย้ายแท็บสรุปโครงการ มาต่อจากแดชบอร์ด -->
-                        <button id="tab-project-summary" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
+                        <button id="tab-project-summary" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ
                         </button>
-                        <button id="tab-calendar" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
+                        <button id="tab-calendar" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน
                         </button>
-                        <button id="tab-list" class="px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
+                        <button id="tab-list" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน
                         </button>
                         <!-- เพิ่มแท็บจัดการผู้ใช้ (Admin Only) -->
-                        <button id="tab-users" class="hidden px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only">
+                        <button id="tab-users" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only">
                             <i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้
                         </button>
                         <!-- ซ่อนแท็บนี้ตามความต้องการ แต่ยังเก็บ id ไว้ใช้งานสลับหน้าด้วย JavaScript -->
-                        <button id="tab-manage" class="hidden px-4 py-3 font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
+                        <button id="tab-manage" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน
                         </button>
                     </div>
                     
                     <!-- เครื่องมือด้านขวา (กรองอีเมล + ปุ่มเพิ่มงาน) -->
-                    <div class="px-2 pb-2 w-full sm:w-auto flex flex-col sm:flex-row items-center gap-3 justify-end">
+                    <div class="px-2 pb-2 w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-end mt-2 sm:mt-0">
                         <!-- Dropdown กรองผู้ใช้สำหรับ Admin/Monitor -->
                         <div id="admin-user-filter-wrapper" class="hidden w-full sm:w-auto">
                             <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-md px-3 py-2 shadow-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] transition-all h-[42px]">
@@ -260,43 +260,43 @@
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
-                            <div class="flex items-center flex-1 w-full">
-                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 ml-2 md:ml-10">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10">
                                     <canvas id="chart-tasktype"></canvas>
                                 </div>
-                                <div id="legend-tasktype" class="flex-1 pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
+                                <div id="legend-tasktype" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i> สัดส่วนตามชื่อลูกค้า</h3>
-                            <div class="flex items-center flex-1 w-full">
-                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 ml-2 md:ml-10">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10">
                                     <canvas id="chart-customer"></canvas>
                                 </div>
-                                <div id="legend-customer" class="flex-1 pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
+                                <div id="legend-customer" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามชื่อผู้รับผิดชอบ</h3>
-                            <div class="flex items-center flex-1 w-full">
-                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 ml-2 md:ml-10">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10">
                                     <canvas id="chart-responsible"></canvas>
                                 </div>
-                                <div id="legend-responsible" class="flex-1 pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
+                                <div id="legend-responsible" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
-                            <div class="flex items-center flex-1 w-full">
-                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 ml-2 md:ml-10">
+                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10">
                                     <canvas id="chart-assignment"></canvas>
                                 </div>
-                                <div id="legend-assignment" class="flex-1 pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
+                                <div id="legend-assignment" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[200px] no-scrollbar flex flex-col gap-0.5"></div>
                             </div>
                         </div>
                     </div>
@@ -315,12 +315,12 @@
                             
                             <!-- เพิ่มช่อง Search, Date, Export ชิดขวา แบบเดียวกับ List View -->
                             <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                                <div class="relative flex-1 min-w-[150px]">
+                                <div class="relative w-full sm:flex-1 min-w-[150px]">
                                     <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                     <input type="text" id="summary-search-input" placeholder="ค้นหาชื่อโครงการ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
                                 </div>
                                 
-                                <select id="summary-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white">
+                                <select id="summary-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
                                     <option value="day">รายวัน</option>
                                     <option value="month">รายเดือน</option>
                                     <option value="year">รายปี</option>
@@ -393,22 +393,24 @@
 
                 <!-- 1. ส่วนแสดงปฏิทิน -->
                 <div id="view-calendar" class="hidden animate-fade-in">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                             <div class="flex items-center gap-4">
-                                <h2 id="calendar-month-year" class="text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2>
+                                <h2 id="calendar-month-year" class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2>
                             </div>
-                            <div class="flex gap-2 w-full sm:w-auto">
-                                <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-2">
+                            <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                                <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-0 sm:mr-2 flex-1 sm:flex-none justify-center">
                                     <i data-lucide="calendar-off" class="w-4 h-4"></i> เพิ่มวันหยุด/ลา
                                 </button>
-                                <button id="prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                                <button id="today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button>
-                                <button id="next-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                                <div class="flex gap-2">
+                                    <button id="prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                                    <button id="today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button>
+                                    <button id="next-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                                </div>
                             </div>
                         </div>
                         
-                        <div class="grid grid-cols-7 gap-px mb-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        <div class="grid grid-cols-7 gap-px mb-2 text-center text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             <div class="text-red-500 py-2">อา.</div>
                             <div class="py-2">จ.</div>
                             <div class="py-2">อ.</div>
@@ -435,12 +437,12 @@
                             </div>
                             
                             <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                                <div class="relative flex-1 min-w-[150px]">
+                                <div class="relative w-full sm:flex-1 min-w-[150px]">
                                     <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                     <input type="text" id="search-input" placeholder="ค้นหาข้อความ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
                                 </div>
                                 
-                                <select id="search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white">
+                                <select id="search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
                                     <option value="day">รายวัน</option>
                                     <option value="month">รายเดือน</option>
                                     <option value="year">รายปี</option>
@@ -502,7 +504,7 @@
                 <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-w-5xl mx-auto relative">
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-400"></div>
-                        <div class="p-8">
+                        <div class="p-4 sm:p-8">
                             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2">
                                 <i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)
                             </h2>
@@ -558,24 +560,24 @@
                         <!-- แถบสีตกแต่ง -->
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-indigo-400"></div>
                         
-                        <div class="p-8">
-                            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-8 mt-2">
+                        <div class="p-4 sm:p-8">
+                            <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2 mb-8 mt-2">
                                 <i data-lucide="file-edit" class="w-6 h-6 text-[#5b5fc7]"></i>
                                 <span id="form-title">เพิ่มรายละเอียดงานใหม่</span>
                             </h2>
-                            <form id="task-form" class="space-y-8">
+                            <form id="task-form" class="space-y-6 sm:space-y-8">
                                 <!-- ชื่องาน -->
                                 <div class="flex items-start gap-3">
-                                    <div class="mt-2 text-gray-400">
+                                    <div class="mt-2 text-gray-400 hidden sm:block">
                                         <i data-lucide="circle" class="w-6 h-6"></i>
                                     </div>
                                     <div class="flex-1">
-                                        <input type="text" id="taskName" required placeholder="เพิ่มชื่องาน" class="w-full text-2xl font-semibold px-2 py-1 border-0 border-b-2 border-transparent hover:border-gray-200 focus:border-[#5b5fc7] bg-transparent focus:bg-gray-50 focus:outline-none transition-colors placeholder-gray-400">
+                                        <input type="text" id="taskName" required placeholder="เพิ่มชื่องาน" class="w-full text-xl sm:text-2xl font-semibold px-2 py-1 border-0 border-b-2 border-transparent hover:border-gray-200 focus:border-[#5b5fc7] bg-transparent focus:bg-gray-50 focus:outline-none transition-colors placeholder-gray-400">
                                     </div>
                                 </div>
 
                                 <!-- เพิ่มช่องชื่อโครงการ -->
-                                <div class="pl-9 mt-2">
+                                <div class="pl-0 sm:pl-9 mt-2">
                                     <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">
                                         <i data-lucide="folder" class="w-4 h-4"></i> ชื่อโครงการ
                                     </label>
@@ -590,7 +592,7 @@
                                     </div>
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 pl-9">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-6 pl-0 sm:pl-9">
                                     <div>
                                         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
                                             <i data-lucide="calendar" class="w-4 h-4"></i> วันรับงาน
@@ -618,7 +620,7 @@
                                 </div>
 
                                 <!-- ส่วนลูกค้า -->
-                                <div class="pl-9 mt-4">
+                                <div class="pl-0 sm:pl-9 mt-4">
                                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
                                         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">
                                             <i data-lucide="briefcase" class="w-4 h-4"></i> ข้อมูลลูกค้า
@@ -631,7 +633,7 @@
                                 </div>
 
                                 <!-- รายละเอียด (ประเภทงาน และ Notes) -->
-                                <div class="pl-9 mt-4">
+                                <div class="pl-0 sm:pl-9 mt-4">
                                     <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
                                         <i data-lucide="tag" class="w-4 h-4"></i> ประเภทงานที่ทำ (เลือกได้หลายรายการ)
                                     </label>
@@ -657,7 +659,7 @@
                                     </div>
                                 </div>
 
-                                <div class="pl-9 pt-4 flex justify-end gap-3 border-t border-gray-100">
+                                <div class="pl-0 sm:pl-9 pt-4 flex justify-end gap-3 border-t border-gray-100">
                                     <button type="button" onclick="switchTab('list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm">
                                         ยกเลิก
                                     </button>
@@ -695,7 +697,7 @@
                     <i data-lucide="x" class="w-4 h-4"></i>
                 </button>
             </div>
-            <div class="p-6 bg-white">
+            <div class="p-4 sm:p-6 bg-white">
                 <form id="holiday-form" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">ประเภท <span class="text-red-500">*</span></label>
@@ -733,7 +735,7 @@
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-            <div class="p-6 overflow-y-auto bg-gray-50/30" id="day-detail-content"></div>
+            <div class="p-4 sm:p-6 overflow-y-auto bg-gray-50/30" id="day-detail-content"></div>
         </div>
     </div>
 
@@ -1320,7 +1322,7 @@
             } else {
                 filtered.forEach(p => {
                     const delBtn = currentUserRole === 'monitor' ? '' : `
-                        <button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_projects', '${p.id}')" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล">
+                        <button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_projects', '${p.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>`;
                     projUl.innerHTML += `
@@ -1421,7 +1423,7 @@
             } else {
                 filtered.forEach(t => {
                     const delBtn = currentUserRole === 'monitor' ? '' : `
-                        <button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_task_types', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล">
+                        <button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_task_types', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>`;
                     taskTypeUl.innerHTML += `
@@ -1653,7 +1655,8 @@
                         else if (type === 'won') { colorClass = 'accent-green-500 text-green-500 focus:ring-green-500'; hoverRing = 'hover:ring-green-500/30'; }
                         else if (type === 'lost') { colorClass = 'accent-red-500 text-red-500 focus:ring-red-500'; hoverRing = 'hover:ring-red-500/30'; }
                         
-                        const disableCheck = currentUserRole === 'monitor' ? 'disabled cursor-not-allowed opacity-50' : `cursor-pointer hover:ring-2 hover:ring-offset-1 ${hoverRing}`;
+                        // อนุญาตให้ Monitor สามารถกด checkbox ได้
+                        const disableCheck = `cursor-pointer hover:ring-2 hover:ring-offset-1 ${hoverRing}`;
                         
                         return `<input type="checkbox" 
                             ${st === type ? 'checked' : ''} 
@@ -1699,7 +1702,7 @@
         };
 
         window.updateProjectStatus = async (projectId, statusType, isChecked) => {
-            if (currentUserRole === 'monitor') return;
+            // อนุญาตให้ Monitor สามารถอัปเดตสถานะโครงการได้
             const newStatus = isChecked ? statusType : ''; 
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), {
@@ -2369,7 +2372,7 @@
                     <td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td>
                     <td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td>
                     <td class="px-6 py-4 text-right action-cell">
-                        <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                             ${actionBtns}
                         </div>
                     </td>
@@ -2382,12 +2385,13 @@
                 if (tasks.length > itemsPerPage) {
                     paginationContainer.innerHTML = `
                         <div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2">
-                            <div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, tasks.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tasks.length}</span> รายการ</div>
-                            <div class="flex gap-2">
-                                <button onclick="goToListPage(${listCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" ${listCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button>
-                                <div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${listCurrentPage} / ${totalPages}</div>
-                                <button onclick="goToListPage(${listCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors" ${listCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button>
-                            </div>
+                        <div class="flex-1 overflow-hidden pb-1">
+                            ${tasksHtml}
+                        </div>
+                        <div class="absolute inset-0 bg-white/50 backdrop-blur-[1px] opacity-0 group-hover/cell:opacity-100 hidden sm:flex items-center justify-center transition-opacity rounded-lg pointer-events-none">
+                            <span class="bg-[#5b5fc7] text-white text-xs font-bold px-3 py-1.5 rounded shadow-sm">ดูรายละเอียด</span>
+                        </div>
+                    </div>
                         </div>
                     `;
                 } else {
