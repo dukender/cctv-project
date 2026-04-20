@@ -5,25 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Task Log - Professional Edition</title>
     
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Icons (Lucide) -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Library สำหรับ Export Excel และ PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
-    <!-- Library สำหรับ Export ภาพ JPG แดชบอร์ด -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Library สำหรับทำกราฟ Dashboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
@@ -43,9 +37,6 @@
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
 
-    <!-- ========================================== -->
-    <!-- 1. หน้าจอ Login (แสดงเมื่อยังไม่เข้าระบบ) -->
-    <!-- ========================================== -->
     <div id="view-login" class="fixed inset-0 bg-[#eef1ff] z-[200] flex flex-col items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center border border-gray-100 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-[#8b5cf6]"></div>
@@ -62,7 +53,6 @@
             </button>
             
             <button id="btn-login-microsoft" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors shadow-sm mb-6">
-                <!-- ใช้ Inline SVG ป้องกันรูปลิงก์เสีย -->
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>
                 เข้าสู่ระบบด้วย Hotmail / Outlook
             </button>
@@ -76,12 +66,8 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- 2. หน้าแอปพลิเคชันหลัก (ซ่อนจนกว่าจะ Login) -->
-    <!-- ========================================== -->
     <div id="main-app" class="hidden h-full flex flex-col overflow-hidden">
         
-        <!-- Header -->
         <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0">
             <div class="max-w-[1400px] mx-auto px-4 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -96,7 +82,6 @@
                         </div>
                     </div>
                 </div>
-                <!-- ส่วนแสดงโปรไฟล์และปุ่มออกจากระบบ -->
                 <div class="flex items-center gap-3">
                     <div class="text-right hidden md:block">
                         <p class="text-sm font-bold text-gray-800" id="display-user-email">user@email.com</p>
@@ -110,17 +95,14 @@
             </div>
         </header>
 
-        <!-- Main Content Area (Scrollable) -->
         <main class="flex-1 overflow-y-auto w-full">
             <div class="max-w-[1400px] mx-auto px-2 sm:px-4 py-4 sm:py-6">
                 
-                <!-- แท็บระบบสำหรับสลับหน้า (Tabs) และปุ่มเพิ่มงานด้านขวา -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 border-b border-gray-200 gap-4 sm:gap-0">
                     <div class="flex gap-2 sm:gap-6 px-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-2 sm:pb-0">
                         <button id="tab-dashboard" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-[#5b5fc7] border-b-2 border-[#5b5fc7] transition-colors flex items-center gap-2 whitespace-nowrap">
                             <i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ
                         </button>
-                        <!-- ย้ายแท็บสรุปโครงการ มาต่อจากแดชบอร์ด -->
                         <button id="tab-project-summary" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ
                         </button>
@@ -130,19 +112,15 @@
                         <button id="tab-list" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน
                         </button>
-                        <!-- เพิ่มแท็บจัดการผู้ใช้ (Admin Only) -->
                         <button id="tab-users" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only">
                             <i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้
                         </button>
-                        <!-- ซ่อนแท็บนี้ตามความต้องการ แต่ยังเก็บ id ไว้ใช้งานสลับหน้าด้วย JavaScript -->
                         <button id="tab-manage" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap">
                             <i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน
                         </button>
                     </div>
                     
-                    <!-- เครื่องมือด้านขวา (กรองอีเมล + ปุ่มเพิ่มงาน) -->
                     <div class="px-2 pb-2 w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-end mt-2 sm:mt-0">
-                        <!-- Dropdown กรองผู้ใช้สำหรับ Admin/Monitor -->
                         <div id="admin-user-filter-wrapper" class="hidden w-full sm:w-auto">
                             <div class="flex items-center gap-2 bg-indigo-50 border border-indigo-200 rounded-md px-3 py-2 shadow-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] transition-all h-[42px]">
                                 <i data-lucide="users" class="w-4 h-4 text-[#5b5fc7]"></i>
@@ -159,7 +137,6 @@
                     </div>
                 </div>
 
-                <!-- 0. ส่วนแสดง Dashboard -->
                 <div id="view-dashboard" class="block animate-fade-in">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -210,7 +187,6 @@
                     </div>
 
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <!-- นำส่วนสถิติงานตามเวลาและจำนวนโครงการที่หายไปกลับมา -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
                             <div class="flex flex-col md:flex-row gap-6">
                                 <div class="md:w-1/4 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 pr-0 md:pr-4">
@@ -244,7 +220,6 @@
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                                 <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)</h3>
                                 
-                                <!-- เปลี่ยนจาก select เป็น Custom Searchable Dropdown -->
                                 <div class="relative min-w-[240px] w-full sm:w-auto z-20" id="dash-project-dropdown-wrapper">
                                     <div class="flex items-center w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus-within:ring-1 focus-within:ring-teal-500 focus-within:bg-white transition-colors cursor-text shadow-sm h-[34px]">
                                         <input type="text" id="dash-project-input" class="flex-1 bg-transparent outline-none text-sm font-medium w-full text-gray-700 placeholder-gray-700 truncate" placeholder="ทุกโครงการทั้งหมด" autocomplete="off">
@@ -302,7 +277,6 @@
                     </div>
                 </div>
 
-                <!-- 5. ส่วนแสดงสรุปรายชื่อโครงการ (Project Summary View) -->
                 <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
@@ -313,7 +287,6 @@
                                 <p class="text-sm text-gray-500 mt-1">แสดงข้อมูล <span id="summary-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
                             </div>
                             
-                            <!-- เพิ่มช่อง Search, Date, Export ชิดขวา แบบเดียวกับ List View -->
                             <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
                                 <div class="relative w-full sm:flex-1 min-w-[150px]">
                                     <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
@@ -349,7 +322,6 @@
                             </div>
                         </div>
                         
-                        <!-- Summary Cards (เพิ่ม Onclick เพื่อกรอง และการแสดงผล %) -->
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
                             <div id="card-sum-all" onclick="setSummaryFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]">
                                 <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p>
@@ -369,7 +341,6 @@
                             </div>
                         </div>
 
-                        <!-- Table -->
                         <div class="overflow-x-auto min-h-[300px]">
                             <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
                                 <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -383,15 +354,13 @@
                                     </tr>
                                 </thead>
                                 <tbody id="projects-summary-body" class="divide-y divide-gray-100 bg-white">
-                                    <!-- JS Populates -->
-                                </tbody>
+                                    </tbody>
                             </table>
                             <div id="summary-pagination"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 1. ส่วนแสดงปฏิทิน -->
                 <div id="view-calendar" class="hidden animate-fade-in">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
@@ -410,7 +379,6 @@
                             </div>
                         </div>
 
-                        <!-- เพิ่มป้ายแสดงจำนวนคงเหลือ -->
                         <div id="leave-quota-container" class="hidden flex-col md:flex-row items-start md:items-center justify-between bg-[#f8fafc] border border-gray-200 rounded-lg p-4 mb-6 gap-4 shadow-sm">
                             <div class="flex items-center gap-2">
                                 <i data-lucide="clipboard-check" class="w-5 h-5 text-[#5b5fc7]"></i>
@@ -439,12 +407,10 @@
                             <div class="text-indigo-500 py-2">ส.</div>
                         </div>
                         <div id="calendar-grid" class="grid grid-cols-7 gap-2">
-                            <!-- JS จะใส่ข้อมูลที่นี่ -->
-                        </div>
+                            </div>
                     </div>
                 </div>
 
-                <!-- 2. ส่วนแสดงรายการตาราง List View -->
                 <div id="view-list" class="hidden animate-fade-in">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
@@ -504,8 +470,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="tasks-table-body" class="divide-y divide-gray-100">
-                                    <!-- รายการข้อมูลจะถูกแสดงที่นี่ -->
-                                </tbody>
+                                    </tbody>
                             </table>
                             <div id="tasks-empty-state" class="hidden text-center py-20 text-gray-400">
                                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -519,7 +484,6 @@
                     </div>
                 </div>
 
-                <!-- 4. ส่วนหน้าจัดการผู้ใช้ (Admin Only) -->
                 <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-w-5xl mx-auto relative">
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-400"></div>
@@ -528,7 +492,6 @@
                                 <i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)
                             </h2>
                             
-                            <!-- Form Add User -->
                             <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
                                 <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-gray-500"></i> เพิ่ม / แก้ไขสิทธิ์ผู้ใช้</h3>
                                 <form id="user-role-form" class="flex flex-col md:flex-row gap-4 items-end">
@@ -553,7 +516,6 @@
                                 </form>
                             </div>
 
-                            <!-- Table Users -->
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="users-table-admin">
                                     <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -565,18 +527,15 @@
                                         </tr>
                                     </thead>
                                     <tbody id="users-table-body-admin" class="divide-y divide-gray-100">
-                                        <!-- JS Populates -->
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. ส่วนฟอร์มเพิ่ม/แก้ไข (Manage View) -->
                 <div id="view-manage" class="hidden animate-fade-in pb-10">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-w-4xl mx-auto relative">
-                        <!-- แถบสีตกแต่ง -->
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-indigo-400"></div>
                         
                         <div class="p-4 sm:p-8">
@@ -585,7 +544,6 @@
                                 <span id="form-title">เพิ่มรายละเอียดงานใหม่</span>
                             </h2>
                             <form id="task-form" class="space-y-6 sm:space-y-8">
-                                <!-- ชื่องาน -->
                                 <div class="flex items-start gap-3">
                                     <div class="mt-2 text-gray-400 hidden sm:block">
                                         <i data-lucide="circle" class="w-6 h-6"></i>
@@ -595,7 +553,6 @@
                                     </div>
                                 </div>
 
-                                <!-- เพิ่มช่องชื่อโครงการ -->
                                 <div class="pl-0 sm:pl-9 mt-2">
                                     <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">
                                         <i data-lucide="folder" class="w-4 h-4"></i> ชื่อโครงการ
@@ -638,7 +595,6 @@
                                     </div>
                                 </div>
 
-                                <!-- ส่วนลูกค้า -->
                                 <div class="pl-0 sm:pl-9 mt-4">
                                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
                                         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">
@@ -651,7 +607,6 @@
                                     </div>
                                 </div>
 
-                                <!-- รายละเอียด (ประเภทงาน และ Notes) -->
                                 <div class="pl-0 sm:pl-9 mt-4">
                                     <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
                                         <i data-lucide="tag" class="w-4 h-4"></i> ประเภทงานที่ทำ (เลือกได้หลายรายการ)
@@ -667,7 +622,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- ระบบ Checklist แบบรายบรรทัด (บังคับติ๊กก่อนพิมพ์) -->
                                     <div class="mt-4" id="notes-container">
                                         <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3 select-none w-fit">
                                             <i data-lucide="list-checks" class="w-4 h-4 text-[#5b5fc7]"></i> บันทึกย่อ / รายละเอียดงาน
@@ -695,17 +649,14 @@
         </main>
     </div>
 
-    <!-- แจ้งเตือน (Toast Notification) -->
     <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-[120] flex items-center gap-3">
         <span id="toast-icon"></span>
         <span id="toast-message" class="font-medium text-sm"></span>
-        <!-- ปุ่ม Undo (จะแสดงเมื่อมีการลบข้อมูล) -->
         <button id="toast-undo-btn" class="hidden ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded transition-colors whitespace-nowrap">
             ย้อนกลับ
         </button>
     </div>
 
-    <!-- Modal สำหรับเพิ่มวันหยุด/วันลา -->
     <div id="holiday-form-modal" class="fixed inset-0 bg-black/50 hidden z-[110] flex items-center justify-center backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 flex flex-col overflow-hidden transform transition-all">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-red-50">
@@ -746,7 +697,6 @@
         </div>
     </div>
 
-    <!-- Modal สำหรับดูงานในปฏิทินแบบละเอียด -->
     <div id="day-detail-modal" class="fixed inset-0 bg-black/50 hidden z-[100] flex items-center justify-center backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl mx-4 flex flex-col max-h-[85vh] overflow-hidden transform transition-all">
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
@@ -761,7 +711,6 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs & Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1841,7 +1790,6 @@
                 
                 list.innerHTML += `
                     <div class="flex items-start gap-3 group/note">
-                        <!-- ปุ่มที่ทำหน้าที่เป็น Checkbox แบบ Native (รับประกันว่าแสดงผล 100%) -->
                         <button type="button" onclick="toggleNote('${note.id}')" class="mt-1.5 w-4 h-4 rounded-sm flex items-center justify-center border transition-all ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-400 hover:border-[#5b5fc7] bg-white'} shadow-sm focus:outline-none shrink-0">
                             ${note.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 font-bold"></i>' : ''}
                         </button>
@@ -3152,10 +3100,10 @@
                 }
             };
 
-            drawPieChart('responsible', counts.responsible, 'ผู้รับผิดชอบ', 'งาน', 20);
-            drawPieChart('customer', counts.customer, 'ลูกค้า', 'งาน', 20);
-            drawPieChart('assignment', counts.assignment, 'การมอบหมาย', 'งาน', 20);
-            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน', 'งาน', 20);
+            drawPieChart('responsible', counts.responsible, 'ผู้รับผิดชอบ', 'งาน', 10);
+            drawPieChart('customer', counts.customer, 'ลูกค้า', 'งาน', 10);
+            drawPieChart('assignment', counts.assignment, 'การมอบหมาย', 'งาน', 10);
+            drawPieChart('tasktype', counts.taskType, 'ประเภทงาน', 'งาน', 10);
         }
 
         // --- Custom Searchable Dropdown สำหรับหน้า Dashboard สถิติ ---
