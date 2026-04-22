@@ -404,7 +404,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA",
@@ -417,10 +417,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         
-        // ใช้คำสั่งแบบใหม่สำหรับ Firebase v10+ / v11+ ในการเปิดระบบแคชออฟไลน์
-        const db = initializeFirestore(app, {
-            localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
-        });
+        // แก้ไข: ใช้ getFirestore มาตรฐาน ป้องกันสคริปต์พังจากข้อจำกัดของเบราว์เซอร์หรือ Iframe
+        const db = getFirestore(app);
 
         const googleProvider = new GoogleAuthProvider();
         const microsoftProvider = new OAuthProvider('microsoft.com');
@@ -509,6 +507,7 @@
             }
             lucide.createIcons();
         }
+        window.switchTab = switchTab; // เพิ่มบรรทัดนี้เพื่อให้ onclick="switchTab(...)" ใน HTML ทำงานได้
 
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
