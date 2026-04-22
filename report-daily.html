@@ -1557,11 +1557,16 @@
                 series: [
                     {
                         type: 'tree', data: [treeData], orient: 'LR', top: '5%', left: '12%', bottom: '5%', right: '15%',
-                        symbolSize: 8, symbol: 'circle', itemStyle: { color: '#cbd5e1', borderColor: '#94a3b8' },
-                        edgeShape: 'curve', edgeForkPosition: '50%', initialTreeDepth: currentTreeDepth,
-                        lineStyle: { color: '#cbd5e1', width: 2, curveness: 0.5 },
-                        label: { position: 'left', verticalAlign: 'middle', align: 'right', fontFamily: 'Sarabun', distance: 8 },
-                        leaves: { label: { position: 'right', verticalAlign: 'middle', align: 'left', distance: 8 } },
+                        symbolSize: 1, symbol: 'circle', itemStyle: { color: 'transparent', borderColor: 'transparent' },
+                        edgeShape: 'polyline', edgeForkPosition: '50%', initialTreeDepth: currentTreeDepth,
+                        lineStyle: { color: '#94a3b8', width: 1.5, curveness: 0 },
+                        label: { 
+                            position: 'left', verticalAlign: 'middle', align: 'right', fontFamily: 'Sarabun', distance: 10,
+                            shadowColor: 'rgba(0, 0, 0, 0.15)', shadowBlur: 6, shadowOffsetY: 2
+                        },
+                        leaves: { 
+                            label: { position: 'right', verticalAlign: 'middle', align: 'left', distance: 10 } 
+                        },
                         expandAndCollapse: true, animationDuration: 550, animationDurationUpdate: 750
                     }
                 ]
