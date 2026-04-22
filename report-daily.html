@@ -404,7 +404,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA",
@@ -416,11 +416,10 @@
         };
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
         
-        enableIndexedDbPersistence(db).catch(err => {
-            if (err.code == 'failed-precondition') console.warn("เปิดเว็บหลายแท็บ ระบบแคชออฟไลน์จะทำงานเต็มที่แค่แท็บเดียว");
-            else if (err.code == 'unimplemented') console.warn("เบราว์เซอร์นี้ไม่รองรับระบบแคชออฟไลน์ของ Firebase");
+        // ใช้คำสั่งแบบใหม่สำหรับ Firebase v10+ / v11+ ในการเปิดระบบแคชออฟไลน์
+        const db = initializeFirestore(app, {
+            localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})
         });
 
         const googleProvider = new GoogleAuthProvider();
