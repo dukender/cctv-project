@@ -76,6 +76,10 @@
                     <div class="flex gap-2 sm:gap-6 px-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-2 sm:pb-0">
                         <button id="tab-dashboard" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-[#5b5fc7] border-b-2 border-[#5b5fc7] transition-colors flex items-center gap-2 whitespace-nowrap"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
                         <button id="tab-project-summary" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
+                        
+                        <!-- เพิ่มแท็บ สรุปผู้รับผิดชอบ -->
+                        <button id="tab-responsible-summary" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="users-round" class="w-5 h-5"></i> สรุปผู้รับผิดชอบ</button>
+                        
                         <button id="tab-calendar" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
                         <button id="tab-list" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
                         <button id="tab-users" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
@@ -196,6 +200,58 @@
                                 <tbody id="projects-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
                             </table>
                             <div id="summary-pagination"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. สรุปผู้รับผิดชอบ -->
+                <div id="view-responsible-summary" class="hidden animate-fade-in pb-10">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="users-round" class="w-6 h-6 text-[#5b5fc7]"></i> สรุปผู้รับผิดชอบงาน</h2>
+                                <p class="text-sm text-gray-500 mt-1">แสดงข้อมูลทั้งหมด <span id="resp-display-count" class="font-bold text-[#5b5fc7]">0</span> คน</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                <div class="relative w-full sm:flex-1 min-w-[150px]">
+                                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                    <input type="text" id="resp-search-input" placeholder="ค้นหาชื่อผู้รับผิดชอบ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
+                                </div>
+                                <select id="resp-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
+                                    <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
+                                </select>
+                                <input type="date" id="resp-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                <input type="month" id="resp-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                <select id="resp-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]">
+                                    <option value="">ทุกปีทั้งหมด</option>
+                                </select>
+                                <button id="btn-resp-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                    <button id="btn-resp-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                    <button id="btn-resp-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card สรุปผู้รับผิดชอบ 5 Card ต่อ 1 แถว -->
+                        <div id="responsible-cards-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6 select-none">
+                            <!-- Cards will be injected here via JS -->
+                        </div>
+
+                        <div class="overflow-x-auto min-h-[200px]">
+                            <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="responsible-summary-table">
+                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                    <tr>
+                                        <th class="px-4 py-4 font-semibold text-center w-16">อันดับ</th>
+                                        <th class="px-6 py-4 font-semibold">ชื่อผู้รับผิดชอบ</th>
+                                        <th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th>
+                                        <th class="px-4 py-4 font-semibold text-center w-32">สัดส่วน (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="responsible-summary-body" class="divide-y divide-gray-100 bg-white">
+                                    <!-- Table body injected via JS -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -466,13 +522,19 @@
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
 
-        const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
+        const viewDashboard = document.getElementById('view-dashboard'), 
+              viewCalendar = document.getElementById('view-calendar'), 
+              viewList = document.getElementById('view-list'), 
+              viewProjectSummary = document.getElementById('view-project-summary'), 
+              viewResponsibleSummary = document.getElementById('view-responsible-summary'), 
+              viewManage = document.getElementById('view-manage'), 
+              viewUsers = document.getElementById('view-users');
         
         function switchTab(activeTabId) {
             const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) resetFormToAddMode();
-            [viewDashboard, viewCalendar, viewList, viewProjectSummary, viewManage, viewUsers].forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
-            ['tab-dashboard', 'tab-calendar', 'tab-list', 'tab-project-summary', 'tab-manage', 'tab-users'].forEach(t => {
+            [viewDashboard, viewCalendar, viewList, viewProjectSummary, viewResponsibleSummary, viewManage, viewUsers].forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
+            ['tab-dashboard', 'tab-calendar', 'tab-list', 'tab-project-summary', 'tab-responsible-summary', 'tab-manage', 'tab-users'].forEach(t => {
                 document.getElementById(t)?.classList.remove('text-[#5b5fc7]', 'border-[#5b5fc7]');
                 document.getElementById(t)?.classList.add('text-gray-500', 'border-transparent');
             });
@@ -481,6 +543,7 @@
             else if (activeTabId === 'calendar') { viewCalendar?.classList.remove('hidden'); viewCalendar?.classList.add('block'); document.getElementById('tab-calendar')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-calendar')?.classList.remove('text-gray-500', 'border-transparent'); renderCalendar(); }
             else if (activeTabId === 'list') { viewList?.classList.remove('hidden'); viewList?.classList.add('block'); document.getElementById('tab-list')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-list')?.classList.remove('text-gray-500', 'border-transparent'); }
             else if (activeTabId === 'project-summary') { viewProjectSummary?.classList.remove('hidden'); viewProjectSummary?.classList.add('block'); document.getElementById('tab-project-summary')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-project-summary')?.classList.remove('text-gray-500', 'border-transparent'); renderProjectSummary(); }
+            else if (activeTabId === 'responsible-summary') { viewResponsibleSummary?.classList.remove('hidden'); viewResponsibleSummary?.classList.add('block'); document.getElementById('tab-responsible-summary')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-responsible-summary')?.classList.remove('text-gray-500', 'border-transparent'); renderResponsibleSummary(); }
             else if (activeTabId === 'manage') { viewManage?.classList.remove('hidden'); viewManage?.classList.add('block'); document.getElementById('tab-manage')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-manage')?.classList.remove('text-gray-500', 'border-transparent'); document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
             else if (activeTabId === 'users') { viewUsers?.classList.remove('hidden'); viewUsers?.classList.add('block'); document.getElementById('tab-users')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-users')?.classList.remove('text-gray-500', 'border-transparent'); }
             lucide.createIcons();
@@ -490,6 +553,7 @@
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
         document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
+        document.getElementById('tab-responsible-summary')?.addEventListener('click', () => switchTab('responsible-summary'));
         document.getElementById('tab-manage')?.addEventListener('click', () => { currentEditTaskId = null; resetFormToAddMode(); switchTab('manage'); });
         document.getElementById('tab-users')?.addEventListener('click', () => switchTab('users'));
         document.getElementById('btn-add-task-top')?.addEventListener('click', () => { currentEditTaskId = null; resetFormToAddMode(); switchTab('manage'); });
@@ -548,6 +612,7 @@
             if (viewCalendar && !viewCalendar.classList.contains('hidden')) renderCalendar();
             if (viewList && !viewList.classList.contains('hidden')) filterAndRenderTasks();
             if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
+            if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
         });
 
         document.getElementById('btn-login-google')?.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน: " + e.message, "error"); } });
@@ -605,24 +670,28 @@
                 tasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 allTasks = tasks; 
                 populateEmailDropdowns();
-                const listYearSelect = document.getElementById('search-year'), summaryYearSelect = document.getElementById('summary-search-year'); 
+                const listYearSelect = document.getElementById('search-year'), 
+                      summaryYearSelect = document.getElementById('summary-search-year'),
+                      respYearSelect = document.getElementById('resp-search-year'); 
                 if (listYearSelect) {
                     const yearsSet = new Set(); tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); });
                     const sortedYears = Array.from(yearsSet).sort().reverse();
-                    const currentVal = listYearSelect.value;
-                    listYearSelect.innerHTML = '<option value="">ทุกปีทั้งหมด</option>';
-                    sortedYears.forEach(y => listYearSelect.innerHTML += `<option value="${y}">${y}</option>`);
-                    if(sortedYears.includes(currentVal)) listYearSelect.value = currentVal;
-                    if (summaryYearSelect) {
-                        const sumCurrentVal = summaryYearSelect.value;
-                        summaryYearSelect.innerHTML = '<option value="">ทุกปีทั้งหมด</option>';
-                        sortedYears.forEach(y => summaryYearSelect.innerHTML += `<option value="${y}">${y}</option>`);
-                        if(sortedYears.includes(sumCurrentVal)) summaryYearSelect.value = sumCurrentVal;
-                    }
+                    
+                    const updateYearOptions = (selectEl) => {
+                        if(!selectEl) return;
+                        const currentVal = selectEl.value;
+                        selectEl.innerHTML = '<option value="">ทุกปีทั้งหมด</option>';
+                        sortedYears.forEach(y => selectEl.innerHTML += `<option value="${y}">${y}</option>`);
+                        if(sortedYears.includes(currentVal)) selectEl.value = currentVal;
+                    };
+                    updateYearOptions(listYearSelect);
+                    updateYearOptions(summaryYearSelect);
+                    updateYearOptions(respYearSelect);
                 }
                 filterAndRenderTasks(); renderCalendar();   
                 if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard(); 
                 if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
+                if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
             }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล'; statusEl.className = 'text-red-500 font-bold'; });
         }
 
@@ -819,6 +888,128 @@
             const newStatus = isChecked ? statusType : ''; 
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); renderProjectSummary(); }
         };
+
+        // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
+        let currentRespFilteredData = [];
+        
+        function renderResponsibleSummary() {
+            const container = document.getElementById('responsible-cards-container');
+            const tbody = document.getElementById('responsible-summary-body');
+            if (!container || !tbody) return;
+
+            let tasksToUse = getTasksByFilter();
+
+            const searchInput = document.getElementById('resp-search-input')?.value.toLowerCase() || '';
+            const timeType = document.getElementById('resp-search-time-type')?.value || 'day';
+            const searchDate = document.getElementById('resp-search-date')?.value;
+            const searchMonth = document.getElementById('resp-search-month')?.value;
+            const searchYear = document.getElementById('resp-search-year')?.value;
+
+            // กรองงานตามวันที่และคำค้นหา
+            const filteredTasks = tasksToUse.filter(t => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = t.receiveDate === searchDate;
+                else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
+                else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
+
+                const respName = t.responsibleName || 'ไม่ระบุ';
+                const matchText = searchInput ? respName.toLowerCase().includes(searchInput) : true;
+                
+                return matchTime && matchText;
+            });
+
+            // คำนวณยอดรวมงานต่อบุคคล
+            const respCounts = {};
+            let totalTasksCount = filteredTasks.length;
+            
+            filteredTasks.forEach(t => {
+                const name = t.responsibleName || 'ไม่ระบุ';
+                respCounts[name] = (respCounts[name] || 0) + 1;
+            });
+
+            // แปลงเป็น Array และเรียงลำดับจากมากไปน้อย
+            const respData = Object.keys(respCounts).map(name => ({
+                name: name,
+                count: respCounts[name],
+                percent: totalTasksCount > 0 ? Math.round((respCounts[name] / totalTasksCount) * 100) : 0
+            })).sort((a, b) => b.count - a.count);
+
+            currentRespFilteredData = respData;
+            
+            const displayCountEl = document.getElementById('resp-display-count');
+            if(displayCountEl) displayCountEl.textContent = respData.length;
+
+            // 1. Render Cards (5 ต่อแถว)
+            container.innerHTML = '';
+            if (respData.length === 0) {
+                 container.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-100">ไม่พบข้อมูลผู้รับผิดชอบตามเงื่อนไข</div>`;
+            } else {
+                respData.forEach(r => {
+                    container.innerHTML += `
+                        <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100 text-center hover:shadow-md hover:border-[#5b5fc7]/40 transition-all flex flex-col justify-center min-h-[96px]">
+                            <p class="text-[15px] font-bold text-[#5b5fc7] truncate w-full mb-1 leading-tight" title="${r.name}">${r.name}</p>
+                            <div class="flex items-baseline justify-center gap-1.5 mt-auto">
+                                <span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span>
+                                <span class="text-xs font-semibold text-gray-500 leading-none">( ${r.percent}% )</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // 2. Render Table
+            tbody.innerHTML = '';
+            if (respData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตารางตามเงื่อนไขที่เลือก</td></tr>`;
+            } else {
+                respData.forEach((r, index) => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center font-medium text-gray-500">${index + 1}</td>
+                            <td class="px-6 py-3 font-bold text-gray-800">${r.name}</td>
+                            <td class="px-4 py-3 text-center font-semibold text-gray-700">${r.count}</td>
+                            <td class="px-4 py-3 text-center text-sm text-gray-500">${r.percent}%</td>
+                        </tr>
+                    `;
+                });
+            }
+            lucide.createIcons();
+        }
+
+        // Event Listeners สำหรับ Filter ของหน้า สรุปผู้รับผิดชอบ
+        document.getElementById('resp-search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value, dateInput = document.getElementById('resp-search-date'), monthInput = document.getElementById('resp-search-month'), yearInput = document.getElementById('resp-search-year');
+            if(dateInput) { if(type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+            if(monthInput) { if(type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+            if(yearInput) { if(type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+            if (dateInput) dateInput.value = ''; if (monthInput) monthInput.value = ''; if (yearInput) yearInput.value = ''; renderResponsibleSummary();
+        });
+
+        document.getElementById('resp-search-input')?.addEventListener('input', renderResponsibleSummary);
+        document.getElementById('resp-search-date')?.addEventListener('change', renderResponsibleSummary);
+        document.getElementById('resp-search-month')?.addEventListener('change', renderResponsibleSummary);
+        document.getElementById('resp-search-year')?.addEventListener('change', renderResponsibleSummary);
+
+        document.getElementById('btn-resp-reset-search')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('resp-search-input'), timeType = document.getElementById('resp-search-time-type');
+            if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); }
+            renderResponsibleSummary();
+        });
+
+        // Export สำหรับหน้าสรุปผู้รับผิดชอบ
+        document.getElementById('btn-resp-export-excel')?.addEventListener('click', () => {
+            if (currentRespFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = currentRespFilteredData.map((r, idx) => ({ 'อันดับ': idx + 1, 'ชื่อผู้รับผิดชอบ': r.name, 'จำนวนงาน (งาน)': r.count, 'สัดส่วน (%)': `${r.percent}%` }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Responsible Summary"); XLSX.writeFile(workbook, `Responsible_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
+        });
+
+        document.getElementById('btn-resp-export-pdf')?.addEventListener('click', () => {
+            if (currentRespFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('responsible-summary-table');
+            html2pdf().set({ margin: 0.4, filename: `Responsible_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+        });
+        // --- จบ Logic หน้าสรุปผู้รับผิดชอบ ---
+
 
         document.getElementById('summary-search-time-type')?.addEventListener('change', (e) => {
             const type = e.target.value, dateInput = document.getElementById('summary-search-date'), monthInput = document.getElementById('summary-search-month'), yearInput = document.getElementById('summary-search-year');
