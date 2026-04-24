@@ -253,6 +253,7 @@
                                     <!-- Table body injected via JS -->
                                 </tbody>
                             </table>
+                            <div id="resp-summary-pagination"></div>
                         </div>
                     </div>
                 </div>
@@ -916,12 +917,19 @@
         // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
         let currentRespFilteredData = [];
         let currentRespFilter = 'all';
+        let respCurrentPage = 1;
 
         window.setResponsibleFilter = (name) => { 
             currentRespFilter = currentRespFilter === name ? 'all' : name; 
+            respCurrentPage = 1;
             renderResponsibleSummary(); 
         };
         
+        window.goToRespSummaryPage = (page) => {
+            respCurrentPage = page;
+            renderResponsibleSummary();
+        };
+
         function renderResponsibleSummary() {
             const container = document.getElementById('responsible-cards-container');
             const tbody = document.getElementById('responsible-summary-body');
@@ -1029,12 +1037,22 @@
             
             currentRespFilteredData = tableData;
 
+            const totalPages = Math.ceil(tableData.length / itemsPerPage) || 1;
+            if (respCurrentPage > totalPages) respCurrentPage = totalPages;
+            const startIndex = (respCurrentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedData = tableData.slice(startIndex, endIndex);
+
+            const paginationContainer = document.getElementById('resp-summary-pagination');
+
             // 3. Render Table
             tbody.innerHTML = '';
-            if (tableData.length === 0) {
+            if (paginatedData.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลโครงการตามเงื่อนไขที่เลือก</td></tr>`;
+                if(paginationContainer) paginationContainer.innerHTML = '';
             } else {
-                tableData.forEach((row, index) => {
+                paginatedData.forEach((row, index) => {
+                    const globalIndex = startIndex + index + 1;
                     const isNoProject = row.projectName === 'ไม่ได้ระบุโครงการ';
                     // นำเอฟเฟกต์ลิงก์ออกเพื่อไม่ให้กดชื่อโครงการได้
                     const projectNameHtml = isNoProject ? 
@@ -1043,7 +1061,7 @@
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-4 py-3 text-center font-medium text-gray-500">${index + 1}</td>
+                            <td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td>
                             <td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td>
                             <td class="px-6 py-3">${projectNameHtml}</td>
                             <td class="px-6 py-3 font-medium text-gray-800">${row.responsibleName}</td>
@@ -1051,6 +1069,12 @@
                         </tr>
                     `;
                 });
+
+                if (paginationContainer && tableData.length > itemsPerPage) {
+                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToRespSummaryPage(${respCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${respCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${respCurrentPage} / ${totalPages}</div><button onclick="goToRespSummaryPage(${respCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${respCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                } else if(paginationContainer) {
+                    paginationContainer.innerHTML = '';
+                }
             }
             lucide.createIcons();
         }
@@ -1061,18 +1085,21 @@
             if(dateInput) { if(type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
             if(monthInput) { if(type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
             if(yearInput) { if(type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
-            if (dateInput) dateInput.value = ''; if (monthInput) monthInput.value = ''; if (yearInput) yearInput.value = ''; renderResponsibleSummary();
+            if (dateInput) dateInput.value = ''; if (monthInput) monthInput.value = ''; if (yearInput) yearInput.value = ''; 
+            respCurrentPage = 1; 
+            renderResponsibleSummary();
         });
 
-        document.getElementById('resp-search-input')?.addEventListener('input', renderResponsibleSummary);
-        document.getElementById('resp-search-date')?.addEventListener('change', renderResponsibleSummary);
-        document.getElementById('resp-search-month')?.addEventListener('change', renderResponsibleSummary);
-        document.getElementById('resp-search-year')?.addEventListener('change', renderResponsibleSummary);
+        document.getElementById('resp-search-input')?.addEventListener('input', () => { respCurrentPage = 1; renderResponsibleSummary(); });
+        document.getElementById('resp-search-date')?.addEventListener('change', () => { respCurrentPage = 1; renderResponsibleSummary(); });
+        document.getElementById('resp-search-month')?.addEventListener('change', () => { respCurrentPage = 1; renderResponsibleSummary(); });
+        document.getElementById('resp-search-year')?.addEventListener('change', () => { respCurrentPage = 1; renderResponsibleSummary(); });
 
         document.getElementById('btn-resp-reset-search')?.addEventListener('click', () => {
             const searchInput = document.getElementById('resp-search-input'), timeType = document.getElementById('resp-search-time-type');
             if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); }
             currentRespFilter = 'all';
+            respCurrentPage = 1;
             renderResponsibleSummary();
         });
 
