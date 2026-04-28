@@ -55,9 +55,9 @@
                     </button>
                     <div class="w-10 h-10 bg-[#5b5fc7] rounded-lg flex items-center justify-center shadow-inner shrink-0"><i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i></div>
                     <div>
-                        <h1 class="font-bold text-xl text-gray-800 leading-tight">Daily Task Log</h1>
+                        <h1 class="hidden sm:block font-bold text-xl text-gray-800 leading-tight">Daily Task Log</h1>
                         <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-green-500" id="network-indicator"></span><span id="user-status">กำลังเชื่อมต่อ...</span>
+                            <span class="w-2 h-2 rounded-full bg-green-500" id="network-indicator"></span><span class="hidden sm:inline"><span id="user-status">กำลังเชื่อมต่อ...</span></span>
                         </div>
                     </div>
                 </div>
@@ -95,7 +95,7 @@
                         
                         <!-- ปรับเมนู สรุปผู้รับผิดชอบ ให้เพิ่มเส้นเชื่อมโยง (L-shape) เพื่อให้รู้ว่าเป็นเมนูย่อยอย่างชัดเจน -->
                         <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
-                            <span class="hidden lg:block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
+                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span>
                         </button>
                         
