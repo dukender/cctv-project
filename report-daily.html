@@ -97,10 +97,10 @@
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
                 <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
-                    <!-- ปุ่มเพิ่มงาน ย้ายมาไว้ขวาบนของเนื้อหาหลัก -->
-                    <div class="flex justify-end mb-4 sm:mb-6 role-restricted-action px-2 sm:px-0">
-                        <button id="btn-add-task-top" class="px-5 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap h-[42px]">
-                            <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มงาน
+                    <!-- ปุ่มเพิ่มงาน เปลี่ยนเป็นปุ่มลอยมุมขวาล่าง (Floating Action Button) -->
+                    <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
+                        <button id="btn-add-task-top" onclick="document.getElementById('tab-manage').click()" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
+                            <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
                         </button>
                     </div>
 
@@ -319,7 +319,7 @@
                 </div>
 
                 <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-w-5xl mx-auto relative">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-400"></div>
                         <div class="p-4 sm:p-8">
                             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2"><i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)</h2>
