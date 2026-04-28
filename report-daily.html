@@ -237,15 +237,16 @@
                         <!-- Content ขวา: ตารางและเครื่องมือค้นหา -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
                             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                                <div class="shrink-0">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="resp-project-count-container">
+                                    <!-- Rendered by JS -->
                                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
-                                        จำนวนโครงการ: <span id="resp-project-count" class="text-[#5b5fc7] text-xl px-1">0</span> โครงการ
+                                        จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">0</span> โครงการ
                                     </h3>
                                 </div>
                                 <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
                                     <div class="relative w-full sm:flex-1 min-w-[150px]">
                                         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                        <input type="text" id="resp-search-input" placeholder="พิมพ์ค้นหาข้อความ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
+                                        <input type="text" id="resp-search-input" placeholder="ค้นหาชื่อผู้รับผิดชอบ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
                                     </div>
                                     <select id="resp-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
                                         <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
@@ -1097,8 +1098,29 @@
             
             currentRespFilteredData = tableData;
 
-            const projectCountEl = document.getElementById('resp-project-count');
-            if (projectCountEl) projectCountEl.textContent = tableData.length;
+            // --- แยกการคำนวณจำนวนโครงการ (มีชื่อ / ไม่ระบุ) ---
+            let namedCount = 0;
+            let unnamedCount = 0;
+            tableData.forEach(row => {
+                if (row.projectName === 'ไม่ได้ระบุโครงการ' || row.projectName.trim() === '') {
+                    unnamedCount++;
+                } else {
+                    namedCount++;
+                }
+            });
+
+            const projectCountContainer = document.getElementById('resp-project-count-container');
+            if (projectCountContainer) {
+                projectCountContainer.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">${namedCount}</span> โครงการ
+                    </h3>
+                    ${unnamedCount > 0 ? `
+                    <span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">
+                        (มีงานที่ไม่ได้ระบุโครงการอีก ${unnamedCount} รายการ)
+                    </span>` : ''}
+                `;
+            }
 
             const totalTablePages = Math.ceil(tableData.length / itemsPerPage) || 1;
             if (respCurrentPage > totalTablePages) respCurrentPage = totalTablePages;
