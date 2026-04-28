@@ -81,8 +81,8 @@
         <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full">
             <!-- Sidebar Navigation (เมนูด้านซ้ายรูปแบบ Card) -->
             <aside class="w-full lg:w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent overflow-y-auto z-10 flex flex-col">
-                <div class="p-2 lg:p-4 h-full">
-                    <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
+                <div class="p-2 lg:p-4 h-full flex flex-col">
+                    <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex lg:flex-col gap-1 overflow-x-auto no-scrollbar flex-1">
                         <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
                         <button id="tab-responsible-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="users-round" class="w-5 h-5"></i> สรุปผู้รับผิดชอบ</button>
@@ -96,7 +96,7 @@
 
             <!-- Main Content Area -->
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
-                <div class="max-w-[1400px] mx-auto px-2 sm:px-6 py-4 sm:py-6">
+                <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
                     <!-- ปุ่มเพิ่มงาน ย้ายมาไว้ขวาบนของเนื้อหาหลัก -->
                     <div class="flex justify-end mb-4 sm:mb-6 role-restricted-action px-2 sm:px-0">
                         <button id="btn-add-task-top" class="px-5 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap h-[42px]">
