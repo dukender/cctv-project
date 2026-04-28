@@ -78,27 +78,31 @@
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto w-full">
-            <div class="max-w-[1400px] mx-auto px-2 sm:px-4 py-4 sm:py-6">
-                <!-- แท็บระบบ -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 border-b border-gray-200 gap-4 sm:gap-0">
-                    <div class="flex gap-2 sm:gap-6 px-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-2 sm:pb-0">
-                        <button id="tab-dashboard" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-[#5b5fc7] border-b-2 border-[#5b5fc7] transition-colors flex items-center gap-2 whitespace-nowrap"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
-                        <button id="tab-project-summary" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
-                        <button id="tab-responsible-summary" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="users-round" class="w-5 h-5"></i> สรุปผู้รับผิดชอบ</button>
-                        <button id="tab-calendar" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
-                        <button id="tab-list" class="px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
-                        <button id="tab-users" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
-                        <button id="tab-manage" class="hidden px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base font-semibold text-gray-500 hover:text-[#5b5fc7] transition-colors flex items-center gap-2 border-b-2 border-transparent whitespace-nowrap"><i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน</button>
-                    </div>
-                    <div class="px-2 pb-2 w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3 justify-end mt-2 sm:mt-0">
-                        <div class="w-full sm:w-auto role-restricted-action">
-                            <button id="btn-add-task-top" class="w-full sm:w-auto px-5 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap h-[42px]">
-                                <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มงาน
-                            </button>
-                        </div>
+        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full">
+            <!-- Sidebar Navigation (เมนูด้านซ้ายรูปแบบ Card) -->
+            <aside class="w-full lg:w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent overflow-y-auto z-10 flex flex-col">
+                <div class="p-2 lg:p-4 h-full">
+                    <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex lg:flex-col gap-1 overflow-x-auto no-scrollbar">
+                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
+                        <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
+                        <button id="tab-responsible-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="users-round" class="w-5 h-5"></i> สรุปผู้รับผิดชอบ</button>
+                        <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
+                        <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
+                        <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
+                        <button id="tab-manage" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน</button>
                     </div>
                 </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
+                <div class="max-w-[1400px] mx-auto px-2 sm:px-6 py-4 sm:py-6">
+                    <!-- ปุ่มเพิ่มงาน ย้ายมาไว้ขวาบนของเนื้อหาหลัก -->
+                    <div class="flex justify-end mb-4 sm:mb-6 role-restricted-action px-2 sm:px-0">
+                        <button id="btn-add-task-top" class="px-5 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-sm font-medium rounded-md transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap h-[42px]">
+                            <i data-lucide="plus" class="w-4 h-4"></i> เพิ่มงาน
+                        </button>
+                    </div>
 
                 <div id="view-dashboard" class="block animate-fade-in">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
@@ -396,6 +400,7 @@
                 </div>
             </div>
         </main>
+        </div>
     </div>
 
     <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-[120] flex items-center gap-3">
@@ -518,18 +523,32 @@
             const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) resetFormToAddMode();
             [viewDashboard, viewCalendar, viewList, viewProjectSummary, viewResponsibleSummary, viewManage, viewUsers].forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
+            
+            // รีเซ็ตคลาสของทุกเมนูให้เป็นแบบไม่ได้ถูกเลือก (Inactive)
             ['tab-dashboard', 'tab-calendar', 'tab-list', 'tab-project-summary', 'tab-responsible-summary', 'tab-manage', 'tab-users'].forEach(t => {
-                document.getElementById(t)?.classList.remove('text-[#5b5fc7]', 'border-[#5b5fc7]');
-                document.getElementById(t)?.classList.add('text-gray-500', 'border-transparent');
+                const el = document.getElementById(t);
+                if(el) {
+                    el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
+                    el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
+                }
             });
 
-            if (activeTabId === 'dashboard') { viewDashboard?.classList.remove('hidden'); viewDashboard?.classList.add('block'); document.getElementById('tab-dashboard')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-dashboard')?.classList.remove('text-gray-500', 'border-transparent'); renderDashboard(); }
-            else if (activeTabId === 'calendar') { viewCalendar?.classList.remove('hidden'); viewCalendar?.classList.add('block'); document.getElementById('tab-calendar')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-calendar')?.classList.remove('text-gray-500', 'border-transparent'); renderCalendar(); }
-            else if (activeTabId === 'list') { viewList?.classList.remove('hidden'); viewList?.classList.add('block'); document.getElementById('tab-list')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-list')?.classList.remove('text-gray-500', 'border-transparent'); filterAndRenderTasks(); }
-            else if (activeTabId === 'project-summary') { viewProjectSummary?.classList.remove('hidden'); viewProjectSummary?.classList.add('block'); document.getElementById('tab-project-summary')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-project-summary')?.classList.remove('text-gray-500', 'border-transparent'); renderProjectSummary(); }
-            else if (activeTabId === 'responsible-summary') { viewResponsibleSummary?.classList.remove('hidden'); viewResponsibleSummary?.classList.add('block'); document.getElementById('tab-responsible-summary')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-responsible-summary')?.classList.remove('text-gray-500', 'border-transparent'); renderResponsibleSummary(); }
-            else if (activeTabId === 'manage') { viewManage?.classList.remove('hidden'); viewManage?.classList.add('block'); document.getElementById('tab-manage')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-manage')?.classList.remove('text-gray-500', 'border-transparent'); document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
-            else if (activeTabId === 'users') { viewUsers?.classList.remove('hidden'); viewUsers?.classList.add('block'); document.getElementById('tab-users')?.classList.add('text-[#5b5fc7]', 'border-[#5b5fc7]'); document.getElementById('tab-users')?.classList.remove('text-gray-500', 'border-transparent'); }
+            // ฟังก์ชันสำหรับใส่คลาสให้เมนูที่ถูกเลือก (Active)
+            const activateTabBtn = (tabId) => {
+                const el = document.getElementById('tab-' + tabId);
+                if(el) {
+                    el.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
+                    el.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
+                }
+            };
+
+            if (activeTabId === 'dashboard') { viewDashboard?.classList.remove('hidden'); viewDashboard?.classList.add('block'); activateTabBtn('dashboard'); renderDashboard(); }
+            else if (activeTabId === 'calendar') { viewCalendar?.classList.remove('hidden'); viewCalendar?.classList.add('block'); activateTabBtn('calendar'); renderCalendar(); }
+            else if (activeTabId === 'list') { viewList?.classList.remove('hidden'); viewList?.classList.add('block'); activateTabBtn('list'); filterAndRenderTasks(); }
+            else if (activeTabId === 'project-summary') { viewProjectSummary?.classList.remove('hidden'); viewProjectSummary?.classList.add('block'); activateTabBtn('project-summary'); renderProjectSummary(); }
+            else if (activeTabId === 'responsible-summary') { viewResponsibleSummary?.classList.remove('hidden'); viewResponsibleSummary?.classList.add('block'); activateTabBtn('responsible-summary'); renderResponsibleSummary(); }
+            else if (activeTabId === 'manage') { viewManage?.classList.remove('hidden'); viewManage?.classList.add('block'); activateTabBtn('manage'); document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
+            else if (activeTabId === 'users') { viewUsers?.classList.remove('hidden'); viewUsers?.classList.add('block'); activateTabBtn('users'); }
             lucide.createIcons();
         }
         window.switchTab = switchTab;
