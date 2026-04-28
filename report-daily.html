@@ -48,8 +48,12 @@
     <div id="main-app" class="hidden h-full flex flex-col overflow-hidden">
         <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0">
             <div class="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-[#5b5fc7] rounded-lg flex items-center justify-center shadow-inner"><i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i></div>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- ปุ่มแฮมเบอร์เกอร์ (Hamburger Menu) -->
+                    <button id="btn-toggle-menu" class="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors lg:opacity-50 lg:cursor-default lg:hover:bg-transparent" title="เมนู">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                    <div class="w-10 h-10 bg-[#5b5fc7] rounded-lg flex items-center justify-center shadow-inner shrink-0"><i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i></div>
                     <div>
                         <h1 class="font-bold text-xl text-gray-800 leading-tight">Daily Task Log</h1>
                         <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5">
@@ -78,11 +82,14 @@
             </div>
         </header>
 
-        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full">
+        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full relative">
+            <!-- Sidebar Backdrop (Mobile) -->
+            <div id="sidebar-backdrop" class="absolute inset-0 bg-black/20 z-20 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
             <!-- Sidebar Navigation (เมนูด้านซ้ายรูปแบบ Card) -->
-            <aside class="w-full lg:w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent overflow-y-auto z-10 flex flex-col">
+            <aside id="sidebar-menu" class="absolute lg:relative left-0 top-0 h-full w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent z-30 lg:z-10 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl lg:shadow-none">
                 <div class="p-2 lg:p-4 h-full flex flex-col">
-                    <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex lg:flex-col gap-1 overflow-x-auto no-scrollbar flex-1">
+                    <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
                         <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
                         
@@ -525,6 +532,29 @@
 
         const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
         
+        // --- เริ่มต้น โค้ดควบคุมเมนูมือถือ (Off-canvas Menu) ---
+        const btnToggleMenu = document.getElementById('btn-toggle-menu');
+        const sidebarMenu = document.getElementById('sidebar-menu');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+
+        window.toggleMobileMenu = () => {
+            if (window.innerWidth >= 1024) return; // ไม่ทำงานบนจอคอมพิวเตอร์ (lg up)
+            const isClosed = sidebarMenu.classList.contains('-translate-x-full');
+            if (isClosed) {
+                sidebarMenu.classList.remove('-translate-x-full');
+                sidebarBackdrop.classList.remove('hidden');
+                setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10);
+            } else {
+                sidebarMenu.classList.add('-translate-x-full');
+                sidebarBackdrop.classList.add('opacity-0');
+                setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300);
+            }
+        };
+
+        btnToggleMenu?.addEventListener('click', toggleMobileMenu);
+        sidebarBackdrop?.addEventListener('click', toggleMobileMenu);
+        // --- สิ้นสุด โค้ดควบคุมเมนูมือถือ ---
+
         function switchTab(activeTabId) {
             const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) resetFormToAddMode();
@@ -555,6 +585,12 @@
             else if (activeTabId === 'responsible-summary') { viewResponsibleSummary?.classList.remove('hidden'); viewResponsibleSummary?.classList.add('block'); activateTabBtn('responsible-summary'); renderResponsibleSummary(); }
             else if (activeTabId === 'manage') { viewManage?.classList.remove('hidden'); viewManage?.classList.add('block'); activateTabBtn('manage'); document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
             else if (activeTabId === 'users') { viewUsers?.classList.remove('hidden'); viewUsers?.classList.add('block'); activateTabBtn('users'); }
+            
+            // ปิดเมนูมือถืออัตโนมัติเมื่อเลือกแท็บแล้ว
+            if (window.innerWidth < 1024 && sidebarMenu && !sidebarMenu.classList.contains('-translate-x-full')) {
+                toggleMobileMenu();
+            }
+            
             lucide.createIcons();
         }
         window.switchTab = switchTab;
