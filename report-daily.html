@@ -1078,7 +1078,7 @@
                     t.projectName || '',
                     t.responsibleName || '',
                     t.customerName || '',
-                    Array.isArray(t.taskType) ? t.taskType.join(' ') : (t.taskType || '')
+                    t.Array?.isArray(t.taskType) ? t.taskType.join(' ') : (t.taskType || '')
                 ].join(' ').toLowerCase();
 
                 const matchText = searchInput ? searchString.includes(searchInput) : true;
