@@ -1031,6 +1031,36 @@
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); renderProjectSummary(); }
         };
 
+        // --- เพิ่ม Event Listeners สำหรับหน้าสรุปโครงการ (Project Summary) ---
+        document.getElementById('summary-search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value,
+                  dateInput = document.getElementById('summary-search-date'),
+                  monthInput = document.getElementById('summary-search-month'),
+                  yearInput = document.getElementById('summary-search-year');
+            if (dateInput) { if (type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+            if (monthInput) { if (type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+            if (yearInput) { if (type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+            if (dateInput) dateInput.value = '';
+            if (monthInput) monthInput.value = '';
+            if (yearInput) yearInput.value = '';
+            summaryCurrentPage = 1;
+            renderProjectSummary();
+        });
+
+        document.getElementById('summary-search-input')?.addEventListener('input', () => { summaryCurrentPage = 1; renderProjectSummary(); });
+        document.getElementById('summary-search-date')?.addEventListener('change', () => { summaryCurrentPage = 1; renderProjectSummary(); });
+        document.getElementById('summary-search-month')?.addEventListener('change', () => { summaryCurrentPage = 1; renderProjectSummary(); });
+        document.getElementById('summary-search-year')?.addEventListener('change', () => { summaryCurrentPage = 1; renderProjectSummary(); });
+
+        document.getElementById('btn-summary-reset-search')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('summary-search-input'), timeType = document.getElementById('summary-search-time-type');
+            if (searchInput) searchInput.value = '';
+            if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); }
+            currentSummaryFilter = 'all'; 
+            summaryCurrentPage = 1;
+            renderProjectSummary();
+        });
+
         // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
         let currentRespFilteredData = [];
         let currentRespFilter = 'all';
