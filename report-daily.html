@@ -1108,7 +1108,7 @@
                     t.projectName || '',
                     t.responsibleName || '',
                     t.customerName || '',
-                    t.Array?.isArray(t.taskType) ? t.taskType.join(' ') : (t.taskType || '')
+                    Array.isArray(t.taskType) ? t.taskType.join(' ') : (t.taskType || '')
                 ].join(' ').toLowerCase();
 
                 const matchText = searchInput ? searchString.includes(searchInput) : true;
@@ -2141,6 +2141,36 @@
             const { id: docId, ...userData } = userToRestore;
             try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email)); showNotification(`ลบข้อมูลสิทธิ์ของ ${email} แล้ว`, "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), userData); showNotification("ย้อนกลับการลบสิทธิ์สำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
+
+        // --- เพิ่ม Event Listeners สำหรับปุ่ม Export ในหน้า สรุปโครงการ (Fix) ---
+        document.getElementById('btn-summary-export-excel')?.addEventListener('click', () => {
+            if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = finalDisplayProjectData.map((p, idx) => ({ 
+                'ลำดับ': idx + 1, 
+                'วันที่เริ่มรับงาน': p.earliestDate ? formatDate(p.earliestDate) : '-', 
+                'ชื่อโครงการ': p.name, 
+                'สถานะโครงการ': p.status === 'won' ? 'ได้งาน' : p.status === 'lost' ? 'ไม่ได้งาน' : 'กำลังดำเนินการ' 
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Project Summary");
+            XLSX.writeFile(workbook, `Project_Summary_${getThaiDateString()}.xlsx`);
+            showNotification("Export Excel สำเร็จ");
+        });
+
+        document.getElementById('btn-summary-export-pdf')?.addEventListener('click', () => {
+            if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            showNotification("กำลังเตรียมไฟล์ PDF...", "success");
+            const element = document.getElementById('projects-summary-table');
+            // ซ่อนหัวคอลัมน์ checkbox ใน PDF (หากต้องการเน้นเฉพาะชื่อโครงการและลำดับ)
+            html2pdf().set({
+                margin: 0.5,
+                filename: `Project_Summary_${getThaiDateString()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+            }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+        });
 
         lucide.createIcons();
     </script>
