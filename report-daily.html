@@ -13,9 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
-    </script>
+    <script>tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }</script>
     <style>
         body { background-color: #f8f9fc; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -27,21 +25,12 @@
     <div id="view-login" class="fixed inset-0 bg-[#eef1ff] z-[200] flex flex-col items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center border border-gray-100 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-[#8b5cf6]"></div>
-            <div class="w-16 h-16 bg-[#5b5fc7] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg rotate-3 mt-4">
-                <i data-lucide="clipboard-list" class="w-8 h-8 text-white -rotate-3"></i>
-            </div>
+            <div class="w-16 h-16 bg-[#5b5fc7] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg rotate-3 mt-4"><i data-lucide="clipboard-list" class="w-8 h-8 text-white -rotate-3"></i></div>
             <h1 class="text-2xl font-bold text-gray-800 mb-2">เข้าสู่ระบบ (Login)</h1>
             <p class="text-gray-500 text-sm mb-8">Daily Task Log System</p>
-            <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl mb-3 transition-colors shadow-sm">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">เข้าสู่ระบบด้วย Google
-            </button>
-            <button id="btn-login-microsoft" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors shadow-sm mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>เข้าสู่ระบบด้วย Hotmail / Outlook
-            </button>
-            <div class="text-xs text-gray-400 text-left bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p class="font-semibold text-gray-600 mb-2 border-b border-gray-200 pb-1"><i data-lucide="shield" class="w-3 h-3 inline"></i> ระดับสิทธิ์การใช้งานในระบบ:</p>
-                <ul class="list-disc pl-4 space-y-1.5 text-gray-500"><li>หากอีเมลไม่ได้รับสิทธิ์จากผู้ดูแลระบบ จะไม่สามารถเข้าใช้งานได้</li></ul>
-            </div>
+            <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl mb-3 transition-colors shadow-sm"><img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">เข้าสู่ระบบด้วย Google</button>
+            <button id="btn-login-microsoft" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors shadow-sm mb-6"><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>เข้าสู่ระบบด้วย Hotmail / Outlook</button>
+            <div class="text-xs text-gray-400 text-left bg-gray-50 p-4 rounded-lg border border-gray-100"><p class="font-semibold text-gray-600 mb-2 border-b border-gray-200 pb-1"><i data-lucide="shield" class="w-3 h-3 inline"></i> ระดับสิทธิ์การใช้งานในระบบ:</p><ul class="list-disc pl-4 space-y-1.5 text-gray-500"><li>หากอีเมลไม่ได้รับสิทธิ์จากผู้ดูแลระบบ จะไม่สามารถเข้าใช้งานได้</li></ul></div>
         </div>
     </div>
 
@@ -50,30 +39,13 @@
         <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0">
             <div class="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <button id="btn-toggle-menu" class="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors lg:opacity-50 lg:cursor-default lg:hover:bg-transparent" title="เมนู">
-                        <i data-lucide="menu" class="w-6 h-6"></i>
-                    </button>
+                    <button id="btn-toggle-menu" class="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors lg:opacity-50 lg:cursor-default lg:hover:bg-transparent" title="เมนู"><i data-lucide="menu" class="w-6 h-6"></i></button>
                     <div class="w-10 h-10 bg-[#5b5fc7] rounded-lg flex items-center justify-center shadow-inner shrink-0"><i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i></div>
-                    <div>
-                        <h1 class="hidden sm:block font-bold text-xl text-gray-800 leading-tight">Daily Task Log</h1>
-                        <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-green-500" id="network-indicator"></span><span class="hidden sm:inline"><span id="user-status">กำลังเชื่อมต่อ...</span></span>
-                        </div>
-                    </div>
+                    <div><h1 class="hidden sm:block font-bold text-xl text-gray-800 leading-tight">Daily Task Log</h1><div class="text-xs text-gray-500 font-medium flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500" id="network-indicator"></span><span class="hidden sm:inline"><span id="user-status">กำลังเชื่อมต่อ...</span></span></div></div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div id="admin-user-filter-wrapper" class="hidden mr-2">
-                        <div class="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 rounded-md px-2 py-1 shadow-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] transition-all h-[34px]">
-                            <i data-lucide="users" class="w-3.5 h-3.5 text-[#5b5fc7]"></i>
-                            <select id="global-user-filter" class="bg-transparent border-none text-xs font-semibold focus:ring-0 outline-none text-[#5b5fc7] cursor-pointer w-32 sm:w-48 truncate">
-                                <option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="text-right hidden md:block">
-                        <p class="text-sm font-bold text-gray-800" id="display-user-email">user@email.com</p>
-                        <p class="text-xs text-[#5b5fc7] font-semibold uppercase tracking-wider" id="display-user-role">[USER]</p>
-                    </div>
+                    <div id="admin-user-filter-wrapper" class="hidden mr-2"><div class="flex items-center gap-1.5 bg-indigo-50 border border-indigo-200 rounded-md px-2 py-1 shadow-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] transition-all h-[34px]"><i data-lucide="users" class="w-3.5 h-3.5 text-[#5b5fc7]"></i><select id="global-user-filter" class="bg-transparent border-none text-xs font-semibold focus:ring-0 outline-none text-[#5b5fc7] cursor-pointer w-32 sm:w-48 truncate"><option value="all">ดูข้อมูลทุกผู้ใช้งาน</option></select></div></div>
+                    <div class="text-right hidden md:block"><p class="text-sm font-bold text-gray-800" id="display-user-email">user@email.com</p><p class="text-xs text-[#5b5fc7] font-semibold uppercase tracking-wider" id="display-user-role">[USER]</p></div>
                     <div class="h-8 w-px bg-gray-200 mx-1"></div>
                     <button id="btn-logout" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="ออกจากระบบ"><i data-lucide="log-out" class="w-5 h-5"></i></button>
                 </div>
@@ -86,21 +58,12 @@
             <aside id="sidebar-menu" class="absolute lg:relative left-0 top-0 h-full w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent z-30 lg:z-10 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl lg:shadow-none">
                 <div class="p-2 lg:p-4 h-full flex flex-col">
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
-                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
+                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
-                        <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
-                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="tag" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปประเภทงาน</span>
-                        </button>
-                        <button id="tab-brand-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
-                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="cpu" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปยี่ห้อ/แบรนด์</span>
-                        </button>
-                        <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
-                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span>
-                        </button>
-                        <button id="tab-customer-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
-                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
-                        </button>
-
+                        <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="tag" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปประเภทงาน</span></button>
+                        <button id="tab-brand-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="cpu" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปยี่ห้อ/แบรนด์</span></button>
+                        <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span></button>
+                        <button id="tab-customer-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span><i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span></button>
                         <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 mt-1"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
                         <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
                         <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
@@ -112,13 +75,11 @@
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
                 <div class="w-full px-2 sm:px-6 py-4 sm:py-6 relative">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
-                        <button id="btn-add-task-top" onclick="window.switchTab('manage')" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
-                            <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
-                        </button>
+                        <button id="btn-add-task-top" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap"><i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน</button>
                     </div>
 
-                    <!-- Dashboard View -->
-                    <div id="view-dashboard" class="hidden animate-fade-in pb-10">
+                    <!-- ================= Dashboard View ================= -->
+                    <div id="view-dashboard" class="block animate-fade-in pb-10">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <label class="font-bold text-gray-700 text-sm flex items-center gap-1"><i data-lucide="filter" class="w-4 h-4 text-[#5b5fc7]"></i> กรองตาม</label>
@@ -189,7 +150,7 @@
                         </div>
                     </div>
 
-                    <!-- Project Summary View -->
+                    <!-- ================= Project Summary View ================= -->
                     <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
@@ -225,177 +186,11 @@
                         </div>
                     </div>
 
-                    <!-- Hardcoded Summary Views (To Avoid Duplication Bugs) -->
-                    <!-- Task Type Summary View -->
-                    <div id="view-tasktype-summary" class="hidden animate-fade-in pb-10">
-                        <div class="flex flex-col lg:flex-row gap-6 items-start">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
-                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="tag" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปประเภทงาน</h2>
-                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="tasktype-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
-                                <div id="tasktype-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
-                                <div id="tasktype-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
-                                    <button onclick="changeSummaryCardPage('tasktype', -1)" id="btn-tasktype-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                    <span id="tasktype-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
-                                    <button onclick="changeSummaryCardPage('tasktype', 1)" id="btn-tasktype-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
-                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="tasktype-project-count-container"></div>
-                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="tasktype-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
-                                        <select id="tasktype-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                        <input type="date" id="tasktype-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 block">
-                                        <input type="month" id="tasktype-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden">
-                                        <select id="tasktype-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                        <button id="btn-tasktype-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                            <button id="btn-tasktype-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                            <button id="btn-tasktype-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-x-auto min-h-[200px]">
-                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="tasktype-summary-table">
-                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ประเภทงานทั้งหมด</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th></tr>
-                                        </thead>
-                                        <tbody id="tasktype-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
-                                    </table>
-                                    <div id="tasktype-summary-pagination"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Container สำหรับหน้า Summary ที่จะถูกเพิ่มด้วย JS -->
+                    <div id="summary-views-container"></div>
 
-                    <!-- Brand Summary View -->
-                    <div id="view-brand-summary" class="hidden animate-fade-in pb-10">
-                        <div class="flex flex-col lg:flex-row gap-6 items-start">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
-                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="cpu" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปยี่ห้อ/แบรนด์</h2>
-                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="brand-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
-                                <div id="brand-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
-                                <div id="brand-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
-                                    <button onclick="changeSummaryCardPage('brand', -1)" id="btn-brand-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                    <span id="brand-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
-                                    <button onclick="changeSummaryCardPage('brand', 1)" id="btn-brand-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
-                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="brand-project-count-container"></div>
-                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="brand-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
-                                        <select id="brand-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                        <input type="date" id="brand-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 block">
-                                        <input type="month" id="brand-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden">
-                                        <select id="brand-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                        <button id="btn-brand-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                            <button id="btn-brand-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                            <button id="btn-brand-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-x-auto min-h-[200px]">
-                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="brand-summary-table">
-                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ยี่ห้อ/แบรนด์ทั้งหมด</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th></tr>
-                                        </thead>
-                                        <tbody id="brand-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
-                                    </table>
-                                    <div id="brand-summary-pagination"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Responsible Summary View -->
-                    <div id="view-responsible-summary" class="hidden animate-fade-in pb-10">
-                        <div class="flex flex-col lg:flex-row gap-6 items-start">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
-                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="users-round" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปผู้รับผิดชอบ</h2>
-                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="responsible-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
-                                <div id="responsible-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
-                                <div id="responsible-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
-                                    <button onclick="changeSummaryCardPage('responsible', -1)" id="btn-responsible-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                    <span id="responsible-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
-                                    <button onclick="changeSummaryCardPage('responsible', 1)" id="btn-responsible-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
-                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="responsible-project-count-container"></div>
-                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="responsible-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
-                                        <select id="responsible-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                        <input type="date" id="responsible-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 block">
-                                        <input type="month" id="responsible-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden">
-                                        <select id="responsible-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                        <button id="btn-responsible-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                            <button id="btn-responsible-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                            <button id="btn-responsible-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-x-auto min-h-[200px]">
-                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="responsible-summary-table">
-                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ชื่อผู้รับผิดชอบทั้งหมด</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th></tr>
-                                        </thead>
-                                        <tbody id="responsible-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
-                                    </table>
-                                    <div id="responsible-summary-pagination"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Customer Summary View -->
-                    <div id="view-customer-summary" class="hidden animate-fade-in pb-10">
-                        <div class="flex flex-col lg:flex-row gap-6 items-start">
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
-                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="briefcase" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปลูกค้า</h2>
-                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="customer-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
-                                <div id="customer-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
-                                <div id="customer-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
-                                    <button onclick="changeSummaryCardPage('customer', -1)" id="btn-customer-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                                    <span id="customer-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
-                                    <button onclick="changeSummaryCardPage('customer', 1)" id="btn-customer-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
-                                </div>
-                            </div>
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
-                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="customer-project-count-container"></div>
-                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="customer-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
-                                        <select id="customer-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                        <input type="date" id="customer-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 block">
-                                        <input type="month" id="customer-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden">
-                                        <select id="customer-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                        <button id="btn-customer-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                            <button id="btn-customer-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                            <button id="btn-customer-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="overflow-x-auto min-h-[200px]">
-                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="customer-summary-table">
-                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ชื่อลูกค้าทั้งหมด</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th></tr>
-                                        </thead>
-                                        <tbody id="customer-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
-                                    </table>
-                                    <div id="customer-summary-pagination"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Calendar View -->
-                    <div id="view-calendar" class="hidden animate-fade-in">
+                    <!-- ================= Calendar View ================= -->
+                    <div id="view-calendar" class="hidden animate-fade-in pb-10">
                         <div class="flex flex-col xl:flex-row gap-6 items-start">
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full xl:w-8/12 flex-1">
                                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
@@ -410,9 +205,8 @@
                                 </div>
                                 <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
                             </div>
-
                             <div class="w-full xl:w-4/12 shrink-0 flex flex-col gap-6">
-                                <!-- Leave Quota ย้ายมาไว้ฝั่งขวาบน -->
+                                <!-- ย้ายสิทธิ์วันลาคงเหลือขึ้นมาด้านบนสุด -->
                                 <div id="leave-quota-container" class="hidden flex-col items-start bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm w-full">
                                     <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3 w-full"><i data-lucide="clipboard-check" class="w-5 h-5 text-[#5b5fc7]"></i><span class="font-bold text-gray-800">สิทธิ์วันลาคงเหลือ ปี <span id="quota-year-display"></span></span></div>
                                     <div class="flex flex-col gap-3 w-full text-sm font-medium text-gray-600">
@@ -430,19 +224,16 @@
                                         </div>
                                     </div>
                                 </div>
-
                                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 max-h-[850px] overflow-hidden flex flex-col w-full">
-                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0">
-                                        <i data-lucide="calendar-heart" class="w-5 h-5 text-red-500"></i> รายการวันหยุด / วันลา เดือนนี้
-                                    </h3>
+                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0"><i data-lucide="calendar-heart" class="w-5 h-5 text-red-500"></i> รายการวันหยุด / วันลา เดือนนี้</h3>
                                     <div id="monthly-holidays-list" class="flex flex-col gap-3 overflow-y-auto pr-2 no-scrollbar flex-1"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- List View -->
-                    <div id="view-list" class="hidden animate-fade-in">
+                    <!-- ================= List View ================= -->
+                    <div id="view-list" class="hidden animate-fade-in pb-10">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                             <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
                                 <div><h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-[#5b5fc7]"></i> รายการงานทั้งหมด</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูลทั้งหมด <span id="task-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p></div>
@@ -475,9 +266,10 @@
                         </div>
                     </div>
 
-                    <!-- Users View -->
+                    <!-- ================= Users View ================= -->
                     <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
+                            <!-- ลบแถบสีด้านบนสุดตามที่คุณสั่ง -->
                             <div class="p-4 sm:p-8">
                                 <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2"><i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)</h2>
                                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
@@ -501,11 +293,10 @@
                         </div>
                     </div>
 
-                    <!-- Add/Edit Task View -->
+                    <!-- ================= Add/Edit Task View (Manage) ================= -->
                     <div id="view-manage" class="hidden animate-fade-in pb-10">
                         <form id="task-form" class="flex flex-col xl:flex-row gap-6 items-start mx-auto w-full max-w-7xl">
-                            
-                            <!-- ฝั่งซ้าย: แบบฟอร์มข้อมูลหลัก -->
+                            <!-- ฝั่งซ้าย: ข้อมูลหลัก -->
                             <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative w-full">
                                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-indigo-400"></div>
                                 <div class="p-4 sm:p-8">
@@ -555,16 +346,14 @@
                                 </div>
                             </div>
 
-                            <!-- ฝั่งขวา: Card ยี่ห้อ/อุปกรณ์ ที่เพิ่มใหม่ -->
+                            <!-- ฝั่งขวา: Card ยี่ห้อ/อุปกรณ์ -->
                             <div class="w-full xl:w-[450px] shrink-0 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col xl:max-h-[850px] sticky top-6">
                                 <div class="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-xl">
                                     <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i> ยี่ห้อ / แบรนด์สินค้า</h3>
                                     <button type="button" onclick="addBrandEquipItem()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors"><i data-lucide="plus" class="w-4 h-4"></i> เพิ่ม</button>
                                 </div>
                                 <p class="text-xs text-gray-500 px-4 pt-3">คลิก Checkbox ด้านหน้าเพื่อเปิดใช้งาน หรือติ๊กออกเพื่อลบรายการ</p>
-                                <div class="p-4 overflow-y-auto flex-1 flex flex-col gap-4 bg-white" id="brand-equip-list">
-                                    <!-- Dynamic Brand/Equip rows injected here -->
-                                </div>
+                                <div class="p-4 overflow-y-auto flex-1 flex flex-col gap-4 bg-white" id="brand-equip-list"></div>
                                 <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
                                     <button type="button" onclick="window.switchTab('list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm w-full sm:w-auto">ยกเลิก</button>
                                     <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm text-sm min-w-[140px] w-full sm:w-auto"><i data-lucide="save" class="w-4 h-4"></i> บันทึกการแก้ไข</button>
@@ -580,8 +369,7 @@
 
     <!-- Modals (Toast, Holidays, Day Detail) -->
     <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-[120] flex items-center gap-3">
-        <span id="toast-icon"></span>
-        <span id="toast-message" class="font-medium text-sm"></span>
+        <span id="toast-icon"></span><span id="toast-message" class="font-medium text-sm"></span>
         <button id="toast-undo-btn" class="hidden ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded transition-colors whitespace-nowrap">ย้อนกลับ</button>
     </div>
 
@@ -615,12 +403,13 @@
         </div>
     </div>
 
+    <!-- ================= Scripts ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // HTML Injector สำหรับหน้า Summary ที่ซ้ำกัน
+        // === 1. Auto Create Summary Pages via JS ===
         const summaryTabsConfig = [
             { id: 'tasktype', title: 'สรุปประเภทงาน', icon: 'tag' },
             { id: 'brand', title: 'สรุปยี่ห้อ/แบรนด์', icon: 'cpu' },
@@ -628,172 +417,137 @@
             { id: 'customer', title: 'สรุปลูกค้า', icon: 'briefcase' }
         ];
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA",
-            authDomain: "project-dailyreport.firebaseapp.com",
-            projectId: "project-dailyreport",
-            storageBucket: "project-dailyreport.firebasestorage.app",
-            messagingSenderId: "777791683600",
-            appId: "1:777791683600:web:41be9e62052d3996fd1e95"
-        };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const googleProvider = new GoogleAuthProvider();
-        const microsoftProvider = new OAuthProvider('microsoft.com');
-        const appId = 'cctv-project';
-
-        function getThaiDate() {
-            const localDate = new Date();
-            return new Date(localDate.toLocaleString("en-US", {timeZone: "Asia/Bangkok"}));
+        function injectSummaryHTML() {
+            const container = document.getElementById('summary-views-container');
+            if(!container) return;
+            summaryTabsConfig.forEach(conf => {
+                container.insertAdjacentHTML('beforeend', `
+                <div id="view-${conf.id}-summary" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="${conf.icon}" class="w-5 h-5 text-[#5b5fc7]"></i> ${conf.title}</h2>
+                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="${conf.id}-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                            <div id="${conf.id}-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                            <div id="${conf.id}-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                <button onclick="changeSummaryCardPage('${conf.id}', -1)" id="btn-${conf.id}-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <span id="${conf.id}-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                <button onclick="changeSummaryCardPage('${conf.id}', 1)" id="btn-${conf.id}-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="${conf.id}-project-count-container"></div>
+                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="${conf.id}-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
+                                    <select id="${conf.id}-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                    <input type="date" id="${conf.id}-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block">
+                                    <input type="month" id="${conf.id}-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden">
+                                    <select id="${conf.id}-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                    <button id="btn-${conf.id}-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-${conf.id}-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-${conf.id}-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto min-h-[200px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="${conf.id}-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">${conf.title.replace('สรุป', '')}ทั้งหมด</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th></tr>
+                                    </thead>
+                                    <tbody id="${conf.id}-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="${conf.id}-summary-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+            });
         }
-        function getThaiDateString() {
-            const thaiDate = getThaiDate();
-            return `${thaiDate.getFullYear()}-${String(thaiDate.getMonth() + 1).padStart(2, '0')}-${String(thaiDate.getDate()).padStart(2, '0')}`;
-        }
+        injectSummaryHTML();
+
+        // === 2. Firebase Database Setup ===
+        const firebaseConfig = { apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA", authDomain: "project-dailyreport.firebaseapp.com", projectId: "project-dailyreport", storageBucket: "project-dailyreport.firebasestorage.app", messagingSenderId: "777791683600", appId: "1:777791683600:web:41be9e62052d3996fd1e95" };
+        const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider(), microsoftProvider = new OAuthProvider('microsoft.com'), appId = 'cctv-project';
+
+        function getThaiDate() { return new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Bangkok"})); }
+        function getThaiDateString() { const d = getThaiDate(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentBrandEquips = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allEquipTypes = [], allBrands = []; 
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null, brand: null };
-        
-        let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all';
-        let dashAvailableProjects = [], dashTimeView = 'month';
+        let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
         let dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null, brand: null };
-        let globalEmailFilter = 'all';
-        let itemsPerPage = 20, listCurrentPage = 1, summaryCurrentPage = 1;
+        let globalEmailFilter = 'all', itemsPerPage = 20, listCurrentPage = 1, summaryCurrentPage = 1;
 
-        const statusEl = document.getElementById('user-status');
-        const taskForm = document.getElementById('task-form');
-        
-        const formatDate = (dateString) => {
-            if (!dateString) return '-';
-            return new Date(dateString).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Bangkok' });
-        };
+        const statusEl = document.getElementById('user-status'), taskForm = document.getElementById('task-form');
+        const formatDate = (dateString) => { if (!dateString) return '-'; return new Date(dateString).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Bangkok' }); };
 
         let toastTimeout;
         function showNotification(msg, type = "success", undoCb = null) {
             const toast = document.getElementById('toast'), icon = document.getElementById('toast-icon'), msgEl = document.getElementById('toast-message'), undoBtn = document.getElementById('toast-undo-btn');
             clearTimeout(toastTimeout);
-            const newUndoBtn = undoBtn.cloneNode(true);
-            undoBtn.parentNode.replaceChild(newUndoBtn, undoBtn);
-            if (type === "success") {
-                toast.className = "fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-[120] flex items-center gap-3";
-                icon.innerHTML = `<i data-lucide="check-circle-2" class="w-5 h-5"></i>`;
-            } else {
-                toast.className = "fixed top-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-[120] flex items-center gap-3";
-                icon.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>`;
-            }
+            const newUndoBtn = undoBtn.cloneNode(true); undoBtn.parentNode.replaceChild(newUndoBtn, undoBtn);
+            toast.className = `fixed top-4 right-4 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-[120] flex items-center gap-3 ${type === "success" ? "bg-green-600" : "bg-red-600"}`;
+            icon.innerHTML = type === "success" ? `<i data-lucide="check-circle-2" class="w-5 h-5"></i>` : `<i data-lucide="alert-circle" class="w-5 h-5"></i>`;
             msgEl.textContent = msg;
-            if (undoCb) {
-                newUndoBtn.classList.remove('hidden');
-                newUndoBtn.addEventListener('click', () => { undoCb(); toast.classList.add('translate-x-full', 'opacity-0'); });
-            } else newUndoBtn.classList.add('hidden');
-            lucide.createIcons();
-            toast.classList.remove('translate-x-full', 'opacity-0');
-            toastTimeout = setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 10000);
+            if (undoCb) { newUndoBtn.classList.remove('hidden'); newUndoBtn.addEventListener('click', () => { undoCb(); toast.classList.add('translate-x-full', 'opacity-0'); }); } else newUndoBtn.classList.add('hidden');
+            lucide.createIcons(); toast.classList.remove('translate-x-full', 'opacity-0'); toastTimeout = setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 10000);
         }
 
         function updateNetworkStatus() {
             const indicator = document.getElementById('network-indicator');
-            if (navigator.onLine && currentUser) {
-                statusEl.textContent = 'เชื่อมต่อและซิงค์ข้อมูลแล้ว'; statusEl.className = 'text-green-600'; indicator.className = 'w-2 h-2 rounded-full bg-green-500';
-            } else {
-                statusEl.textContent = 'ออฟไลน์ (Offline)'; statusEl.className = 'text-red-500 font-bold'; indicator.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse';
-            }
+            if (navigator.onLine && currentUser) { statusEl.textContent = 'เชื่อมต่อและซิงค์ข้อมูลแล้ว'; statusEl.className = 'text-green-600'; indicator.className = 'w-2 h-2 rounded-full bg-green-500'; } 
+            else { statusEl.textContent = 'ออฟไลน์ (Offline)'; statusEl.className = 'text-red-500 font-bold'; indicator.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse'; }
         }
-        window.addEventListener('online', updateNetworkStatus);
-        window.addEventListener('offline', updateNetworkStatus);
+        window.addEventListener('online', updateNetworkStatus); window.addEventListener('offline', updateNetworkStatus);
 
-        window.toggleMobileMenu = () => {
-            if (window.innerWidth >= 1024) return;
-            const sidebarMenu = document.getElementById('sidebar-menu');
-            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-            const isClosed = sidebarMenu.classList.contains('-translate-x-full');
-            if (isClosed) {
-                sidebarMenu.classList.remove('-translate-x-full');
-                sidebarBackdrop.classList.remove('hidden');
-                setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10);
-            } else {
-                sidebarMenu.classList.add('-translate-x-full');
-                sidebarBackdrop.classList.add('opacity-0');
-                setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300);
-            }
+        // === 3. Navigation (Tab Switching) ===
+        const viewsList = ['dashboard', 'calendar', 'list', 'project-summary', 'tasktype-summary', 'brand-summary', 'responsible-summary', 'customer-summary', 'manage', 'users'];
+        const btnToggleMenu = document.getElementById('btn-toggle-menu'), sidebarMenu = document.getElementById('sidebar-menu'), sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        
+        window.toggleMobileMenu = () => { 
+            if (window.innerWidth >= 1024) return; 
+            const isClosed = sidebarMenu.classList.contains('-translate-x-full'); 
+            if (isClosed) { sidebarMenu.classList.remove('-translate-x-full'); sidebarBackdrop.classList.remove('hidden'); setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10); } 
+            else { sidebarMenu.classList.add('-translate-x-full'); sidebarBackdrop.classList.add('opacity-0'); setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300); } 
         };
-
-        document.getElementById('btn-toggle-menu')?.addEventListener('click', window.toggleMobileMenu);
-        document.getElementById('sidebar-backdrop')?.addEventListener('click', window.toggleMobileMenu);
+        btnToggleMenu?.addEventListener('click', toggleMobileMenu); sidebarBackdrop?.addEventListener('click', toggleMobileMenu);
 
         window.switchTab = function(activeTabId) {
-            const viewManage = document.getElementById('view-manage');
-            const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
+            const isLeavingManage = !document.getElementById('view-manage')?.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) window.resetFormToAddMode();
             
-            const allTabs = ['dashboard', 'calendar', 'list', 'project-summary', 'tasktype-summary', 'brand-summary', 'responsible-summary', 'customer-summary', 'manage', 'users'];
-            
-            allTabs.forEach(id => { 
-                const v = document.getElementById('view-' + id);
+            viewsList.forEach(id => { 
+                const v = document.getElementById('view-' + id), t = document.getElementById('tab-' + id);
                 if (v) { v.classList.add('hidden'); v.classList.remove('block'); }
-                const t = document.getElementById('tab-' + id);
-                if(t) {
-                    t.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
-                    t.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
-                }
+                if (t) { t.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); t.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); }
             });
 
-            const targetView = document.getElementById('view-' + activeTabId);
-            const targetTab = document.getElementById('tab-' + activeTabId);
-            
+            const targetView = document.getElementById('view-' + activeTabId), targetTab = document.getElementById('tab-' + activeTabId);
             if(targetView) {
-                targetView.classList.remove('hidden'); 
-                targetView.classList.add('block'); 
-                if(targetTab) {
-                    targetTab.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
-                    targetTab.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
-                }
+                targetView.classList.remove('hidden'); targetView.classList.add('block'); 
+                if(targetTab) { targetTab.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); targetTab.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); }
                 
                 if (activeTabId === 'dashboard') window.renderDashboard(); 
                 else if (activeTabId === 'calendar') window.renderCalendar(); 
                 else if (activeTabId === 'list') window.filterAndRenderTasks(); 
                 else if (activeTabId === 'project-summary') window.renderProjectSummary(); 
                 else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); 
-                else if (activeTabId === 'manage') {
-                    const t = document.getElementById('form-title');
-                    if (t) t.innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่";
-                }
+                else if (activeTabId === 'manage') { const t = document.getElementById('form-title'); if (t) t.innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
             }
-            if (window.innerWidth < 1024 && document.getElementById('sidebar-menu') && !document.getElementById('sidebar-menu').classList.contains('-translate-x-full')) {
-                window.toggleMobileMenu();
-            }
+            if (window.innerWidth < 1024 && !sidebarMenu.classList.contains('-translate-x-full')) window.toggleMobileMenu();
             lucide.createIcons();
         };
 
-        ['dashboard', 'calendar', 'list', 'project-summary', 'tasktype-summary', 'brand-summary', 'responsible-summary', 'customer-summary', 'users'].forEach(key => { 
-            document.getElementById('tab-' + key)?.addEventListener('click', () => window.switchTab(key)); 
-        });
-        document.getElementById('tab-manage')?.addEventListener('click', () => { 
-            currentEditTaskId = null; 
-            window.resetFormToAddMode(); 
-            window.switchTab('manage'); 
-        });
+        viewsList.forEach(key => { document.getElementById('tab-' + key)?.addEventListener('click', () => { if (key === 'manage') { currentEditTaskId = null; window.resetFormToAddMode(); } window.switchTab(key); }); });
 
-        async function updatePresence(isOnline) { 
-            if (!currentUser || !currentUser.email) return; 
-            try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { isOnline: isOnline, lastActive: Date.now() }, { merge: true }); } catch (e) {} 
-        }
-        
+        // === 4. Authentication & Global Filters ===
+        async function updatePresence(isOnline) { if (!currentUser || !currentUser.email) return; try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { isOnline: isOnline, lastActive: Date.now() }, { merge: true }); } catch (e) {} }
         async function fetchUserRole(user) { 
             const e = (user.email || '').toLowerCase(), ref = doc(db, 'artifacts', appId, 'public', 'data', 'users', e); 
-            try { 
-                const snap = await getDoc(ref); 
-                if (snap.exists()) { 
-                    let r = snap.data().role || 'unauthorized'; 
-                    if (e === 'dukender7188@gmail.com' && r !== 'admin') { r = 'admin'; await updateDoc(ref, { role: 'admin' }); } 
-                    return r; 
-                } else { 
-                    if (e === 'dukender7188@gmail.com') { await setDoc(ref, { email: e, role: 'admin', createdAt: Date.now() }); return 'admin'; } 
-                    return 'unauthorized'; 
-                } 
-            } catch(e) { return e === 'dukender7188@gmail.com' ? 'admin' : 'unauthorized'; } 
+            try { const snap = await getDoc(ref); if (snap.exists()) { let r = snap.data().role || 'unauthorized'; if (e === 'dukender7188@gmail.com' && r !== 'admin') { r = 'admin'; await updateDoc(ref, { role: 'admin' }); } return r; } else { if (e === 'dukender7188@gmail.com') { await setDoc(ref, { email: e, role: 'admin', createdAt: Date.now() }); return 'admin'; } return 'unauthorized'; } } 
+            catch(e) { return e === 'dukender7188@gmail.com' ? 'admin' : 'unauthorized'; } 
         }
 
         function applyRoleUI() {
@@ -806,14 +560,10 @@
         function filterDataByRole(dataList) { return (currentUserRole === 'admin' || currentUserRole === 'monitor') ? dataList : dataList.filter(item => item.ownerId === currentUser.uid); }
         
         function populateEmailDropdowns() { 
-            const emailFilterSelect = document.getElementById('global-user-filter'); 
-            if (!emailFilterSelect || (currentUserRole !== 'admin' && currentUserRole !== 'monitor')) return; 
-            const currentVal = globalEmailFilter; const emailsSet = new Set(); 
-            allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); }); 
-            let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>'; 
-            Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; }); 
-            emailFilterSelect.innerHTML = optionsHtml; 
-            if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; } 
+            const emailFilterSelect = document.getElementById('global-user-filter'); if (!emailFilterSelect || (currentUserRole !== 'admin' && currentUserRole !== 'monitor')) return; 
+            const currentVal = globalEmailFilter; const emailsSet = new Set(); allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); }); 
+            let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>'; Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; }); 
+            emailFilterSelect.innerHTML = optionsHtml; if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; } 
         }
 
         function getTasksByFilter() { return globalEmailFilter === 'all' ? allTasks : allTasks.filter(t => t.ownerEmail === globalEmailFilter); }
@@ -828,8 +578,8 @@
             summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); });
         });
 
-        document.getElementById('btn-login-google')?.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
-        document.getElementById('btn-login-microsoft')?.addEventListener('click', async () => { try { await signInWithPopup(auth, microsoftProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
+        document.getElementById('btn-login-google')?.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
+        document.getElementById('btn-login-microsoft')?.addEventListener('click', async () => { try { await signInWithPopup(auth, microsoftProvider); } catch (e) { showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
         document.getElementById('btn-logout')?.addEventListener('click', async () => { await updatePresence(false); signOut(auth); });
         window.addEventListener('beforeunload', () => { if (currentUser) updatePresence(false); });
 
@@ -841,37 +591,23 @@
                 
                 currentUser = user; 
                 unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => { 
-                    currentUserData = docSnap.exists() ? docSnap.data() : null; 
-                    if (!document.getElementById('view-calendar').classList.contains('hidden')) window.renderCalendar(); 
+                    currentUserData = docSnap.exists() ? docSnap.data() : null; if (!document.getElementById('view-calendar').classList.contains('hidden')) window.renderCalendar(); 
                 });
                 
-                document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ'; 
-                document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
+                document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ'; document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
+                loginView.classList.add('hidden'); mainApp.classList.remove('hidden'); updateNetworkStatus(); document.getElementById('receiveDate').value = getThaiDateString();
                 
-                loginView.classList.add('hidden'); 
-                mainApp.classList.remove('hidden'); 
-                updateNetworkStatus(); 
-                
-                document.getElementById('receiveDate').value = getThaiDateString();
                 applyRoleUI(); loadTasks(); loadHolidays(); loadOptions(); 
-                
                 if (currentUserRole === 'admin' || currentUserRole === 'monitor') loadUsersList();
-                updatePresence(true); 
-                
-                if (presenceInterval) clearInterval(presenceInterval); 
-                presenceInterval = setInterval(() => updatePresence(true), 60000); 
-                
+                updatePresence(true); if (presenceInterval) clearInterval(presenceInterval); presenceInterval = setInterval(() => updatePresence(true), 60000); 
                 window.switchTab('list');
             } else {
-                currentUser = null; currentUserRole = 'user'; 
-                loginView.classList.remove('hidden'); mainApp.classList.add('hidden');
-                if (presenceInterval) clearInterval(presenceInterval); 
-                if (unsubscribeTasks) unsubscribeTasks(); 
-                if (unsubscribeHolidays) unsubscribeHolidays(); 
-                if (unsubscribeUser) unsubscribeUser();
+                currentUser = null; currentUserRole = 'user'; loginView.classList.remove('hidden'); mainApp.classList.add('hidden');
+                if (presenceInterval) clearInterval(presenceInterval); if (unsubscribeTasks) unsubscribeTasks(); if (unsubscribeHolidays) unsubscribeHolidays(); if (unsubscribeUser) unsubscribeUser();
             }
         });
 
+        // === 5. Data Loading & Dropdowns ===
         function loadOptions() {
             if (!currentUser) return;
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), (snap) => { allProjects = []; snap.forEach(d => allProjects.push({id: d.id, ...d.data()})); allProjects.sort((a,b) => a.createdAt - b.createdAt); if (!document.getElementById('view-project-summary').classList.contains('hidden')) window.renderProjectSummary(); });
@@ -880,21 +616,11 @@
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_brands'), (snap) => { allBrands = []; snap.forEach(d => allBrands.push({id: d.id, ...d.data()})); allBrands.sort((a,b) => a.name.localeCompare(b.name, 'th')); });
         }
 
-        function loadHolidays() { 
-            if (!currentUser) return; 
-            unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => { 
-                let hols = []; snapshot.forEach(doc => { hols.push({ id: doc.id, ...doc.data() }); }); 
-                allHolidays = filterDataByRole(hols); window.renderCalendar(); 
-            }, (error) => console.error(error)); 
-        }
+        function loadHolidays() { if (!currentUser) return; unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => { let hols = []; snapshot.forEach(doc => { hols.push({ id: doc.id, ...doc.data() }); }); allHolidays = filterDataByRole(hols); window.renderCalendar(); }, (error) => console.error(error)); }
 
         async function addGenericOption(collectionName, name, setterCb) {
             if(!currentUser || currentUserRole === 'monitor' || !name) return;
-            try { 
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email }); 
-                if (setterCb) setterCb(name); 
-                showNotification(`เพิ่มรายการ "${name}" สำเร็จ`); 
-            } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มรายการ", "error"); }
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email }); if (setterCb) setterCb(name); showNotification(`เพิ่มรายการ "${name}" สำเร็จ`); } catch (e) {}
         }
 
         window.deleteOptionData = async (collectionName, docId) => {
@@ -903,12 +629,8 @@
             let itemToRestore = targetArray.find(t => t.id === docId); if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); 
-                showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => { 
-                    try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับสำเร็จ", "success"); } 
-                    catch (e) { showNotification("ผิดพลาด", "error"); } 
-                });
-            } catch(e) { showNotification("ผิดพลาดในการลบ", "error"); }
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับสำเร็จ", "success"); } catch (e) {} });
+            } catch(e) {}
         };
 
         function setupDropdown(inputId, listId, ulId, dataArray, collectionName, selectCallback) {
@@ -923,7 +645,7 @@
                     ul.innerHTML += `<li class="px-4 py-2 hover:bg-indigo-50 text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" data-add="${q}"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
                 }
                 
-                if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+                if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">พิมพ์เพื่อค้นหา/เพิ่ม...</li>`;
                 else {
                     filtered.forEach(t => {
                         const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" data-del="${t.id}" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
@@ -933,12 +655,11 @@
                 lucide.createIcons(); list.classList.remove('hidden');
             };
             
-            input.addEventListener('focus', () => renderList(input.value)); 
-            input.addEventListener('input', (e) => renderList(e.target.value));
+            input.addEventListener('focus', () => renderList(input.value)); input.addEventListener('input', (e) => renderList(e.target.value));
             ul.addEventListener('mousedown', (e) => {
                 e.preventDefault(); e.stopPropagation();
                 const addTarget = e.target.closest('[data-add]'), selTarget = e.target.closest('[data-sel]'), delTarget = e.target.closest('[data-del]');
-                if (delTarget) { deleteOptionData(collectionName, delTarget.dataset.del); setTimeout(() => renderList(input.value), 100); } 
+                if (delTarget) { window.deleteOptionData(collectionName, delTarget.dataset.del); setTimeout(() => renderList(input.value), 100); } 
                 else if (addTarget) { const newName = addTarget.dataset.add; if(collectionName === 'daily_projects') input.value = 'กำลังเพิ่ม...'; addGenericOption(collectionName, newName, selectCallback); list.classList.add('hidden'); } 
                 else if (selTarget) { selectCallback(selTarget.dataset.sel); list.classList.add('hidden'); }
             });
@@ -960,7 +681,7 @@
         }
         window.removeTaskType = (tag) => { selectedTaskTypes = selectedTaskTypes.filter(t => t !== tag); window.renderTaskTypeChips(); };
 
-        // --- Brand/Equip Management ---
+        // === 6. Brand & Equipment Logic ===
         window.addBrandEquipItem = (data = { id: Date.now().toString() + Math.random(), equip: '', brand: '', enabled: true }) => { currentBrandEquips.push(data); window.renderBrandEquipList(); };
         window.removeBrandEquip = (id) => {
             const idx = currentBrandEquips.findIndex(b => b.id === id); if (idx === -1) return;
@@ -969,7 +690,7 @@
         };
         window.toggleBrandEquipRow = (id, isEnabled) => {
             const item = currentBrandEquips.find(b => b.id === id); if (!item) return;
-            if(!isEnabled) { window.removeBrandEquip(id); }
+            if(!isEnabled) { window.removeBrandEquip(id); } // ติ๊กออกคือลบทันทีพร้อมปุ่ม Undo
         };
         window.updateBrandEquipVal = (id, field, val) => { const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; };
 
@@ -1014,12 +735,11 @@
 
         document.addEventListener('mousedown', (e) => {
             const closeIfOutside = (wId, lId) => { const w = document.getElementById(wId), l = document.getElementById(lId); if (w && l && !w.contains(e.target)) l.classList.add('hidden'); };
-            closeIfOutside('project-dropdown-wrapper', 'project-dropdown-list'); 
-            closeIfOutside('tasktype-dropdown-wrapper', 'tasktype-dropdown-list'); 
-            closeIfOutside('dash-project-dropdown-wrapper', 'dash-project-dropdown-list');
+            closeIfOutside('project-dropdown-wrapper', 'project-dropdown-list'); closeIfOutside('tasktype-dropdown-wrapper', 'tasktype-dropdown-list'); closeIfOutside('dash-project-dropdown-wrapper', 'dash-project-dropdown-list');
             currentBrandEquips.forEach(b => { closeIfOutside(`equip-wrapper-${b.id}`, `equip-list-${b.id}`); closeIfOutside(`brand-wrapper-${b.id}`, `brand-list-${b.id}`); });
         });
 
+        // === 7. Dashboard & Summary Logic ===
         function generateAggregatedProjectTable(baseFilteredTasks, selectedFilterValue, filterKeyName) {
             let targetProjectNames = new Set();
             if (selectedFilterValue === 'all') {
@@ -1027,11 +747,8 @@
             } else {
                 baseFilteredTasks.forEach(t => {
                     let val = filterKeyName === 'brands' ? (t.brands || []).filter(b=>b.enabled).map(b=>b.brand) : t[filterKeyName];
-                    if (filterKeyName === 'taskType' || filterKeyName === 'brands') {
-                       if (Array.isArray(val) && val.includes(selectedFilterValue)) targetProjectNames.add(t.projectName || 'ไม่ได้ระบุโครงการ');
-                    } else {
-                       if ((val || 'ไม่ระบุ') === selectedFilterValue) targetProjectNames.add(t.projectName || 'ไม่ได้ระบุโครงการ');
-                    }
+                    if (filterKeyName === 'taskType' || filterKeyName === 'brands') { if (Array.isArray(val) && val.includes(selectedFilterValue)) targetProjectNames.add(t.projectName || 'ไม่ได้ระบุโครงการ'); } 
+                    else { if ((val || 'ไม่ระบุ') === selectedFilterValue) targetProjectNames.add(t.projectName || 'ไม่ได้ระบุโครงการ'); }
                 });
             }
 
@@ -1073,7 +790,6 @@
 
         function setupSummaryPage(config) {
             const { prefix, name, filterKey, getFilterValue, setFilterValue, getPage, setPage, getCardPage, setCardPage, dataExtrFn, formatJoined } = config;
-            
             window[`set${prefix}Filter`] = (val) => { setFilterValue(val === getFilterValue() ? 'all' : val); setPage(1); window[`render${prefix}Summary`](); };
             window[`changeSummaryCardPage`] = (pfx, d) => { if(pfx===prefix) { setCardPage(getCardPage() + d); window[`render${prefix}Summary`](); } };
             
@@ -1084,22 +800,9 @@
                 setPage(1); setCardPage(1); window[`render${prefix}Summary`]();
             });
             ['search-input', 'search-date', 'search-month', 'search-year'].forEach(id => { document.getElementById(`${prefix}-${id}`)?.addEventListener(id.includes('input') ? 'input' : 'change', () => { setPage(1); setCardPage(1); window[`render${prefix}Summary`](); }); });
-            document.getElementById(`btn-${prefix}-reset-search`)?.addEventListener('click', () => {
-                const inp = document.getElementById(`${prefix}-search-input`), tt = document.getElementById(`${prefix}-search-time-type`);
-                if(inp) inp.value = ''; if(tt) { tt.value = 'day'; tt.dispatchEvent(new Event('change')); }
-                setFilterValue('all'); setPage(1); setCardPage(1); window[`render${prefix}Summary`]();
-            });
-
-            document.getElementById(`btn-${prefix}-export-excel`)?.addEventListener('click', () => {
-                const data = window[`${prefix}CurrentFilteredData`]; if (!data || data.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
-                const exportData = data.map((r, i) => ({ 'ลำดับ': i + 1, 'วันที่รับงานล่าสุด': r.latest ? formatDate(r.latest) : '-', 'ชื่อโครงการ': r.pName, [`${name}ทั้งหมด`]: Array.from(r[formatJoined]).join(', ') || '-', 'จำนวนงาน (งาน)': r.count }));
-                const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), "Summary"); XLSX.writeFile(wb, `${prefix}_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
-            });
-            document.getElementById(`btn-${prefix}-export-pdf`)?.addEventListener('click', () => {
-                const data = window[`${prefix}CurrentFilteredData`]; if (!data || data.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
-                showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const el = document.getElementById(`${prefix}-summary-table`);
-                html2pdf().set({ margin: 0.4, filename: `${prefix}_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(el).save().then(() => showNotification("Export PDF สำเร็จ"));
-            });
+            document.getElementById(`btn-${prefix}-reset-search`)?.addEventListener('click', () => { const inp = document.getElementById(`${prefix}-search-input`), tt = document.getElementById(`${prefix}-search-time-type`); if(inp) inp.value = ''; if(tt) { tt.value = 'day'; tt.dispatchEvent(new Event('change')); } setFilterValue('all'); setPage(1); setCardPage(1); window[`render${prefix}Summary`](); });
+            document.getElementById(`btn-${prefix}-export-excel`)?.addEventListener('click', () => { const data = window[`${prefix}CurrentFilteredData`]; if (!data || data.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); const exportData = data.map((r, i) => ({ 'ลำดับ': i + 1, 'วันที่รับงานล่าสุด': r.latest ? formatDate(r.latest) : '-', 'ชื่อโครงการ': r.pName, [`${name}ทั้งหมด`]: Array.from(r[formatJoined]).join(', ') || '-', 'จำนวนงาน (งาน)': r.count })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), "Summary"); XLSX.writeFile(wb, `${prefix}_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ"); });
+            document.getElementById(`btn-${prefix}-export-pdf`)?.addEventListener('click', () => { const data = window[`${prefix}CurrentFilteredData`]; if (!data || data.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const el = document.getElementById(`${prefix}-summary-table`); html2pdf().set({ margin: 0.4, filename: `${prefix}_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(el).save().then(() => showNotification("Export PDF สำเร็จ")); });
 
             window[`render${prefix}Summary`] = () => {
                 const container = document.getElementById(`${prefix}-cards-container`), tbody = document.getElementById(`${prefix}-summary-body`);
@@ -1111,8 +814,7 @@
                 const cardsData = Object.keys(countsObj).map(n => ({ name: n, count: countsObj[n], percent: totalCount > 0 ? Math.round((countsObj[n] / totalCount) * 100) : 0 })).sort((a, b) => b.count - a.count);
                 
                 const dispCountEl = document.getElementById(`${prefix}-display-count`); if(dispCountEl) dispCountEl.textContent = cardsData.length;
-                const cardsPerPage = 6, totalCardPages = Math.ceil(cardsData.length / cardsPerPage) || 1;
-                let cPage = getCardPage(); if (cPage > totalCardPages) { cPage = totalCardPages; setCardPage(cPage); }
+                const cardsPerPage = 6, totalCardPages = Math.ceil(cardsData.length / cardsPerPage) || 1; let cPage = getCardPage(); if (cPage > totalCardPages) { cPage = totalCardPages; setCardPage(cPage); }
                 const paginatedCards = cardsData.slice((cPage - 1) * cardsPerPage, cPage * cardsPerPage);
                 
                 container.innerHTML = ''; const pgEl = document.getElementById(`${prefix}-cards-pagination`);
@@ -1122,21 +824,14 @@
                         const isSel = getFilterValue() === c.name, ring = isSel ? 'ring-2 ring-[#5b5fc7] ring-offset-1 scale-[1.01] shadow-md border-[#5b5fc7]/50' : 'border-indigo-100 hover:shadow-sm hover:border-[#5b5fc7]/40';
                         container.innerHTML += `<div onclick="set${prefix}Filter('${c.name.replace(/'/g, "\\'")}')" class="bg-indigo-50/50 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ring} group shrink-0"><p class="text-sm font-bold text-[#5b5fc7] truncate w-full group-hover:text-indigo-800 transition-colors" title="${c.name}">${c.name}</p><div class="flex items-baseline justify-center gap-1.5 mt-0.5"><span class="text-2xl font-black text-gray-800 leading-none">${c.count}</span><span class="text-[11px] font-semibold text-gray-500 leading-none">( ${c.percent}% ) งาน</span></div></div>`;
                     });
-                    if(pgEl) {
-                        if (cardsData.length > cardsPerPage) { pgEl.classList.remove('hidden'); pgEl.classList.add('flex'); document.getElementById(`${prefix}-cards-page-text`).textContent = `หน้า ${cPage} / ${totalCardPages}`; document.getElementById(`btn-${prefix}-card-prev`).disabled = cPage === 1; document.getElementById(`btn-${prefix}-card-next`).disabled = cPage === totalCardPages; }
-                        else { pgEl.classList.add('hidden'); pgEl.classList.remove('flex'); }
-                    }
+                    if(pgEl) { if (cardsData.length > cardsPerPage) { pgEl.classList.remove('hidden'); pgEl.classList.add('flex'); document.getElementById(`${prefix}-cards-page-text`).textContent = `หน้า ${cPage} / ${totalCardPages}`; document.getElementById(`btn-${prefix}-card-prev`).disabled = cPage === 1; document.getElementById(`btn-${prefix}-card-next`).disabled = cPage === totalCardPages; } else { pgEl.classList.add('hidden'); pgEl.classList.remove('flex'); } }
                 }
 
-                const tableData = generateAggregatedProjectTable(filteredTasks, getFilterValue(), filterKey);
-                window[`${prefix}CurrentFilteredData`] = tableData;
-
+                const tableData = generateAggregatedProjectTable(filteredTasks, getFilterValue(), filterKey); window[`${prefix}CurrentFilteredData`] = tableData;
                 let named = 0, unnamed = 0; tableData.forEach(r => { if(r.pName === 'ไม่ได้ระบุโครงการ' || !r.pName.trim()) unnamed++; else named++; });
-                const projCountEl = document.getElementById(`${prefix}-project-count-container`);
-                if (projCountEl) projCountEl.innerHTML = `<h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">${named}</span> โครงการ</h3> ${unnamed > 0 ? `<span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">(มีงานที่ไม่ได้ระบุโครงการอีก ${unnamed} รายการ)</span>` : ''}`;
+                const projCountEl = document.getElementById(`${prefix}-project-count-container`); if (projCountEl) projCountEl.innerHTML = `<h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">${named}</span> โครงการ</h3> ${unnamed > 0 ? `<span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">(มีงานที่ไม่ได้ระบุโครงการอีก ${unnamed} รายการ)</span>` : ''}`;
 
-                const totalTblPages = Math.ceil(tableData.length / itemsPerPage) || 1;
-                let tPage = getPage(); if (tPage > totalTblPages) { tPage = totalTblPages; setPage(tPage); }
+                const totalTblPages = Math.ceil(tableData.length / itemsPerPage) || 1; let tPage = getPage(); if (tPage > totalTblPages) { tPage = totalTblPages; setPage(tPage); }
                 const startIdx = (tPage - 1) * itemsPerPage, paginatedTable = tableData.slice(startIdx, startIdx + itemsPerPage);
                 
                 tbody.innerHTML = ''; const tblPgEl = document.getElementById(`${prefix}-summary-pagination`);
@@ -1148,137 +843,99 @@
                         const joinedItems = Array.from(row[formatJoined]).join(', ') || '-';
                         tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-3 text-center font-medium text-gray-500">${startIdx + i + 1}</td><td class="px-4 py-3 text-center text-sm text-gray-600">${row.latest ? formatDate(row.latest) : '-'}</td><td class="px-6 py-3">${htmlName}</td><td class="px-6 py-3 font-medium ${textColors[formatJoined]} max-w-xs truncate" title="${joinedItems}">${joinedItems}</td><td class="px-4 py-3 text-center font-semibold text-gray-800">${row.count}</td></tr>`;
                     });
-                    if (tblPgEl && tableData.length > itemsPerPage) {
-                        window[`goTo${prefix}SummaryPage`] = (p) => { setPage(p); window[`render${prefix}Summary`](); };
-                        tblPgEl.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIdx + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(startIdx + itemsPerPage, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goTo${prefix}SummaryPage(${tPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${tPage} / ${totalTblPages}</div><button onclick="goTo${prefix}SummaryPage(${tPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tPage === totalTblPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                    } else if(tblPgEl) tblPgEl.innerHTML = '';
+                    if (tblPgEl && tableData.length > itemsPerPage) { window[`goTo${prefix}SummaryPage`] = (p) => { setPage(p); window[`render${prefix}Summary`](); }; tblPgEl.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIdx + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(startIdx + itemsPerPage, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goTo${prefix}SummaryPage(${tPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${tPage} / ${totalTblPages}</div><button onclick="goTo${prefix}SummaryPage(${tPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tPage === totalTblPages ? 'disabled' : ''}>ถัดไป</button></div></div>`; } 
+                    else if(tblPgEl) tblPgEl.innerHTML = '';
                 }
                 lucide.createIcons();
             };
         }
 
-        let filters = { resp: 'all', cust: 'all', tasktype: 'all', brand: 'all' }, pages = { resp: 1, cust: 1, tasktype: 1, brand: 1 }, cPages = { resp: 1, cust: 1, tasktype: 1, brand: 1 };
-        setupSummaryPage({ prefix: 'tasktype', name: 'ประเภทงาน', filterKey: 'taskType', formatJoined: 'types', getFilterValue: () => filters.tasktype, setFilterValue: (v) => filters.tasktype = v, getPage: () => pages.tasktype, setPage: (p) => pages.tasktype = p, getCardPage: () => cPages.tasktype, setCardPage: (p) => cPages.tasktype = p, dataExtrFn: (t) => Array.isArray(t.taskType) && t.taskType.length > 0 ? t.taskType : ['ไม่ระบุ'] });
-        setupSummaryPage({ prefix: 'brand', name: 'ยี่ห้อ/แบรนด์', filterKey: 'brands', formatJoined: 'brands', getFilterValue: () => filters.brand, setFilterValue: (v) => filters.brand = v, getPage: () => pages.brand, setPage: (p) => pages.brand = p, getCardPage: () => cPages.brand, setCardPage: (p) => cPages.brand = p, dataExtrFn: (t) => Array.isArray(t.brands) && t.brands.length > 0 ? t.brands.filter(b=>b.enabled).map(b => b.brand || 'ไม่ระบุ') : ['ไม่ระบุ'] });
-        setupSummaryPage({ prefix: 'responsible', name: 'ชื่อผู้รับผิดชอบ', filterKey: 'responsibleName', formatJoined: 'resp', getFilterValue: () => filters.resp, setFilterValue: (v) => filters.resp = v, getPage: () => pages.resp, setPage: (p) => pages.resp = p, getCardPage: () => cPages.resp, setCardPage: (p) => cPages.resp = p, dataExtrFn: (t) => [t.responsibleName || 'ไม่ระบุ'] });
-        setupSummaryPage({ prefix: 'customer', name: 'ชื่อลูกค้า', filterKey: 'customerName', formatJoined: 'cust', getFilterValue: () => filters.cust, setFilterValue: (v) => filters.cust = v, getPage: () => pages.cust, setPage: (p) => pages.cust = p, getCardPage: () => cPages.cust, setCardPage: (p) => cPages.cust = p, dataExtrFn: (t) => [t.customerName || 'ไม่ระบุ'] });
+        setupSummaryPage({ prefix: 'tasktype', name: 'ประเภทงาน', filterKey: 'taskType', formatJoined: 'types', getFilterValue: () => summaryState.tasktype.filter, setFilterValue: (v) => summaryState.tasktype.filter = v, getPage: () => summaryState.tasktype.page, setPage: (p) => summaryState.tasktype.page = p, getCardPage: () => summaryState.tasktype.cardPage, setCardPage: (p) => summaryState.tasktype.cardPage = p, dataExtrFn: (t) => Array.isArray(t.taskType) && t.taskType.length > 0 ? t.taskType : ['ไม่ระบุ'] });
+        setupSummaryPage({ prefix: 'brand', name: 'ยี่ห้อ/แบรนด์', filterKey: 'brands', formatJoined: 'brands', getFilterValue: () => summaryState.brand.filter, setFilterValue: (v) => summaryState.brand.filter = v, getPage: () => summaryState.brand.page, setPage: (p) => summaryState.brand.page = p, getCardPage: () => summaryState.brand.cardPage, setCardPage: (p) => summaryState.brand.cardPage = p, dataExtrFn: (t) => Array.isArray(t.brands) && t.brands.length > 0 ? t.brands.filter(b=>b.enabled).map(b => b.brand || 'ไม่ระบุ') : ['ไม่ระบุ'] });
+        setupSummaryPage({ prefix: 'responsible', name: 'ชื่อผู้รับผิดชอบ', filterKey: 'responsibleName', formatJoined: 'resp', getFilterValue: () => summaryState.responsible.filter, setFilterValue: (v) => summaryState.responsible.filter = v, getPage: () => summaryState.responsible.page, setPage: (p) => summaryState.responsible.page = p, getCardPage: () => summaryState.responsible.cardPage, setCardPage: (p) => summaryState.responsible.cardPage = p, dataExtrFn: (t) => [t.responsibleName || 'ไม่ระบุ'] });
+        setupSummaryPage({ prefix: 'customer', name: 'ชื่อลูกค้า', filterKey: 'customerName', formatJoined: 'cust', getFilterValue: () => summaryState.customer.filter, setFilterValue: (v) => summaryState.customer.filter = v, getPage: () => summaryState.customer.page, setPage: (p) => summaryState.customer.page = p, getCardPage: () => summaryState.customer.cardPage, setCardPage: (p) => summaryState.customer.cardPage = p, dataExtrFn: (t) => [t.customerName || 'ไม่ระบุ'] });
 
-        function loadTasks() {
-            if (!currentUser) return;
-            unsubscribeTasks = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), (snapshot) => {
-                let tasks = []; snapshot.forEach((doc) => tasks.push({ id: doc.id, ...doc.data() }));
-                tasks = filterDataByRole(tasks); tasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); allTasks = tasks; populateEmailDropdowns();
-                const yearsSet = new Set(); tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); }); const sortedYears = Array.from(yearsSet).sort().reverse();
-                const updateYearOptions = (id) => { const el = document.getElementById(id); if(!el) return; const cv = el.value; el.innerHTML = '<option value="">ทุกปีทั้งหมด</option>'; sortedYears.forEach(y => el.innerHTML += `<option value="${y}">${y}</option>`); if(sortedYears.includes(cv)) el.value = cv; };
-                ['search-year', 'summary-search-year', ...summaryTabsConfig.map(c=>`${c.id}-search-year`)].forEach(updateYearOptions);
-                
-                window.filterAndRenderTasks(); 
-                window.renderCalendar();   
-                if (!document.getElementById('view-dashboard').classList.contains('hidden')) window.renderDashboard(); 
-                if (!document.getElementById('view-project-summary').classList.contains('hidden')) window.renderProjectSummary();
-                summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); });
-            }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาดในการโหลดข้อมูล'; statusEl.className = 'text-red-500 font-bold'; });
-        }
+        window.renderProjectSummary = function() {
+            const tbody = document.getElementById('projects-summary-body'), paginationContainer = document.getElementById('summary-pagination');
+            if (!tbody) return;
+            const tasksToUse = getTasksByFilter(); let visibleProjects = [];
+            if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
+                if (globalEmailFilter === 'all') visibleProjects = [...allProjects];
+                else { const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean)), targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null; visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name)); }
+            } else { const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean)); visibleProjects = allProjects.filter(p => p.ownerId === currentUser.uid || userProjectNames.has(p.name)); }
 
-        taskForm?.addEventListener('submit', async (e) => {
-            e.preventDefault(); if (!currentUser || currentUserRole === 'monitor') return;
-            const submitBtn = document.getElementById('submit-btn'); submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
-            
-            const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
-            const taskData = { 
-                taskName: document.getElementById('taskName')?.value || '', 
-                projectName: document.getElementById('projectNameInput')?.value || '', 
-                taskType: selectedTaskTypes, 
-                brands: currentBrandEquips.filter(b=>b.enabled), 
-                receiveDate: document.getElementById('receiveDate')?.value || '', 
-                responsibleName: document.getElementById('responsibleName')?.value || '', 
-                assignment: document.getElementById('assignment')?.value || '', 
-                customerName: document.getElementById('customerName')?.value || '', 
-                customerPhone: document.getElementById('customerPhone')?.value || '', 
-                workLocation: document.getElementById('workLocation')?.value || '', 
-                notes: notesToSave, 
-                updatedAt: Date.now() 
-            };
-            
-            try {
-                if (currentEditTaskId) { 
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); 
-                    showNotification("อัปเดตงานเรียบร้อยแล้ว"); 
-                }
-                else { 
-                    taskData.createdAt = Date.now(); 
-                    taskData.ownerId = currentUser.uid; 
-                    taskData.ownerEmail = currentUser.email; 
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); 
-                    showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); 
-                }
-                window.resetFormToAddMode(); window.switchTab('list');
-            } catch (error) { 
-                showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); 
-            } finally { 
-                submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; 
-                submitBtn.disabled = false; lucide.createIcons(); 
-            }
-        });
-
-        window.editTask = (taskId) => {
-            if (currentUserRole === 'monitor') return; 
-            const task = allTasks.find(t => t.id === taskId); if(!task) return;
-            if (currentUserRole === 'user' && task.ownerId !== currentUser.uid) return showNotification("คุณแก้ไขได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
-            document.getElementById('day-detail-modal')?.classList.add('hidden');
-            
-            ['taskName', 'receiveDate', 'responsibleName', 'assignment', 'customerName', 'customerPhone', 'workLocation'].forEach(field => { 
-                const el = document.getElementById(field); if (el) el.value = task[field] || ''; 
+            const projectData = visibleProjects.map(p => {
+                const pTasks = tasksToUse.filter(t => t.projectName === p.name && t.receiveDate);
+                let earliestDate = ''; if (pTasks.length > 0) { pTasks.sort((a, b) => a.receiveDate.localeCompare(b.receiveDate)); earliestDate = pTasks[0].receiveDate; }
+                return { ...p, status: p.status === undefined ? 'in_progress' : p.status, earliestDate: earliestDate, sortDate: earliestDate || '0000-00-00' };
             });
-            
-            const projInputEl = document.getElementById('projectNameInput'); if (projInputEl) projInputEl.value = task.projectName || '';
-            if (Array.isArray(task.taskType)) { selectedTaskTypes = [...task.taskType]; selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); } 
-            else if (task.taskType && typeof task.taskType === 'string') selectedTaskTypes = [task.taskType]; else selectedTaskTypes = [];
-            renderTaskTypeChips();
-            
-            if (Array.isArray(task.brands)) { currentBrandEquips = JSON.parse(JSON.stringify(task.brands)); } else currentBrandEquips = [];
-            window.renderBrandEquipList();
 
-            if (task.notes && task.notes.length > 0) { 
-                currentNotes = JSON.parse(JSON.stringify(task.notes)); 
-                const lastNote = currentNotes[currentNotes.length - 1]; 
-                if (lastNote && lastNote.completed) currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }); 
-            } else {
-                currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
-            }
-            window.renderNotes(); 
-            currentEditTaskId = taskId; window.switchTab('manage');
-        };
+            const searchInput = document.getElementById('summary-search-input')?.value.toLowerCase() || '', timeType = document.getElementById('summary-search-time-type')?.value || 'day', searchDate = document.getElementById('summary-search-date')?.value, searchMonth = document.getElementById('summary-search-month')?.value, searchYear = document.getElementById('summary-search-year')?.value;
+            const searchedProjects = projectData.filter(p => {
+                let matchTime = true; if (timeType === 'day' && searchDate) matchTime = p.earliestDate === searchDate; else if (timeType === 'month' && searchMonth) matchTime = p.earliestDate && p.earliestDate.startsWith(searchMonth); else if (timeType === 'year' && searchYear) matchTime = p.earliestDate && p.earliestDate.startsWith(searchYear);
+                return matchTime && (searchInput ? p.name.toLowerCase().includes(searchInput) : true);
+            });
+            searchedProjects.sort((a, b) => b.sortDate.localeCompare(a.sortDate));
 
-        window.deleteTask = async (id) => {
-            if (!currentUser || currentUserRole === 'monitor') return;
-            const taskToRestore = allTasks.find(t => t.id === id); if (!taskToRestore) return;
-            if (currentUserRole === 'user' && taskToRestore.ownerId !== currentUser.uid) return showNotification("คุณลบได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
-            
-            const { id: docId, ...taskData } = taskToRestore; 
-            document.getElementById('day-detail-modal')?.classList.add('hidden');
-            const projectName = taskData.projectName; 
-            let projectToDeleteId = null, projectToDeleteData = null;
-            
-            if (projectName) {
-                const remainingTasks = allTasks.filter(t => t.projectName === projectName && t.id !== id);
-                if (remainingTasks.length === 0) { 
-                    const projObj = allProjects.find(p => p.name === projectName); 
-                    if (projObj) { projectToDeleteId = projObj.id; const { id: pId, ...pData } = projObj; projectToDeleteData = pData; } 
-                }
-            }
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id));
-                if (projectToDeleteId) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId));
-                showNotification("ลบงานเรียบร้อยแล้ว", "success", async () => { 
-                    try { 
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id), taskData); 
-                        if (projectToDeleteId && projectToDeleteData) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId), projectToDeleteData); 
-                        showNotification("ย้อนกลับการลบสำเร็จ", "success"); 
-                    } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } 
+            let total = searchedProjects.length, inProgress = 0, won = 0, lost = 0;
+            searchedProjects.forEach(p => { if (p.status === 'in_progress') inProgress++; else if (p.status === 'won') won++; else if (p.status === 'lost') lost++; });
+            const getPct = (val) => total > 0 ? Math.round((val / total) * 100) : 0;
+            document.getElementById('summary-total').textContent = `${total} ( 100% )`; document.getElementById('summary-progress').textContent = `${inProgress} ( ${getPct(inProgress)}% )`; document.getElementById('summary-won').textContent = `${won} ( ${getPct(won)}% )`; document.getElementById('summary-lost').textContent = `${lost} ( ${getPct(lost)}% )`;
+
+            const cards = [ { id: 'card-sum-all', match: 'all', ring: 'ring-gray-400' }, { id: 'card-sum-prog', match: 'in_progress', ring: 'ring-blue-500' }, { id: 'card-sum-won', match: 'won', ring: 'ring-green-500' }, { id: 'card-sum-lost', match: 'lost', ring: 'ring-red-500' } ];
+            cards.forEach(c => { const el = document.getElementById(c.id); if(el) { el.classList.remove('ring-2', 'ring-offset-2', 'scale-[1.02]', 'ring-gray-400', 'ring-blue-500', 'ring-green-500', 'ring-red-500'); if(currentSummaryFilter === c.match) el.classList.add('ring-2', 'ring-offset-2', 'scale-[1.02]', c.ring); } });
+
+            finalDisplayProjectData = searchedProjects.filter(p => currentSummaryFilter === 'all' ? true : p.status === currentSummaryFilter);
+            const totalPages = Math.ceil(finalDisplayProjectData.length / itemsPerPage) || 1; if (summaryCurrentPage > totalPages) summaryCurrentPage = totalPages;
+            const startIndex = (summaryCurrentPage - 1) * itemsPerPage, endIndex = startIndex + itemsPerPage, paginatedData = finalDisplayProjectData.slice(startIndex, endIndex);
+
+            tbody.innerHTML = '';
+            if (paginatedData.length === 0) { tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลโครงการ</td></tr>`; if(paginationContainer) paginationContainer.innerHTML = ''; } 
+            else {
+                paginatedData.forEach((p, index) => {
+                    const globalIndex = startIndex + index + 1, st = p.status || '';
+                    const checkboxHTML = (type) => {
+                        let colorClass = '', hoverRing = '';
+                        if (type === 'in_progress') { colorClass = 'accent-blue-500 text-blue-500 focus:ring-blue-500'; hoverRing = 'hover:ring-blue-500/30'; } else if (type === 'won') { colorClass = 'accent-green-500 text-green-500 focus:ring-green-500'; hoverRing = 'hover:ring-green-500/30'; } else if (type === 'lost') { colorClass = 'accent-red-500 text-red-500 focus:ring-red-500'; hoverRing = 'hover:ring-red-500/30'; }
+                        return `<input type="checkbox" ${st === type ? 'checked' : ''} class="cursor-pointer hover:ring-2 hover:ring-offset-1 ${hoverRing} w-5 h-5 ${colorClass} border-gray-300 rounded shadow-sm" onchange="window.updateProjectStatus('${p.id}', '${type}', this.checked)">`;
+                    };
+                    tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-4 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td><td class="px-6 py-4 font-bold text-[#5b5fc7] cursor-pointer hover:underline" onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">${p.name}</td><td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td><td class="px-4 py-4 text-center">${checkboxHTML('won')}</td><td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td></tr>`;
                 });
-            } catch (error) { showNotification("เกิดข้อผิดพลาดในการลบงาน", "error"); }
+                if (paginationContainer && finalDisplayProjectData.length > itemsPerPage) {
+                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, finalDisplayProjectData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${finalDisplayProjectData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToSummaryPage(${summaryCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${summaryCurrentPage} / ${totalPages}</div><button onclick="goToSummaryPage(${summaryCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                } else if(paginationContainer) paginationContainer.innerHTML = '';
+            }
+            lucide.createIcons();
         };
+
+        window.goToSummaryPage = (page) => { summaryCurrentPage = page; window.renderProjectSummary(); };
+        window.updateProjectStatus = async (projectId, statusType, isChecked) => {
+            const newStatus = isChecked ? statusType : ''; 
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); window.renderProjectSummary(); }
+        };
+
+        ['summary-search-time-type', 'summary-search-date', 'summary-search-month', 'summary-search-year'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', (e) => {
+                if(id==='summary-search-time-type'){
+                    const t = e.target.value, d = document.getElementById('summary-search-date'), m = document.getElementById('summary-search-month'), y = document.getElementById('summary-search-year');
+                    [d,m,y].forEach(el => { if(el) { el.classList.add('hidden'); el.classList.remove('block'); el.value = ''; }});
+                    if(t==='day'&&d) { d.classList.remove('hidden'); d.classList.add('block'); } else if(t==='month'&&m) { m.classList.remove('hidden'); m.classList.add('block'); } else if(t==='year'&&y) { y.classList.remove('hidden'); y.classList.add('block'); }
+                }
+                summaryCurrentPage = 1; window.renderProjectSummary();
+            });
+        });
+        document.getElementById('summary-search-input')?.addEventListener('input', () => { summaryCurrentPage = 1; window.renderProjectSummary(); });
+        document.getElementById('btn-summary-reset-search')?.addEventListener('click', () => { document.getElementById('summary-search-input').value = ''; const tt = document.getElementById('summary-search-time-type'); if(tt){tt.value='day'; tt.dispatchEvent(new Event('change'));} currentSummaryFilter = 'all'; summaryCurrentPage = 1; window.renderProjectSummary(); });
+
+        document.getElementById('btn-summary-export-excel')?.addEventListener('click', () => {
+            if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = finalDisplayProjectData.map((p, idx) => ({ 'ลำดับ': idx + 1, 'วันที่เริ่มรับงาน': p.earliestDate ? formatDate(p.earliestDate) : '-', 'ชื่อโครงการ': p.name, 'สถานะโครงการ': p.status === 'won' ? 'ได้งาน' : p.status === 'lost' ? 'ไม่ได้งาน' : 'กำลังดำเนินการ' }));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), "Project Summary"); XLSX.writeFile(wb, `Project_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
+        });
+        document.getElementById('btn-summary-export-pdf')?.addEventListener('click', () => {
+            if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('projects-summary-table');
+            html2pdf().set({ margin: 0.5, filename: `Project_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+        });
 
         window.renderDashboard = function() {
             const tasksToUse = getTasksByFilter(); if (tasksToUse.length === 0) return;
@@ -1324,15 +981,11 @@
             tasksToUse.forEach(t => { if(t.projectName) totalProjectsSet.add(t.projectName); });
             if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
                 if (globalEmailFilter === 'all') allProjects.forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
-                else {
-                    const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean)), targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
-                    allProjects.filter(p => p.ownerId === targetUid || userProjectNames.has(p.name)).forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
-                }
+                else { const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean)), targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null; allProjects.filter(p => p.ownerId === targetUid || userProjectNames.has(p.name)).forEach(p => { if(p.name) totalProjectsSet.add(p.name); }); }
             }
 
             const filteredProjectsSet = new Set(); let noProjectCount = 0;
             fullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') filteredProjectsSet.add(t.projectName); else noProjectCount++; });
-
             const totalProjEl = document.getElementById('dash-total-projects'), noProjEl = document.getElementById('dash-no-project'), filteredProjEl = document.getElementById('dash-filtered-projects');
             if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size; if (noProjEl) noProjEl.textContent = noProjectCount; if (filteredProjEl) filteredProjEl.textContent = filteredProjectsSet.size;
 
@@ -1364,7 +1017,7 @@
                     return k; 
                 });
                 const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0, timeYAxisMax = Math.max(10, Math.ceil(maxTimeVal / 10) * 10);
-                chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์'})`, data: timeDataValues, backgroundColor: '#6366f1', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'barLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value, datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
+                chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `จำนวนงาน`, data: timeDataValues, backgroundColor: '#6366f1', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'barLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value, datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
                 const timeLabel = document.getElementById('dash-time-label'); if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
             }
 
@@ -1387,7 +1040,7 @@
                 let bgColors = [...originalColors], offsets = Array(finalValues.length).fill(0);
                 if (activeIndex !== -1) { bgColors = originalColors.map((col, i) => i === activeIndex ? col : col + '33'); offsets[activeIndex] = 15; }
 
-                const handleChartClick = (index) => { const clickedLabel = finalKeys[index]; if (clickedLabel === othersLabel) return; dashCrossFilters[canvasId] = dashCrossFilters[canvasId] === clickedLabel ? null : clickedLabel; renderDashboard(); };
+                const handleChartClick = (index) => { const clickedLabel = finalKeys[index]; if (clickedLabel === othersLabel) return; dashCrossFilters[canvasId] = dashCrossFilters[canvasId] === clickedLabel ? null : clickedLabel; window.renderDashboard(); };
                 chartInstances[canvasId] = new Chart(canvas.getContext('2d'), { type: 'doughnut', data: { labels: finalKeys, datasets: [{ data: finalValues, backgroundColor: bgColors, borderWidth: 0, hoverOffset: 4, offset: offsets }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: 10 }, onClick: (e, activeElements) => { if (activeElements.length > 0) handleChartClick(activeElements[0].index); }, plugins: { legend: { display: false } }, cutout: '65%' }, plugins: [{ id: 'centerText', beforeDraw: function(chart) { if (chart.data.datasets.length === 0) return; const ctx = chart.ctx, meta = chart.getDatasetMeta(0); if (!meta.data || meta.data.length === 0) return; const centerX = meta.data[0].x, centerY = meta.data[0].y; let displayNum = (activeIndex !== -1 && finalValues[activeIndex] !== undefined) ? finalValues[activeIndex] : finalValues.reduce((a, b) => a + b, 0); const textNum = displayNum.toString(); ctx.restore(); ctx.font = "bold 2.2rem Sarabun, sans-serif"; ctx.fillStyle = "#dc2626"; ctx.textBaseline = "middle"; const textNumWidth = ctx.measureText(textNum).width; ctx.fillText(textNum, centerX - (textNumWidth / 2), centerY + 4); ctx.save(); } }] });
 
                 const legendContainer = document.getElementById(`legend-${canvasId}`);
@@ -1401,346 +1054,7 @@
                     });
                 }
             };
-
-            drawPieChart('responsible', counts.responsible, 10); drawPieChart('customer', counts.customer, 10); drawPieChart('assignment', counts.assignment, 10); drawPieChart('tasktype', counts.taskType, 10); drawPieChart('brand', counts.brand, 10);
-        };
-
-        window.renderProjectSummary = function() {
-            const tbody = document.getElementById('projects-summary-body'), paginationContainer = document.getElementById('summary-pagination');
-            if (!tbody) return;
-            const tasksToUse = getTasksByFilter();
-            let visibleProjects = [];
-            if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
-                if (globalEmailFilter === 'all') visibleProjects = [...allProjects];
-                else {
-                    const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean)), targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
-                    visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name));
-                }
-            } else {
-                const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
-                visibleProjects = allProjects.filter(p => p.ownerId === currentUser.uid || userProjectNames.has(p.name));
-            }
-
-            const projectData = visibleProjects.map(p => {
-                const pTasks = tasksToUse.filter(t => t.projectName === p.name && t.receiveDate);
-                let earliestDate = ''; if (pTasks.length > 0) { pTasks.sort((a, b) => a.receiveDate.localeCompare(b.receiveDate)); earliestDate = pTasks[0].receiveDate; }
-                return { ...p, status: p.status === undefined ? 'in_progress' : p.status, earliestDate: earliestDate, sortDate: earliestDate || '0000-00-00' };
-            });
-
-            const searchInput = document.getElementById('summary-search-input')?.value.toLowerCase() || '', timeType = document.getElementById('summary-search-time-type')?.value || 'day', searchDate = document.getElementById('summary-search-date')?.value, searchMonth = document.getElementById('summary-search-month')?.value, searchYear = document.getElementById('summary-search-year')?.value;
-
-            const searchedProjects = projectData.filter(p => {
-                let matchTime = true;
-                if (timeType === 'day' && searchDate) matchTime = p.earliestDate === searchDate;
-                else if (timeType === 'month' && searchMonth) matchTime = p.earliestDate && p.earliestDate.startsWith(searchMonth);
-                else if (timeType === 'year' && searchYear) matchTime = p.earliestDate && p.earliestDate.startsWith(searchYear);
-                return matchTime && (searchInput ? p.name.toLowerCase().includes(searchInput) : true);
-            });
-
-            searchedProjects.sort((a, b) => b.sortDate.localeCompare(a.sortDate));
-
-            let total = searchedProjects.length, inProgress = 0, won = 0, lost = 0;
-            searchedProjects.forEach(p => { if (p.status === 'in_progress') inProgress++; else if (p.status === 'won') won++; else if (p.status === 'lost') lost++; });
-            const getPct = (val) => total > 0 ? Math.round((val / total) * 100) : 0;
-
-            document.getElementById('summary-total').textContent = `${total} ( 100% )`; document.getElementById('summary-progress').textContent = `${inProgress} ( ${getPct(inProgress)}% )`; document.getElementById('summary-won').textContent = `${won} ( ${getPct(won)}% )`; document.getElementById('summary-lost').textContent = `${lost} ( ${getPct(lost)}% )`;
-
-            const cards = [ { id: 'card-sum-all', match: 'all', ring: 'ring-gray-400' }, { id: 'card-sum-prog', match: 'in_progress', ring: 'ring-blue-500' }, { id: 'card-sum-won', match: 'won', ring: 'ring-green-500' }, { id: 'card-sum-lost', match: 'lost', ring: 'ring-red-500' } ];
-            cards.forEach(c => { const el = document.getElementById(c.id); if(el) { el.classList.remove('ring-2', 'ring-offset-2', 'scale-[1.02]', 'ring-gray-400', 'ring-blue-500', 'ring-green-500', 'ring-red-500'); if(currentSummaryFilter === c.match) el.classList.add('ring-2', 'ring-offset-2', 'scale-[1.02]', c.ring); } });
-
-            finalDisplayProjectData = searchedProjects.filter(p => currentSummaryFilter === 'all' ? true : p.status === currentSummaryFilter);
-            document.getElementById('summary-display-count').textContent = finalDisplayProjectData.length;
-
-            const totalPages = Math.ceil(finalDisplayProjectData.length / itemsPerPage) || 1;
-            if (summaryCurrentPage > totalPages) summaryCurrentPage = totalPages;
-            const startIndex = (summaryCurrentPage - 1) * itemsPerPage, endIndex = startIndex + itemsPerPage, paginatedData = finalDisplayProjectData.slice(startIndex, endIndex);
-
-            tbody.innerHTML = '';
-            if (paginatedData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลโครงการ</td></tr>`;
-                if(paginationContainer) paginationContainer.innerHTML = '';
-            } else {
-                paginatedData.forEach((p, index) => {
-                    const globalIndex = startIndex + index + 1, st = p.status || '';
-                    const checkboxHTML = (type) => {
-                        let colorClass = '', hoverRing = '';
-                        if (type === 'in_progress') { colorClass = 'accent-blue-500 text-blue-500 focus:ring-blue-500'; hoverRing = 'hover:ring-blue-500/30'; } else if (type === 'won') { colorClass = 'accent-green-500 text-green-500 focus:ring-green-500'; hoverRing = 'hover:ring-green-500/30'; } else if (type === 'lost') { colorClass = 'accent-red-500 text-red-500 focus:ring-red-500'; hoverRing = 'hover:ring-red-500/30'; }
-                        return `<input type="checkbox" ${st === type ? 'checked' : ''} class="cursor-pointer hover:ring-2 hover:ring-offset-1 ${hoverRing} w-5 h-5 ${colorClass} border-gray-300 rounded shadow-sm" onchange="window.updateProjectStatus('${p.id}', '${type}', this.checked)">`;
-                    };
-                    tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-4 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td><td class="px-6 py-4 font-bold text-[#5b5fc7] cursor-pointer hover:underline" onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">${p.name}</td><td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td><td class="px-4 py-4 text-center">${checkboxHTML('won')}</td><td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td></tr>`;
-                });
-                if (paginationContainer && finalDisplayProjectData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, finalDisplayProjectData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${finalDisplayProjectData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToSummaryPage(${summaryCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${summaryCurrentPage} / ${totalPages}</div><button onclick="goToSummaryPage(${summaryCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                } else if(paginationContainer) paginationContainer.innerHTML = '';
-            }
-            lucide.createIcons();
-        };
-
-        window.goToSummaryPage = (page) => { summaryCurrentPage = page; window.renderProjectSummary(); };
-        window.updateProjectStatus = async (projectId, statusType, isChecked) => {
-            const newStatus = isChecked ? statusType : ''; 
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); window.renderProjectSummary(); }
-        };
-
-        ['summary-search-time-type', 'summary-search-date', 'summary-search-month', 'summary-search-year'].forEach(id => {
-            document.getElementById(id)?.addEventListener('change', (e) => {
-                if(id==='summary-search-time-type'){
-                    const t = e.target.value, d = document.getElementById('summary-search-date'), m = document.getElementById('summary-search-month'), y = document.getElementById('summary-search-year');
-                    [d,m,y].forEach(el => { if(el) { el.classList.add('hidden'); el.classList.remove('block'); el.value = ''; }});
-                    if(t==='day'&&d) { d.classList.remove('hidden'); d.classList.add('block'); } else if(t==='month'&&m) { m.classList.remove('hidden'); m.classList.add('block'); } else if(t==='year'&&y) { y.classList.remove('hidden'); y.classList.add('block'); }
-                }
-                summaryCurrentPage = 1; window.renderProjectSummary();
-            });
-        });
-        document.getElementById('summary-search-input')?.addEventListener('input', () => { summaryCurrentPage = 1; window.renderProjectSummary(); });
-        document.getElementById('btn-summary-reset-search')?.addEventListener('click', () => {
-            document.getElementById('summary-search-input').value = ''; const tt = document.getElementById('summary-search-time-type'); if(tt){tt.value='day'; tt.dispatchEvent(new Event('change'));}
-            currentSummaryFilter = 'all'; summaryCurrentPage = 1; window.renderProjectSummary();
-        });
-
-        window.openProjectDetailModal = (projectName) => {
-            const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), projectTasks = getTasksByFilter().filter(t => t.projectName === projectName);
-            title.innerHTML = `<i data-lucide="folder-open" class="w-5 h-5"></i> โครงการ: ${projectName} ${projectTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${projectTasks.length} งาน )</span>` : ''}`;
-            content.innerHTML = '';
-            if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
-            else {
-                projectTasks.sort((a, b) => (b.receiveDate || '').localeCompare(a.receiveDate || ''));
-                let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
-                projectTasks.forEach((task) => {
-                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
-                    let brandsDisplay = Array.isArray(task.brands) && task.brands.length > 0 ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(', ') : '-';
-                    let notesHtml = '';
-                    if (task.notes && task.notes.length > 0) {
-                        const validNotes = task.notes.filter(n => n.text.trim() !== '' || n.completed);
-                        if(validNotes.length > 0) {
-                            notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
-                            validNotes.forEach(note => notesHtml += `<div class="flex items-start gap-2 text-sm"><div class="mt-0.5">${note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`}</div><div class="flex-1 text-gray-700">${note.text}</div>${note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : ''}</div>`);
-                            notesHtml += `</div>`;
-                        }
-                    }
-                    let actionBtns = (currentUserRole === 'admin' || currentUserRole === 'user') ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
-                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><div class="flex justify-between items-start mb-1"><h4 class="font-bold text-gray-800 text-lg group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium shrink-0 ml-2 border border-gray-200">${formatDate(task.receiveDate)}</span></div><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandsDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5 col-span-1 sm:col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
-                });
-                tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
-            }
-            lucide.createIcons(); modal.classList.remove('hidden'); modal.classList.add('flex');
-        };
-
-        window.renderNotes = function() {
-            const list = document.getElementById('notes-list');
-            if(!list) return;
-            if (!currentNotes || currentNotes.length === 0) currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
-            list.innerHTML = '';
-            currentNotes.forEach((note, index) => {
-                const timeHtml = note.completedAt ? `<span class="text-[10px] text-gray-400 font-medium whitespace-nowrap"><i data-lucide="clock" class="w-3 h-3 inline"></i> ${note.completedAt}</span>` : '';
-                list.innerHTML += `<div class="flex items-start gap-3 group/note"><button type="button" onclick="toggleNote('${note.id}')" class="mt-1.5 w-4 h-4 rounded-sm flex items-center justify-center border transition-all ${note.completed ? 'bg-[#5b5fc7] border-[#5b5fc7] text-white' : 'border-gray-400 hover:border-[#5b5fc7] bg-white'} shadow-sm shrink-0">${note.completed ? '<i data-lucide="check" class="w-3.5 h-3.5 font-bold"></i>' : ''}</button><div class="flex-1 flex flex-col gap-1"><div class="flex items-center gap-2"><textarea rows="1" oninput="updateNoteText('${note.id}', this.value); this.style.height = 'auto'; this.style.height = this.scrollHeight + 'px';" placeholder="${note.completed ? 'พิมพ์รายละเอียดที่นี่...' : 'คลิกติ๊กถูกที่กล่องด้านหน้า เพื่อลงเวลาและเริ่มพิมพ์...'}" class="flex-1 bg-transparent border-0 border-b hover:border-gray-300 focus:border-[#5b5fc7] focus:ring-0 px-1 py-1 text-sm ${note.completed ? 'text-gray-800 border-gray-200' : 'text-gray-400 opacity-60 border-transparent cursor-not-allowed select-none'} resize-none overflow-hidden" ${!note.completed ? 'readonly tabindex="-1"' : ''}>${note.text}</textarea>${timeHtml}</div></div>${currentNotes.length > 1 || note.completed ? `<button type="button" onclick="removeNote('${note.id}')" class="mt-1.5 text-gray-300 hover:text-red-500 opacity-0 group-hover/note:opacity-100 transition-opacity p-1 shrink-0"><i data-lucide="x" class="w-4 h-4"></i></button>` : '<div class="w-6 shrink-0"></div>'}</div>`;
-            });
-            lucide.createIcons();
-            setTimeout(() => list.querySelectorAll('textarea').forEach(ta => { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }), 0);
-        };
-
-        window.toggleNote = (id) => {
-            const note = currentNotes.find(n => String(n.id) === String(id));
-            if (note) {
-                note.completed = !note.completed;
-                if (note.completed) {
-                    const now = new Date();
-                    note.completedAt = `${now.toLocaleDateString('th-TH', {timeZone: 'Asia/Bangkok'})} ${now.toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit', timeZone: 'Asia/Bangkok'})} น.`;
-                    if (String(currentNotes[currentNotes.length - 1].id) === String(id)) currentNotes.push({ id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: '', completed: false, completedAt: null });
-                } else note.completedAt = null;
-                window.renderNotes();
-                if (note.completed) setTimeout(() => { const inputs = document.querySelectorAll('#notes-list textarea'), index = currentNotes.findIndex(n => String(n.id) === String(id)); if(inputs[index]) { inputs[index].focus(); const val = inputs[index].value; inputs[index].value = ''; inputs[index].value = val; } }, 50);
-            }
-        };
-
-        window.updateNoteText = (id, text) => { const note = currentNotes.find(n => String(n.id) === String(id)); if (note) note.text = text; };
-        window.removeNote = (id) => {
-            const noteIndex = currentNotes.findIndex(n => String(n.id) === String(id));
-            if (noteIndex === -1) return;
-            const noteToRestore = currentNotes[noteIndex];
-            currentNotes = currentNotes.filter(n => String(n.id) !== String(id));
-            if(currentNotes.length === 0 || currentNotes[currentNotes.length - 1].completed) currentNotes.push({ id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: '', completed: false, completedAt: null });
-            window.renderNotes();
-            showNotification("ลบรายการบันทึกย่อแล้ว", "success", () => {
-                if (currentNotes.length > 0 && currentNotes[currentNotes.length - 1].text === '' && !currentNotes[currentNotes.length - 1].completed && String(currentNotes[currentNotes.length - 1].id) !== String(noteToRestore.id)) currentNotes.pop();
-                currentNotes.splice(noteIndex, 0, noteToRestore);
-                if(currentNotes.length === 0 || currentNotes[currentNotes.length - 1].completed) currentNotes.push({ id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000), text: '', completed: false, completedAt: null });
-                window.renderNotes();
-            });
-        };
-
-        function calculateUsedLeaves(yearStr) {
-            const hols = getHolidaysByFilter().filter(h => h.holidayDate && h.holidayDate.startsWith(yearStr));
-            let used = { vacation: 0, personal: 0, sick: 0 };
-            hols.forEach(h => { if (h.holidayType === 'vacation_leave') used.vacation++; else if (h.holidayType === 'personal_leave' || h.holidayType === 'leave') used.personal++; else if (h.holidayType === 'sick_leave') used.sick++; });
-            return used;
-        }
-
-        function getViewedUserQuotas(year) {
-            let uData = (currentUserRole === 'admin' || currentUserRole === 'monitor') ? allUsers.find(u => u.email === globalEmailFilter) : currentUserData;
-            return uData?.leaveQuotas?.[year] || { vacation: 10, personal: 5, sick: 30 };
-        }
-
-        window.updateQuota = async (type, newRemaining) => {
-             if (currentUserRole === 'monitor') return;
-             const emailToUpdate = (currentUserRole === 'admin' || currentUserRole === 'monitor') ? globalEmailFilter : currentUser.email.toLowerCase();
-             if (!emailToUpdate || emailToUpdate === 'all') return;
-             const year = currentCalendarDate.getFullYear().toString(), used = calculateUsedLeaves(year), newTotal = parseInt(newRemaining || 0) + used[type];
-             try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailToUpdate), { leaveQuotas: { [year]: { [type]: newTotal } } }, { merge: true }); showNotification("อัปเดตสิทธิ์วันลาเรียบร้อยแล้ว"); } catch(e) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); }
-        };
-
-        window.renderCalendar = function() {
-            const grid = document.getElementById('calendar-grid'), monthYearText = document.getElementById('calendar-month-year');
-            if (!grid || !monthYearText) return;
-            grid.innerHTML = '';
-            const year = currentCalendarDate.getFullYear(), month = currentCalendarDate.getMonth(), yearStr = year.toString();
-            const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            monthYearText.innerHTML = `<i data-lucide="calendar" class="w-6 h-6 text-[#5b5fc7]"></i> ${monthNames[month]} ${year + 543} (${year})`;
-
-            const quotaContainer = document.getElementById('leave-quota-container');
-            if (quotaContainer) {
-                let showQuota = !((currentUserRole === 'admin' || currentUserRole === 'monitor') && globalEmailFilter === 'all');
-                if (showQuota) {
-                    quotaContainer.classList.remove('hidden'); quotaContainer.classList.add('flex'); document.getElementById('quota-year-display').textContent = year + 543;
-                    const quotas = getViewedUserQuotas(yearStr), used = calculateUsedLeaves(yearStr);
-                    const qVac = document.getElementById('quota-vacation'), qPer = document.getElementById('quota-personal'), qSick = document.getElementById('quota-sick');
-                    if (qVac) { qVac.value = quotas.vacation - used.vacation; qVac.disabled = currentUserRole === 'monitor'; }
-                    if (qPer) { qPer.value = quotas.personal - used.personal; qPer.disabled = currentUserRole === 'monitor'; }
-                    if (qSick) { qSick.value = quotas.sick - used.sick; qSick.disabled = currentUserRole === 'monitor'; }
-                } else { quotaContainer.classList.add('hidden'); quotaContainer.classList.remove('flex'); }
-            }
-
-            const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate(); 
-            for(let i = 0; i < firstDay; i++) grid.innerHTML += `<div class="bg-gray-50/30 border border-gray-100 rounded-lg p-1.5 h-[130px] opacity-50"></div>`;
-
-            for(let day = 1; day <= daysInMonth; day++) {
-                const cellDate = new Date(year, month, day), isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
-                const dateString = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dayTasks = getTasksByFilter().filter(t => t.receiveDate === dateString), holidayMatch = getHolidaysByFilter().find(h => h.holidayDate === dateString);
-                let allItemsHtml = [];
-
-                if (holidayMatch) {
-                    let badgeBg = 'bg-red-500', badgeTextHover = 'hover:text-red-200', iconName = 'tent';
-                    if (holidayMatch.holidayType === 'vacation_leave') { badgeBg = 'bg-green-500'; badgeTextHover = 'hover:text-green-200'; iconName = 'plane-takeoff'; } else if (holidayMatch.holidayType === 'personal_leave' || holidayMatch.holidayType === 'leave') { badgeBg = 'bg-orange-500'; badgeTextHover = 'hover:text-orange-200'; iconName = 'user-minus'; } else if (holidayMatch.holidayType === 'sick_leave') { badgeBg = 'bg-purple-500'; badgeTextHover = 'hover:text-purple-200'; iconName = 'pill'; }
-                    const canDelete = currentUserRole === 'admin' || (currentUserRole === 'user' && holidayMatch.ownerId === currentUser.uid);
-                    const delBtn = canDelete ? `<button onclick="event.stopPropagation(); deleteHoliday('${holidayMatch.id}')" class="opacity-0 group-hover/hol:opacity-100 text-white ${badgeTextHover} ml-1 transition-opacity"><i data-lucide="x" class="w-3 h-3"></i></button>` : '';
-                    allItemsHtml.push(`<div class="text-[10px] font-bold ${badgeBg} text-white rounded px-1.5 py-0.5 mb-1.5 flex items-center justify-between group/hol" title="${holidayMatch.holidayName}"><span class="truncate flex items-center gap-1"><i data-lucide="${iconName}" class="w-3 h-3"></i> ${holidayMatch.holidayName}</span>${delBtn}</div>`);
-                }
-
-                dayTasks.forEach(t => {
-                    const initial = t.responsibleName ? t.responsibleName.charAt(0).toUpperCase() : '?';
-                    allItemsHtml.push(`<div class="text-[11px] bg-[#eef1ff] border border-[#d2dbfb] text-[#5b5fc7] rounded px-1.5 py-1 mb-1 truncate cursor-default hover:bg-[#d2dbfb] transition-colors flex items-center justify-between group" title="${t.taskName} (รับผิดชอบ: ${t.responsibleName || 'ไม่ระบุ'})"><span class="truncate">${t.taskName}</span><span class="text-[9px] font-bold bg-[#5b5fc7] text-white w-3 h-3 flex items-center justify-center rounded-full opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-1">${initial}</span></div>`);
-                });
-
-                let tasksHtml = allItemsHtml.length > 4 ? allItemsHtml.slice(0, 3).join('') + `<div class="text-[10px] text-gray-500 font-bold mt-1 text-center bg-gray-100 border border-gray-200 rounded py-0.5">รายการอื่นอีก + ${allItemsHtml.length - 3}</div>` : allItemsHtml.join('');
-                
-                const today = getThaiDate(), isToday = cellDate.getDate() === today.getDate() && cellDate.getMonth() === today.getMonth() && cellDate.getFullYear() === today.getFullYear();
-                let cellBgBorderClass = 'bg-white border-gray-200 hover:border-[#5b5fc7]/50', numberColor = 'text-gray-700';
-                
-                if (holidayMatch) {
-                    if (holidayMatch.holidayType === 'vacation_leave') { cellBgBorderClass = 'bg-green-50/70 border-green-200 hover:border-green-400'; numberColor = 'text-green-600'; } else if (holidayMatch.holidayType === 'personal_leave' || holidayMatch.holidayType === 'leave') { cellBgBorderClass = 'bg-orange-50/70 border-orange-200 hover:border-orange-400'; numberColor = 'text-orange-600'; } else if (holidayMatch.holidayType === 'sick_leave') { cellBgBorderClass = 'bg-purple-50/70 border-purple-200 hover:border-purple-400'; numberColor = 'text-purple-600'; } else { cellBgBorderClass = 'bg-red-50/70 border-red-200 hover:border-red-400'; numberColor = 'text-red-600'; }
-                } else if (isWeekend) { cellBgBorderClass = 'bg-gray-100/60 border-gray-200 hover:border-[#5b5fc7]/50'; numberColor = 'text-red-500'; }
-                
-                if (isToday && !holidayMatch) cellBgBorderClass = 'bg-indigo-50/30 border-[#5b5fc7] border-2';
-                else if (isToday && holidayMatch) {
-                    if (holidayMatch.holidayType === 'vacation_leave') cellBgBorderClass = 'bg-green-50 border-green-500 border-2'; else if (holidayMatch.holidayType === 'personal_leave' || holidayMatch.holidayType === 'leave') cellBgBorderClass = 'bg-orange-50 border-orange-500 border-2'; else if (holidayMatch.holidayType === 'sick_leave') cellBgBorderClass = 'bg-purple-50 border-purple-500 border-2'; else cellBgBorderClass = 'bg-red-50 border-red-500 border-2';
-                }
-
-                const dayNumberClass = isToday ? 'bg-[#5b5fc7] text-white rounded-full w-7 h-7 flex items-center justify-center font-bold shadow-sm' : `${numberColor} font-semibold w-7 h-7 flex items-center justify-center`;
-                let cellActionBtns = currentUserRole !== 'monitor' ? `<div class="hidden md:flex items-start gap-1 opacity-0 group-hover/cell:opacity-100 transition-opacity z-10 relative"><button onclick="event.stopPropagation(); window.openAddTaskFromCalendar('${dateString}')" class="p-1 bg-indigo-50 text-[#5b5fc7] hover:bg-indigo-100 rounded transition-colors shadow-sm border border-indigo-100" title="เพิ่มงานในวันนี้"><i data-lucide="plus" class="w-3.5 h-3.5"></i></button><button onclick="event.stopPropagation(); window.openAddHolidayFromCalendar('${dateString}')" class="p-1 bg-red-50 text-red-500 hover:bg-red-100 rounded transition-colors shadow-sm border border-red-100" title="เพิ่มวันหยุด/ลาในวันนี้"><i data-lucide="calendar-off" class="w-3.5 h-3.5"></i></button></div>` : '';
-
-                grid.innerHTML += `<div onclick="window.openDayModal('${dateString}')" class="${cellBgBorderClass} border rounded-lg p-1.5 h-[130px] flex flex-col transition-colors cursor-pointer group/cell relative"><div class="flex justify-between items-start mb-1">${cellActionBtns}<span class="${dayNumberClass} text-xs ml-auto shrink-0">${day}</span></div><div class="flex-1 overflow-hidden pb-1">${tasksHtml}</div><div class="absolute inset-0 bg-white/50 backdrop-blur-[1px] opacity-0 group-hover/cell:opacity-100 hidden sm:flex items-center justify-center transition-opacity rounded-lg pointer-events-none"><span class="bg-[#5b5fc7] text-white text-xs font-bold px-3 py-1.5 rounded shadow-sm">ดูรายละเอียด</span></div></div>`;
-            }
-            
-            const targetMonthStr = String(month + 1).padStart(2, '0');
-            const targetPrefix = `${yearStr}-${targetMonthStr}`;
-            const monthlyHolidays = getHolidaysByFilter().filter(h => h.holidayDate && h.holidayDate.startsWith(targetPrefix));
-            monthlyHolidays.sort((a, b) => a.holidayDate.localeCompare(b.holidayDate));
-
-            const holidayListContainer = document.getElementById('monthly-holidays-list');
-            if (holidayListContainer) {
-                holidayListContainer.innerHTML = '';
-                if (monthlyHolidays.length === 0) {
-                    holidayListContainer.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm border border-dashed border-gray-200 rounded-lg bg-gray-50/50">ไม่มีข้อมูลวันหยุด/วันลาในเดือนนี้</div>`;
-                } else {
-                    monthlyHolidays.forEach(h => {
-                        let typeText = 'ประเภทวันหยุด : วันหยุดประจำปี';
-                        let typeColor = 'text-red-600 bg-red-50 border-red-200';
-                        if (h.holidayType === 'vacation_leave') { typeText = 'ประเภทวันลา : ลาพักร้อน'; typeColor = 'text-green-600 bg-green-50 border-green-200'; }
-                        else if (h.holidayType === 'personal_leave' || h.holidayType === 'leave') { typeText = 'ประเภทวันลา : ลากิจ'; typeColor = 'text-orange-600 bg-orange-50 border-orange-200'; }
-                        else if (h.holidayType === 'sick_leave') { typeText = 'ประเภทวันลา : ลาป่วย'; typeColor = 'text-purple-600 bg-purple-50 border-purple-200'; }
-
-                        const dateObj = new Date(h.holidayDate);
-                        const thaiDateStr = dateObj.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
-
-                        holidayListContainer.innerHTML += `
-                            <div class="p-3.5 rounded-lg border ${typeColor} shadow-sm flex flex-col gap-1.5 relative overflow-hidden">
-                                <div class="absolute left-0 top-0 bottom-0 w-1.5 ${typeColor.replace('text-', 'bg-').split(' ')[0]}"></div>
-                                <div class="font-bold text-gray-800 pl-2 text-sm">วันที่ ${thaiDateStr}</div>
-                                <div class="text-gray-600 pl-2 text-sm leading-relaxed">
-                                    <span class="font-semibold ${typeColor.split(' ')[0]}">${typeText}</span> / ${h.holidayName}
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-            }
-            lucide.createIcons(); applyRoleUI(); 
-        };
-
-        window.openDayModal = (dateString) => {
-            const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), dayTasks = getTasksByFilter().filter(t => t.receiveDate === dateString);
-            title.innerHTML = `<i data-lucide="calendar" class="w-5 h-5"></i> ${formatDate(dateString)} ${dayTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${dayTasks.length} งาน )</span>` : ''}`;
-            content.innerHTML = '';
-            const dayHolidays = getHolidaysByFilter().filter(h => h.holidayDate === dateString);
-            if (dayHolidays.length > 0) {
-                let holsHtml = '';
-                dayHolidays.forEach(h => {
-                    let colorClass = 'bg-red-100 text-red-700 border-red-200', icon = 'tent', typeText = 'วันหยุดบริษัท/วันหยุดประจำปี';
-                    if (h.holidayType === 'vacation_leave') { colorClass = 'bg-green-100 text-green-700 border-green-200'; icon = 'plane-takeoff'; typeText = 'ลาพักร้อน'; } else if (h.holidayType === 'personal_leave' || h.holidayType === 'leave') { colorClass = 'bg-orange-100 text-orange-700 border-orange-200'; icon = 'user-minus'; typeText = 'ลากิจ'; } else if (h.holidayType === 'sick_leave') { colorClass = 'bg-purple-100 text-purple-700 border-purple-200'; icon = 'pill'; typeText = 'ลาป่วย'; }
-                    holsHtml += `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${colorClass}" title="ประเภท: ${typeText}"><i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${h.holidayName}</span>`;
-                });
-                content.innerHTML += `<div class="mb-5 flex flex-wrap gap-2">${holsHtml}</div>`;
-            }
-            if (dayTasks.length === 0) content.innerHTML += `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในวันนี้</p></div>`;
-            else {
-                let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
-                dayTasks.forEach((task) => {
-                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
-                    let brandsDisplay = Array.isArray(task.brands) && task.brands.length > 0 ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(', ') : '-';
-                    let notesHtml = '';
-                    if (task.notes && task.notes.length > 0) {
-                        const validNotes = task.notes.filter(n => n.text.trim() !== '' || n.completed);
-                        if(validNotes.length > 0) {
-                            notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
-                            validNotes.forEach(note => notesHtml += `<div class="flex items-start gap-2 text-sm"><div class="mt-0.5">${note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`}</div><div class="flex-1 text-gray-700">${note.text}</div>${note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : ''}</div>`);
-                            notesHtml += `</div>`;
-                        }
-                    }
-                    let actionBtns = (currentUserRole === 'admin' || currentUserRole === 'user') ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="window.editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="window.deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
-                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><h4 class="font-bold text-gray-800 text-lg mb-1 group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandsDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5 col-span-1 sm:col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
-                });
-                tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
-            }
-            lucide.createIcons(); modal.classList.remove('hidden'); modal.classList.add('flex');
-        };
-
-        window.filterAndRenderTasks = function() {
-            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type')?.value || 'day', searchDate = document.getElementById('search-date')?.value, searchMonth = document.getElementById('search-month')?.value, searchYear = document.getElementById('search-year')?.value, searchText = searchInput?.value.toLowerCase() || '';
-            filteredTasks = getTasksByFilter().filter(task => {
-                let matchTime = true;
-                if (timeType === 'day' && searchDate) matchTime = task.receiveDate === searchDate; 
-                else if (timeType === 'month' && searchMonth) matchTime = task.receiveDate && task.receiveDate.startsWith(searchMonth); 
-                else if (timeType === 'year' && searchYear) matchTime = task.receiveDate && task.receiveDate.startsWith(searchYear);
-                
-                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || '');
-                const brandStr = Array.isArray(task.brands) ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(' ') : '';
-                const searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr, brandStr].join(' ').toLowerCase();
-                const notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
-                
-                return matchTime && (searchText ? `${searchString} ${notesString}`.includes(searchText) : true);
-            });
-            window.renderTasks(filteredTasks);
+            drawPieChart('tasktype', counts.taskType, 10); drawPieChart('brand', counts.brand, 10); drawPieChart('customer', counts.customer, 10); drawPieChart('responsible', counts.responsible, 10); drawPieChart('assignment', counts.assignment, 10);
         };
 
         window.renderTasks = function(tasks) {
@@ -1753,7 +1067,6 @@
             const startIndex = (listCurrentPage - 1) * itemsPerPage, endIndex = startIndex + itemsPerPage, paginatedTasks = tasks.slice(startIndex, endIndex);
             
             tableEl.classList.remove('hidden'); emptyState.classList.add('hidden'); tableBody.innerHTML = '';
-            
             paginatedTasks.forEach((task, index) => {
                 const globalIndex = startIndex + index + 1, tr = document.createElement('tr'); tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
                 let typeArray = Array.isArray(task.taskType) ? [...task.taskType] : (task.taskType ? [task.taskType] : []); typeArray.sort((a, b) => a.localeCompare(b, 'th'));
@@ -1763,7 +1076,6 @@
                 tr.innerHTML = `<td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td><td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td><td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td><td class="px-6 py-4 text-right action-cell"><div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${actionBtns}</div></td>`;
                 tableBody.appendChild(tr);
             });
-            
             if (paginationContainer) {
                 window.goToListPage = (page) => { listCurrentPage = page; window.renderTasks(filteredTasks); };
                 if (tasks.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, tasks.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tasks.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToListPage(${listCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${listCurrentPage} / ${totalPages}</div><button onclick="goToListPage(${listCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
@@ -1772,22 +1084,64 @@
             lucide.createIcons(); applyRoleUI();
         };
 
-        window.resetFormToAddMode = function() {
-            if (taskForm) taskForm.reset(); 
-            currentEditTaskId = null; 
-            const projInputEl = document.getElementById('projectNameInput'); if(projInputEl) projInputEl.value = '';
-            selectedTaskTypes = []; window.renderTaskTypeChips(); 
-            const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
-            currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }]; window.renderNotes();
-            currentBrandEquips = []; window.renderBrandEquipList();
-            
-            const titleEl = document.getElementById('form-title'); if(titleEl) titleEl.innerText = "เพิ่มรายละเอียดงานใหม่"; 
-            const subBtn = document.getElementById('submit-btn'); if(subBtn) subBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; 
-            lucide.createIcons();
+        window.filterAndRenderTasks = function() {
+            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type')?.value || 'day', searchDate = document.getElementById('search-date')?.value, searchMonth = document.getElementById('search-month')?.value, searchYear = document.getElementById('search-year')?.value, searchText = searchInput?.value.toLowerCase() || '';
+            filteredTasks = getTasksByFilter().filter(task => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = task.receiveDate === searchDate; 
+                else if (timeType === 'month' && searchMonth) matchTime = task.receiveDate && task.receiveDate.startsWith(searchMonth); 
+                else if (timeType === 'year' && searchYear) matchTime = task.receiveDate && task.receiveDate.startsWith(searchYear);
+                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || '');
+                const brandStr = Array.isArray(task.brands) ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(' ') : '';
+                const searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr, brandStr].join(' ').toLowerCase();
+                const notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
+                return matchTime && (searchText ? `${searchString} ${notesString}`.includes(searchText) : true);
+            });
+            window.renderTasks(filteredTasks);
         };
 
-        // Initialize Icons & First View
-        lucide.createIcons();
+        ['search-input', 'search-date', 'search-month', 'search-year'].forEach(id => { document.getElementById(id)?.addEventListener(id.includes('input') ? 'input' : 'change', () => { listCurrentPage = 1; window.filterAndRenderTasks(); }); });
+        document.getElementById('search-time-type')?.addEventListener('change', (e) => {
+            const t = e.target.value, d = document.getElementById('search-date'), m = document.getElementById('search-month'), y = document.getElementById('search-year');
+            [d,m,y].forEach(el => { if(el) { el.classList.add('hidden'); el.classList.remove('block'); el.value = ''; }});
+            if(t==='day'&&d) { d.classList.remove('hidden'); d.classList.add('block'); } else if(t==='month'&&m) { m.classList.remove('hidden'); m.classList.add('block'); } else if(t==='year'&&y) { y.classList.remove('hidden'); y.classList.add('block'); }
+            listCurrentPage = 1; window.filterAndRenderTasks();
+        });
+        document.getElementById('btn-reset-search')?.addEventListener('click', () => { 
+            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type'); 
+            if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } 
+            listCurrentPage = 1; window.filterAndRenderTasks(); 
+        });
+
+        window.openProjectDetailModal = (projectName) => {
+            const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), projectTasks = getTasksByFilter().filter(t => t.projectName === projectName);
+            title.innerHTML = `<i data-lucide="folder-open" class="w-5 h-5"></i> โครงการ: ${projectName} ${projectTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${projectTasks.length} งาน )</span>` : ''}`;
+            content.innerHTML = '';
+            if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
+            else {
+                projectTasks.sort((a, b) => (b.receiveDate || '').localeCompare(a.receiveDate || '')); let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
+                projectTasks.forEach((task) => {
+                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
+                    let brandsDisplay = Array.isArray(task.brands) && task.brands.length > 0 ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(', ') : '-';
+                    let notesHtml = '';
+                    if (task.notes && task.notes.length > 0) {
+                        const validNotes = task.notes.filter(n => n.text.trim() !== '' || n.completed);
+                        if(validNotes.length > 0) {
+                            notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
+                            validNotes.forEach(note => notesHtml += `<div class="flex items-start gap-2 text-sm"><div class="mt-0.5">${note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`}</div><div class="flex-1 text-gray-700">${note.text}</div>${note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : ''}</div>`);
+                            notesHtml += `</div>`;
+                        }
+                    }
+                    let actionBtns = (currentUserRole === 'admin' || currentUserRole === 'user') ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="window.editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="window.deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
+                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><div class="flex justify-between items-start mb-1"><h4 class="font-bold text-gray-800 text-lg group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium shrink-0 ml-2 border border-gray-200">${formatDate(task.receiveDate)}</span></div><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandsDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5 col-span-1 sm:col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
+                });
+                tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
+            }
+            lucide.createIcons(); modal.classList.remove('hidden'); modal.classList.add('flex');
+        };
+
+        // Initialize First Run
+        document.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); });
     </script>
 </body>
 </html>
