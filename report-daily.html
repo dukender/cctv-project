@@ -1319,6 +1319,22 @@
             document.getElementById(`btn-${prefix}-reset-search`)?.addEventListener('click', () => { document.getElementById(`${prefix}-search-input`).value = ''; const tt = document.getElementById(`${prefix}-search-time-type`); if(tt){ tt.value='day'; tt.dispatchEvent(new Event('change')); } if(prefix==='resp'){ currentRespFilter='all'; respCurrentPage=1; respCardCurrentPage=1; renderResponsibleSummary(); } else if(prefix==='cust'){ currentCustFilter='all'; custCurrentPage=1; custCardCurrentPage=1; renderCustomerSummary(); } else if(prefix==='ttype'){ currentTTypeFilter='all'; ttypeCurrentPage=1; ttypeCardCurrentPage=1; renderTaskTypeSummary(); } else { currentBrandFilter='all'; brandCurrentPage=1; brandCardCurrentPage=1; renderBrandSummary(); } });
         });
 
+        // --- Export Handlers for New Summaries ---
+        const exportSummaryExcel = (data, prefix) => {
+            if (data.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = data.map((r, idx) => ({ 'ลำดับ': idx + 1, 'วันที่รับงานล่าสุด': r.latestDate ? formatDate(r.latestDate) : '-', 'ชื่อโครงการ': r.projectName, [prefix==='TType'?'ประเภทงาน':'ยี่ห้อ/แบรนด์']: r.mergedValues, 'จำนวนงาน (งาน)': r.taskCount }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, `${prefix} Summary`); XLSX.writeFile(workbook, `${prefix}_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
+        };
+        const exportSummaryPdf = (tableId, prefix) => {
+            const table = document.getElementById(tableId); if (!table || table.rows.length <= 1) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success");
+            html2pdf().set({ margin: 0.4, filename: `${prefix}_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(table).save().then(() => showNotification("Export PDF สำเร็จ"));
+        };
+
+        document.getElementById('btn-ttype-export-excel')?.addEventListener('click', () => exportSummaryExcel(currentTTypeFilteredData, 'TaskType'));
+        document.getElementById('btn-ttype-export-pdf')?.addEventListener('click', () => exportSummaryPdf('tasktype-summary-table', 'TaskType'));
+        document.getElementById('btn-brand-export-excel')?.addEventListener('click', () => exportSummaryExcel(currentBrandFilteredData, 'Brand'));
+        document.getElementById('btn-brand-export-pdf')?.addEventListener('click', () => exportSummaryPdf('brand-summary-table', 'Brand'));
+
         // --- Notes Logic ---
         function renderNotes() {
             const list = document.getElementById('notes-list'); if(!list) return;
@@ -1354,7 +1370,10 @@
             filteredTasks = getTasksByFilter().filter(task => {
                 let matchTime = true;
                 if (timeType === 'day' && searchDate) matchTime = task.receiveDate === searchDate; else if (timeType === 'month' && searchMonth) matchTime = task.receiveDate && task.receiveDate.startsWith(searchMonth); else if (timeType === 'year' && searchYear) matchTime = task.receiveDate && task.receiveDate.startsWith(searchYear);
-                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || ''), searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr].join(' ').toLowerCase(), notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
+                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || '');
+                const brandStr = (task.equipments || []).map(e => e.brand).join(' ');
+                const searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr, brandStr].join(' ').toLowerCase();
+                const notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
                 return matchTime && (searchText ? `${searchString} ${notesString}`.includes(searchText) : true);
             });
             renderTasks(filteredTasks);
@@ -1395,6 +1414,23 @@
             });
         });
         document.getElementById('btn-reset-search')?.addEventListener('click', () => { document.getElementById('search-input').value = ''; const tt = document.getElementById('search-time-type'); if(tt){ tt.value='day'; tt.dispatchEvent(new Event('change')); } listCurrentPage = 1; filterAndRenderTasks(); });
+
+        document.getElementById('btn-export-excel')?.addEventListener('click', () => {
+            if (filteredTasks.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = filteredTasks.map(t => { 
+                let notesStr = t.notes ? t.notes.map(n => n.text).filter(text => text.trim() !== '').join(' | ') : ''; 
+                let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || '-'); 
+                let brandStr = (t.equipments || []).map(e => e.brand).filter(b => b && b.trim() !== '').join(', ') || '-';
+                return { 'วันรับงาน': formatDate(t.receiveDate), 'ชื่องาน': t.taskName || '-', 'ชื่อโครงการ': t.projectName || '-', 'ประเภทงาน': typeStr, 'ยี่ห้อ/แบรนด์': brandStr, 'ผู้รับผิดชอบ': t.responsibleName || '-', 'การมอบหมาย': t.assignment || '-', 'ชื่อลูกค้า': t.customerName || '-', 'เบอร์ลูกค้า': t.customerPhone || '-', 'สถานที่': t.workLocation || '-', 'บันทึกย่อ': notesStr }; 
+            });
+            const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Daily Tasks"); XLSX.writeFile(workbook, `Daily_Tasks_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
+        });
+
+        document.getElementById('btn-export-pdf')?.addEventListener('click', () => {
+            if (filteredTasks.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success");
+            const element = document.getElementById('tasks-table'), actionCells = element.querySelectorAll('.action-cell'); actionCells.forEach(cell => cell.style.display = 'none');
+            html2pdf().set({ margin: 0.4, filename: `Daily_Tasks_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => { actionCells.forEach(cell => cell.style.display = ''); showNotification("Export PDF สำเร็จ"); });
+        });
 
         function resetFormToAddMode() {
             if (taskForm) taskForm.reset(); currentEditTaskId = null; const projInputEl = document.getElementById('projectNameInput'); if(projInputEl) projInputEl.value = '';
@@ -1453,7 +1489,9 @@
                 projectTasks.sort((a, b) => (b.receiveDate || '').localeCompare(a.receiveDate || ''));
                 let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
                 projectTasks.forEach((task) => {
-                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-'), notesHtml = '';
+                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
+                    let brandDisplay = (task.equipments || []).map(e => e.brand).filter(b => b && b.trim() !== '').join(', ') || '-';
+                    let notesHtml = '';
                     if (task.notes && task.notes.length > 0) {
                         const validNotes = task.notes.filter(n => n.text.trim() !== '' || n.completed);
                         if(validNotes.length > 0) {
@@ -1463,7 +1501,44 @@
                         }
                     }
                     let actionBtns = (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid)) ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
-                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><div class="flex justify-between items-start mb-1"><h4 class="font-bold text-gray-800 text-lg group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium shrink-0 ml-2 border border-gray-200">${formatDate(task.receiveDate)}</span></div><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5 col-span-1 sm:col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
+                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><div class="flex justify-between items-start mb-1"><h4 class="font-bold text-gray-800 text-lg group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium shrink-0 ml-2 border border-gray-200">${formatDate(task.receiveDate)}</span></div><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
+                });
+                tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
+            }
+            lucide.createIcons(); modal.classList.remove('hidden'); modal.classList.add('flex');
+        };
+
+        window.openDayModal = (dateString) => {
+            const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), dayTasks = getTasksByFilter().filter(t => t.receiveDate === dateString);
+            title.innerHTML = `<i data-lucide="calendar" class="w-5 h-5"></i> ${formatDate(dateString)} ${dayTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${dayTasks.length} งาน )</span>` : ''}`;
+            content.innerHTML = '';
+            const dayHolidays = getHolidaysByFilter().filter(h => h.holidayDate === dateString);
+            if (dayHolidays.length > 0) {
+                let holsHtml = '';
+                dayHolidays.forEach(h => {
+                    let colorClass = 'bg-red-100 text-red-700 border-red-200', icon = 'tent', typeText = 'วันหยุดบริษัท/วันหยุดประจำปี';
+                    if (h.holidayType === 'vacation_leave') { colorClass = 'bg-green-100 text-green-700 border-green-200'; icon = 'plane-takeoff'; typeText = 'ลาพักร้อน'; } else if (h.holidayType === 'personal_leave' || h.holidayType === 'leave') { colorClass = 'bg-orange-100 text-orange-700 border-orange-200'; icon = 'user-minus'; typeText = 'ลากิจ'; } else if (h.holidayType === 'sick_leave') { colorClass = 'bg-purple-100 text-purple-700 border-purple-200'; icon = 'pill'; typeText = 'ลาป่วย'; }
+                    holsHtml += `<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${colorClass}" title="ประเภท: ${typeText}"><i data-lucide="${icon}" class="w-3.5 h-3.5"></i> ${h.holidayName}</span>`;
+                });
+                content.innerHTML += `<div class="mb-5 flex flex-wrap gap-2">${holsHtml}</div>`;
+            }
+            if (dayTasks.length === 0) content.innerHTML += `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในวันนี้</p></div>`;
+            else {
+                let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
+                dayTasks.forEach((task) => {
+                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
+                    let brandDisplay = (task.equipments || []).map(e => e.brand).filter(b => b && b.trim() !== '').join(', ') || '-';
+                    let notesHtml = '';
+                    if (task.notes && task.notes.length > 0) {
+                        const validNotes = task.notes.filter(n => n.text.trim() !== '' || n.completed);
+                        if(validNotes.length > 0) {
+                            notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
+                            validNotes.forEach(note => notesHtml += `<div class="flex items-start gap-2 text-sm"><div class="mt-0.5">${note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`}</div><div class="flex-1 text-gray-700">${note.text}</div>${note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : ''}</div>`);
+                            notesHtml += `</div>`;
+                        }
+                    }
+                    let actionBtns = (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid)) ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
+                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><h4 class="font-bold text-gray-800 text-lg mb-1 group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
                 });
                 tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
             }
