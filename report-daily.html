@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <script>
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
     </script>
@@ -85,6 +86,7 @@
                 <div class="p-2 lg:p-4 h-full flex flex-col">
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
                         <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
+                        
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
                         
                         <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
@@ -104,13 +106,15 @@
                             <i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
                         </button>
 
-                        <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 mt-1"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
+                        <button id="tab-workflow" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 mt-1"><i data-lucide="git-merge" class="w-5 h-5"></i> โครงสร้างงาน</button>
+                        <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
                         <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
                         <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
                         <button id="tab-manage" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน</button>
                     </div>
                 </div>
             </aside>
+
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
                 <div class="w-full px-2 sm:px-6 py-4 sm:py-6 relative">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
@@ -118,7 +122,8 @@
                             <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
                         </button>
                     </div>
-					<!-- Dashboard View -->
+
+                <!-- Dashboard View -->
                 <div id="view-dashboard" class="block animate-fade-in">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -168,7 +173,6 @@
                             <div class="relative h-80 w-full"><canvas id="chart-project"></canvas></div>
                         </div>
                         
-                        <!-- กราฟวงกลมและสัดส่วนยี่ห้อ -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
                             <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-tasktype"></canvas></div><div id="legend-tasktype" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
@@ -230,6 +234,27 @@
 
                 <!-- Container รับ HTML ที่ JS จะสร้างให้อัตโนมัติ (ประเภทงาน, แบรนด์, ผู้รับผิดชอบ, ลูกค้า) -->
                 <div id="summary-views-container"></div>
+                
+                <!-- View โครงสร้างงาน (Workflow / ECharts) -->
+                <div id="view-workflow" class="hidden animate-fade-in pb-10">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b border-gray-100 pb-4 gap-4">
+                            <div>
+                                <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                                    <i data-lucide="git-merge" class="w-6 h-6 text-[#5b5fc7]"></i> โครงสร้างงาน (Workflow / Tree Flow)
+                                </h2>
+                                <p class="text-sm text-gray-500 mt-1">
+                                    เดือน ปี > ชื่อโครงการ > ประเภทงาน > สถานะ > ชื่อลูกค้า > ผู้รับผิดชอบ
+                                </p>
+                            </div>
+                            <button onclick="window.renderWorkflow()" class="p-2 bg-gray-50 text-gray-500 hover:text-[#5b5fc7] rounded-md transition-colors border border-gray-200 shrink-0" title="รีเฟรชข้อมูลแผนผัง">
+                                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                        <div id="workflow-container" class="w-full h-[700px] bg-gray-50/30 rounded-lg border border-gray-100 p-2"></div>
+                    </div>
+                </div>
+
 				<!-- Calendar View -->
                 <div id="view-calendar" class="hidden animate-fade-in">
                     <div class="flex flex-col xl:flex-row gap-6 items-start">
@@ -413,7 +438,8 @@
         </main>
         </div>
     </div>
-	<!-- Modals -->
+
+    <!-- Modals -->
     <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-[120] flex items-center gap-3">
         <span id="toast-icon"></span><span id="toast-message" class="font-medium text-sm"></span>
         <button id="toast-undo-btn" class="hidden ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded transition-colors whitespace-nowrap">ย้อนกลับ</button>
@@ -536,14 +562,14 @@
             if (undoCb) { newUndoBtn.classList.remove('hidden'); newUndoBtn.addEventListener('click', () => { undoCb(); toast.classList.add('translate-x-full', 'opacity-0'); }); } else newUndoBtn.classList.add('hidden');
             lucide.createIcons(); toast.classList.remove('translate-x-full', 'opacity-0'); toastTimeout = setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 10000);
         }
-		function updateNetworkStatus() {
+        function updateNetworkStatus() {
             const indicator = document.getElementById('network-indicator');
             if (navigator.onLine && currentUser) { statusEl.textContent = 'เชื่อมต่อและซิงค์ข้อมูลแล้ว'; statusEl.className = 'text-green-600'; indicator.className = 'w-2 h-2 rounded-full bg-green-500'; } 
             else { statusEl.textContent = 'ออฟไลน์ (Offline)'; statusEl.className = 'text-red-500 font-bold'; indicator.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse'; }
         }
         window.addEventListener('online', updateNetworkStatus); window.addEventListener('offline', updateNetworkStatus);
 
-        const views = { 'dashboard': document.getElementById('view-dashboard'), 'calendar': document.getElementById('view-calendar'), 'list': document.getElementById('view-list'), 'project-summary': document.getElementById('view-project-summary'), 'tasktype-summary': document.getElementById('view-tasktype-summary'), 'brand-summary': document.getElementById('view-brand-summary'), 'responsible-summary': document.getElementById('view-responsible-summary'), 'customer-summary': document.getElementById('view-customer-summary'), 'manage': document.getElementById('view-manage'), 'users': document.getElementById('view-users') };
+        const views = { 'dashboard': document.getElementById('view-dashboard'), 'calendar': document.getElementById('view-calendar'), 'list': document.getElementById('view-list'), 'project-summary': document.getElementById('view-project-summary'), 'tasktype-summary': document.getElementById('view-tasktype-summary'), 'brand-summary': document.getElementById('view-brand-summary'), 'responsible-summary': document.getElementById('view-responsible-summary'), 'customer-summary': document.getElementById('view-customer-summary'), 'manage': document.getElementById('view-manage'), 'users': document.getElementById('view-users'), 'workflow': document.getElementById('view-workflow') };
         const btnToggleMenu = document.getElementById('btn-toggle-menu'), sidebarMenu = document.getElementById('sidebar-menu'), sidebarBackdrop = document.getElementById('sidebar-backdrop');
         window.toggleMobileMenu = () => { if (window.innerWidth >= 1024) return; const isClosed = sidebarMenu.classList.contains('-translate-x-full'); if (isClosed) { sidebarMenu.classList.remove('-translate-x-full'); sidebarBackdrop.classList.remove('hidden'); setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10); } else { sidebarMenu.classList.add('-translate-x-full'); sidebarBackdrop.classList.add('opacity-0'); setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300); } };
         btnToggleMenu?.addEventListener('click', toggleMobileMenu); sidebarBackdrop?.addEventListener('click', toggleMobileMenu);
@@ -557,7 +583,7 @@
             const targetView = views[activeTabId];
             if(targetView) {
                 targetView.classList.remove('hidden'); targetView.classList.add('block'); activateTabBtn(activeTabId);
-                if (activeTabId === 'dashboard') renderDashboard(); else if (activeTabId === 'calendar') renderCalendar(); else if (activeTabId === 'list') filterAndRenderTasks(); else if (activeTabId === 'project-summary') renderProjectSummary(); else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); else if (activeTabId === 'manage') document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่";
+                if (activeTabId === 'dashboard') renderDashboard(); else if (activeTabId === 'calendar') renderCalendar(); else if (activeTabId === 'list') filterAndRenderTasks(); else if (activeTabId === 'project-summary') renderProjectSummary(); else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); else if (activeTabId === 'manage') document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; else if (activeTabId === 'workflow') { setTimeout(() => window.renderWorkflow(), 100); }
             }
             if (window.innerWidth < 1024 && sidebarMenu && !sidebarMenu.classList.contains('-translate-x-full')) toggleMobileMenu();
             lucide.createIcons();
@@ -581,7 +607,7 @@
         function getTasksByFilter() { return globalEmailFilter === 'all' ? allTasks : allTasks.filter(t => t.ownerEmail === globalEmailFilter); }
         function getHolidaysByFilter() { return globalEmailFilter === 'all' ? allHolidays : allHolidays.filter(h => h.ownerEmail === globalEmailFilter); }
         
-        document.getElementById('global-user-filter')?.addEventListener('change', (e) => { globalEmailFilter = e.target.value; if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); if (!views['calendar'].classList.contains('hidden')) renderCalendar(); if (!views['list'].classList.contains('hidden')) filterAndRenderTasks(); if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary(); summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); }); });
+        document.getElementById('global-user-filter')?.addEventListener('change', (e) => { globalEmailFilter = e.target.value; if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); if (!views['calendar'].classList.contains('hidden')) renderCalendar(); if (!views['list'].classList.contains('hidden')) filterAndRenderTasks(); if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary(); summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); }); if (!views['workflow'].classList.contains('hidden')) window.renderWorkflow(); });
         document.getElementById('btn-login-google')?.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
         document.getElementById('btn-login-microsoft')?.addEventListener('click', async () => { try { await signInWithPopup(auth, microsoftProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
         document.getElementById('btn-logout')?.addEventListener('click', async () => { await updatePresence(false); signOut(auth); });
@@ -653,7 +679,7 @@
             });
             return renderList;
         }
-		const renderProjectDD = setupDropdown('projectNameInput', 'project-dropdown-list', 'project-options-ul', allProjects, 'daily_projects', (name) => { document.getElementById('projectNameInput').value = name; });
+        const renderProjectDD = setupDropdown('projectNameInput', 'project-dropdown-list', 'project-options-ul', allProjects, 'daily_projects', (name) => { document.getElementById('projectNameInput').value = name; });
         const renderTaskTypeDD = setupDropdown('taskTypeInput', 'tasktype-dropdown-list', 'tasktype-options-ul', allTaskTypes, 'daily_task_types', (name) => {
             if (!selectedTaskTypes.includes(name)) { selectedTaskTypes.push(name); selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); renderTaskTypeChips(); }
             const input = document.getElementById('taskTypeInput'); if(input) { input.value = ''; input.focus(); }
@@ -668,7 +694,6 @@
         }
         window.removeTaskType = (tag) => { selectedTaskTypes = selectedTaskTypes.filter(t => t !== tag); renderTaskTypeChips(); };
 
-        // --- Brand/Equip Management ---
         window.addBrandEquipItem = (data = { id: Date.now().toString() + Math.random(), equip: '', brand: '', enabled: true }) => { currentBrandEquips.push(data); renderBrandEquipList(); };
         window.removeBrandEquip = (id) => {
             const idx = currentBrandEquips.findIndex(b => b.id === id); if (idx === -1) return;
@@ -677,7 +702,7 @@
         };
         window.toggleBrandEquipRow = (id, isEnabled) => {
             const item = currentBrandEquips.find(b => b.id === id); if (!item) return;
-            if(!isEnabled) { window.removeBrandEquip(id); } // ติ๊กออกคือลบ
+            if(!isEnabled) { window.removeBrandEquip(id); }
         };
         window.updateBrandEquipVal = (id, field, val) => { const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; };
 
@@ -726,7 +751,6 @@
             currentBrandEquips.forEach(b => { closeIfOutside(`equip-wrapper-${b.id}`, `equip-list-${b.id}`); closeIfOutside(`brand-wrapper-${b.id}`, `brand-list-${b.id}`); });
         });
 
-        // Summary View Generic Generator
         function generateAggregatedProjectTable(baseFilteredTasks, selectedFilterValue, filterKeyName) {
             let targetProjectNames = new Set();
             if (selectedFilterValue === 'all') {
@@ -762,7 +786,6 @@
             });
         }
 
-        // Shared Summary Filter Builder
         function getCommonFilteredTasks(prefix) {
             let tasksToUse = getTasksByFilter();
             const searchInput = document.getElementById(`${prefix}-search-input`)?.value.toLowerCase() || '';
@@ -777,13 +800,13 @@
                 else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
                 else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
 
-                let brandStr = Array.isArray(t.brands) ? t.brands.map(b => `${b.equip} ${b.brand}`).join(' ') : '';
+                let brandStr = Array.isArray(t.brands) ? t.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(' ') : '';
                 const searchString = [t.taskName, t.projectName, t.responsibleName, t.customerName, Array.isArray(t.taskType) ? t.taskType.join(' ') : t.taskType, brandStr].join(' ').toLowerCase();
-                const matchText = searchInput ? searchString.includes(searchInput) : true;
-                return matchTime && matchText;
+                return matchTime && (searchInput ? searchString.includes(searchInput) : true);
             });
         }
-		function setupSummaryPage(config) {
+
+        function setupSummaryPage(config) {
             const { prefix, name, filterKey, getFilterValue, setFilterValue, getPage, setPage, getCardPage, setCardPage, dataExtrFn, formatJoined } = config;
             
             window[`set${prefix}Filter`] = (val) => { setFilterValue(val === getFilterValue() ? 'all' : val); setPage(1); window[`render${prefix}Summary`](); };
@@ -875,38 +898,286 @@
         setupSummaryPage({ prefix: 'responsible', name: 'ชื่อผู้รับผิดชอบ', filterKey: 'responsibleName', formatJoined: 'resp', getFilterValue: () => filters.resp, setFilterValue: (v) => filters.resp = v, getPage: () => pages.resp, setPage: (p) => pages.resp = p, getCardPage: () => cPages.resp, setCardPage: (p) => cPages.resp = p, dataExtrFn: (t) => [t.responsibleName || 'ไม่ระบุ'] });
         setupSummaryPage({ prefix: 'customer', name: 'ชื่อลูกค้า', filterKey: 'customerName', formatJoined: 'cust', getFilterValue: () => filters.cust, setFilterValue: (v) => filters.cust = v, getPage: () => pages.cust, setPage: (p) => pages.cust = p, getCardPage: () => cPages.cust, setCardPage: (p) => cPages.cust = p, dataExtrFn: (t) => [t.customerName || 'ไม่ระบุ'] });
 
-        function loadTasks() {
-            if (!currentUser) return;
-            unsubscribeTasks = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), (snapshot) => {
-                let tasks = []; snapshot.forEach((doc) => tasks.push({ id: doc.id, ...doc.data() }));
-                tasks = filterDataByRole(tasks); tasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); allTasks = tasks; populateEmailDropdowns();
-                const yearsSet = new Set(); tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); }); const sortedYears = Array.from(yearsSet).sort().reverse();
-                const updateYearOptions = (id) => { const el = document.getElementById(id); if(!el) return; const cv = el.value; el.innerHTML = '<option value="">ทุกปีทั้งหมด</option>'; sortedYears.forEach(y => el.innerHTML += `<option value="${y}">${y}</option>`); if(sortedYears.includes(cv)) el.value = cv; };
-                ['search-year', 'summary-search-year', ...summaryTabsConfig.map(c=>`${c.id}-search-year`)].forEach(updateYearOptions);
-                filterAndRenderTasks(); renderCalendar();   
-                if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); 
-                if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary();
-                summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); });
-            }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาด'; statusEl.className = 'text-red-500 font-bold'; });
+        function renderTasks(tasks) {
+            const tableBody = document.getElementById('tasks-table-body'), emptyState = document.getElementById('tasks-empty-state'), tableEl = document.getElementById('tasks-table'), countEl = document.getElementById('task-count'), paginationContainer = document.getElementById('list-pagination');
+            if (!tableBody || !emptyState || !tableEl || !countEl) return;
+            countEl.textContent = tasks.length;
+            if (tasks.length === 0) { tableEl.classList.add('hidden'); emptyState.classList.remove('hidden'); if(paginationContainer) paginationContainer.innerHTML = ''; return; }
+            
+            const totalPages = Math.ceil(tasks.length / itemsPerPage) || 1; if (listCurrentPage > totalPages) listCurrentPage = totalPages;
+            const startIndex = (listCurrentPage - 1) * itemsPerPage, endIndex = startIndex + itemsPerPage, paginatedTasks = tasks.slice(startIndex, endIndex);
+            
+            tableEl.classList.remove('hidden'); emptyState.classList.add('hidden'); tableBody.innerHTML = '';
+            
+            paginatedTasks.forEach((task, index) => {
+                const globalIndex = startIndex + index + 1, tr = document.createElement('tr'); tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
+                let typeArray = Array.isArray(task.taskType) ? [...task.taskType] : (task.taskType ? [task.taskType] : []); typeArray.sort((a, b) => a.localeCompare(b, 'th'));
+                let displayTaskTypeHtml = typeArray.length > 0 ? typeArray.map(t => `<div class="whitespace-nowrap">- ${t}</div>`).join('') : '-';
+                
+                let actionBtns = (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid)) ? `<button onclick="editTask('${task.id}')" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="แก้ไขงาน"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="deleteTask('${task.id}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="ลบงาน"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
+                tr.innerHTML = `<td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td><td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td><td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td><td class="px-6 py-4 text-right action-cell"><div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${actionBtns}</div></td>`;
+                tableBody.appendChild(tr);
+            });
+            
+            if (paginationContainer) {
+                if (tasks.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, tasks.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tasks.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToListPage(${listCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${listCurrentPage} / ${totalPages}</div><button onclick="goToListPage(${listCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                else paginationContainer.innerHTML = '';
+            }
+            lucide.createIcons(); applyRoleUI();
+        }
+
+        window.goToListPage = (page) => { listCurrentPage = page; renderTasks(filteredTasks); };
+
+        function filterAndRenderTasks() {
+            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type')?.value || 'day', searchDate = document.getElementById('search-date')?.value, searchMonth = document.getElementById('search-month')?.value, searchYear = document.getElementById('search-year')?.value, searchText = searchInput?.value.toLowerCase() || '';
+            filteredTasks = getTasksByFilter().filter(task => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = task.receiveDate === searchDate; 
+                else if (timeType === 'month' && searchMonth) matchTime = task.receiveDate && task.receiveDate.startsWith(searchMonth); 
+                else if (timeType === 'year' && searchYear) matchTime = task.receiveDate && task.receiveDate.startsWith(searchYear);
+                
+                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || '');
+                const brandStr = Array.isArray(task.brands) ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(' ') : '';
+                const searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr, brandStr].join(' ').toLowerCase();
+                const notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
+                
+                return matchTime && (searchText ? `${searchString} ${notesString}`.includes(searchText) : true);
+            });
+            renderTasks(filteredTasks);
+        }
+
+        document.getElementById('search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value, dateInput = document.getElementById('search-date'), monthInput = document.getElementById('search-month'), yearInput = document.getElementById('search-year');
+            if(dateInput) { if(type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+            if(monthInput) { if(type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+            if(yearInput) { if(type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+            if (dateInput) dateInput.value = ''; if (monthInput) monthInput.value = ''; if (yearInput) yearInput.value = ''; listCurrentPage = 1; filterAndRenderTasks();
+        });
+
+        document.getElementById('search-input')?.addEventListener('input', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        document.getElementById('search-date')?.addEventListener('change', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        document.getElementById('search-month')?.addEventListener('change', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        document.getElementById('search-year')?.addEventListener('change', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        
+        document.getElementById('btn-reset-search')?.addEventListener('click', () => { 
+            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type'); 
+            if (searchInput) searchInput.value = ''; 
+            if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } 
+            listCurrentPage = 1; filterAndRenderTasks(); 
+        });
+
+        function resetFormToAddMode() {
+            if (taskForm) taskForm.reset(); 
+            currentEditTaskId = null; 
+            const projInputEl = document.getElementById('projectNameInput'); if(projInputEl) projInputEl.value = '';
+            selectedTaskTypes = []; renderTaskTypeChips(); 
+            const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
+            currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }]; renderNotes();
+            currentBrandEquips = []; renderBrandEquipList();
+            
+            document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่"; 
+            document.getElementById('submit-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; 
+            lucide.createIcons();
         }
 
         taskForm?.addEventListener('submit', async (e) => {
             e.preventDefault(); if (!currentUser || currentUserRole === 'monitor') return;
-            const submitBtn = document.getElementById('submit-btn'); submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
+            const submitBtn = document.getElementById('submit-btn'); 
+            submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
+            
             const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
             const taskData = { 
-                taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', 
-                taskType: selectedTaskTypes, brands: currentBrandEquips, receiveDate: document.getElementById('receiveDate')?.value || '', 
-                responsibleName: document.getElementById('responsibleName')?.value || '', assignment: document.getElementById('assignment')?.value || '', 
-                customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', 
-                workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, updatedAt: Date.now() 
+                taskName: document.getElementById('taskName')?.value || '', 
+                projectName: document.getElementById('projectNameInput')?.value || '', 
+                taskType: selectedTaskTypes, 
+                brands: currentBrandEquips.filter(b=>b.enabled), // Save only enabled items
+                receiveDate: document.getElementById('receiveDate')?.value || '', 
+                responsibleName: document.getElementById('responsibleName')?.value || '', 
+                assignment: document.getElementById('assignment')?.value || '', 
+                customerName: document.getElementById('customerName')?.value || '', 
+                customerPhone: document.getElementById('customerPhone')?.value || '', 
+                workLocation: document.getElementById('workLocation')?.value || '', 
+                notes: notesToSave, 
+                updatedAt: Date.now() 
             };
+            
             try {
-                if (currentEditTaskId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); showNotification("อัปเดตงานเรียบร้อยแล้ว"); }
-                else { taskData.createdAt = Date.now(); taskData.ownerId = currentUser.uid; taskData.ownerEmail = currentUser.email; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); }
+                if (currentEditTaskId) { 
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); 
+                    showNotification("อัปเดตงานเรียบร้อยแล้ว"); 
+                }
+                else { 
+                    taskData.createdAt = Date.now(); 
+                    taskData.ownerId = currentUser.uid; 
+                    taskData.ownerEmail = currentUser.email; 
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); 
+                    showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); 
+                }
                 resetFormToAddMode(); switchTab('list');
-            } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } finally { submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; submitBtn.disabled = false; lucide.createIcons(); }
+            } catch (error) { 
+                showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); 
+            } finally { 
+                submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; 
+                submitBtn.disabled = false; lucide.createIcons(); 
+            }
         });
+
+        window.editTask = (taskId) => {
+            if (currentUserRole === 'monitor') return; 
+            const task = allTasks.find(t => t.id === taskId); if(!task) return;
+            if (currentUserRole === 'user' && task.ownerId !== currentUser.uid) return showNotification("คุณแก้ไขได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
+            document.getElementById('day-detail-modal')?.classList.add('hidden');
+            
+            ['taskName', 'receiveDate', 'responsibleName', 'assignment', 'customerName', 'customerPhone', 'workLocation'].forEach(field => { 
+                const el = document.getElementById(field); if (el) el.value = task[field] || ''; 
+            });
+            
+            const projInputEl = document.getElementById('projectNameInput'); if (projInputEl) projInputEl.value = task.projectName || '';
+            if (Array.isArray(task.taskType)) { selectedTaskTypes = [...task.taskType]; selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); } 
+            else if (task.taskType && typeof task.taskType === 'string') selectedTaskTypes = [task.taskType]; else selectedTaskTypes = [];
+            renderTaskTypeChips();
+            
+            if (Array.isArray(task.brands)) { currentBrandEquips = JSON.parse(JSON.stringify(task.brands)); } else currentBrandEquips = [];
+            renderBrandEquipList();
+
+            if (task.notes && task.notes.length > 0) { 
+                currentNotes = JSON.parse(JSON.stringify(task.notes)); 
+                const lastNote = currentNotes[currentNotes.length - 1]; 
+                if (lastNote && lastNote.completed) currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }); 
+            } else {
+                currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
+            }
+            renderNotes(); 
+            currentEditTaskId = taskId; switchTab('manage');
+        };
+
+        window.deleteTask = async (id) => {
+            if (!currentUser || currentUserRole === 'monitor') return;
+            const taskToRestore = allTasks.find(t => t.id === id); if (!taskToRestore) return;
+            if (currentUserRole === 'user' && taskToRestore.ownerId !== currentUser.uid) return showNotification("คุณลบได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
+            
+            const { id: docId, ...taskData } = taskToRestore; 
+            document.getElementById('day-detail-modal')?.classList.add('hidden');
+            const projectName = taskData.projectName; 
+            let projectToDeleteId = null, projectToDeleteData = null;
+            
+            if (projectName) {
+                const remainingTasks = allTasks.filter(t => t.projectName === projectName && t.id !== id);
+                if (remainingTasks.length === 0) { 
+                    const projObj = allProjects.find(p => p.name === projectName); 
+                    if (projObj) { projectToDeleteId = projObj.id; const { id: pId, ...pData } = projObj; projectToDeleteData = pData; } 
+                }
+            }
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id));
+                if (projectToDeleteId) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId));
+                showNotification("ลบงานเรียบร้อยแล้ว", "success", async () => { 
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id), taskData); 
+                        if (projectToDeleteId && projectToDeleteData) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId), projectToDeleteData); 
+                        showNotification("ย้อนกลับการลบสำเร็จ", "success"); 
+                    } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } 
+                });
+            } catch (error) { showNotification("เกิดข้อผิดพลาดในการลบงาน", "error"); }
+        };
+
+        // --- เพิ่มฟังก์ชัน Workflow (ECharts) ---
+        let workflowChartInstance = null;
+
+        window.buildTreeData = function(tasks) {
+            const root = { name: 'สรุปรวมงาน', children: [] };
+            const treeMap = {};
+
+            tasks.forEach(t => {
+                const dt = t.receiveDate || '';
+                let mY = 'ไม่ระบุเดือน';
+                if (dt) {
+                    const p = dt.split('-');
+                    if(p.length >= 2) mY = `${["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."][parseInt(p[1])-1]} ${parseInt(p[0])+543}`;
+                }
+                const proj = t.projectName || 'ไม่ระบุโครงการ';
+                const typs = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || 'ไม่ระบุประเภท');
+                const stat = t.status || 'ไม่ได้ระบุสถานะ';
+                const cst = t.customerName || 'ไม่ระบุลูกค้า';
+                const rsp = t.responsibleName || 'ไม่ระบุผู้รับผิดชอบ';
+
+                if (!treeMap[mY]) { treeMap[mY] = { name: mY, children: {}, value: 0 }; root.children.push(treeMap[mY]); }
+                treeMap[mY].value++;
+
+                if (!treeMap[mY].children[proj]) { treeMap[mY].children[proj] = { name: proj, children: {}, value: 0 }; }
+                treeMap[mY].children[proj].value++;
+
+                if (!treeMap[mY].children[proj].children[typs]) { treeMap[mY].children[proj].children[typs] = { name: typs, children: {}, value: 0 }; }
+                treeMap[mY].children[proj].children[typs].value++;
+
+                if (!treeMap[mY].children[proj].children[typs].children[stat]) { treeMap[mY].children[proj].children[typs].children[stat] = { name: stat, children: {}, value: 0 }; }
+                treeMap[mY].children[proj].children[typs].children[stat].value++;
+
+                if (!treeMap[mY].children[proj].children[typs].children[stat].children[cst]) { treeMap[mY].children[proj].children[typs].children[stat].children[cst] = { name: cst, children: {}, value: 0 }; }
+                treeMap[mY].children[proj].children[typs].children[stat].children[cst].value++;
+
+                if (!treeMap[mY].children[proj].children[typs].children[stat].children[cst].children[rsp]) { treeMap[mY].children[proj].children[typs].children[stat].children[cst].children[rsp] = { name: rsp, value: 0 }; }
+                treeMap[mY].children[proj].children[typs].children[stat].children[cst].children[rsp].value++;
+            });
+
+            function convertToArray(nodeMap) {
+                return Object.values(nodeMap).map(node => {
+                    const newNode = { name: `${node.name}\n(${node.value})` };
+                    if (node.children) newNode.children = convertToArray(node.children);
+                    return newNode;
+                });
+            }
+            root.children = convertToArray(treeMap);
+            return [root];
+        };
+
+        window.renderWorkflow = function() {
+            const ct = document.getElementById('workflow-container');
+            if(!ct) return;
+
+            let tks = window.filteredTasks || allTasks || [];
+
+            if (tks.length === 0) { 
+                ct.innerHTML = '<div class="flex flex-col items-center justify-center h-full text-gray-400 py-20"><p>ไม่พบข้อมูลโครงสร้างงาน (ลองเคลียร์ช่องค้นหา หรือรอข้อมูลโหลด)</p></div>'; 
+                if (workflowChartInstance) { workflowChartInstance.dispose(); workflowChartInstance = null; }
+                return; 
+            }
+
+            if (ct.innerHTML.includes('ไม่พบข้อมูล')) ct.innerHTML = '';
+            if (!workflowChartInstance) {
+                workflowChartInstance = echarts.init(ct);
+                window.addEventListener('resize', () => { if (workflowChartInstance) workflowChartInstance.resize(); });
+            }
+
+            const chartData = window.buildTreeData(tks);
+            const option = {
+                tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+                series: [{
+                    type: 'tree',
+                    data: chartData,
+                    orient: 'RL', // Right to Left
+                    top: '5%', left: '12%', bottom: '5%', right: '12%',
+                    symbol: 'rect',
+                    symbolSize: [160, 42],
+                    itemStyle: { color: '#5b5fc7', borderRadius: 6, borderColor: '#eef1ff', borderWidth: 2 },
+                    label: {
+                        position: 'inside', verticalAlign: 'middle', align: 'center', color: '#ffffff',
+                        fontSize: 12, fontFamily: 'Sarabun', fontWeight: 'bold',
+                        formatter: function(params) {
+                            let name = params.name;
+                            return name.length > 25 ? name.substring(0, 22) + '...' : name;
+                        }
+                    },
+                    leaves: { label: { position: 'inside', verticalAlign: 'middle', align: 'center' }, itemStyle: { color: '#14b8a6' } },
+                    lineStyle: { color: '#cbd5e1', width: 2.5, curveness: 0.6 },
+                    expandAndCollapse: true,
+                    initialTreeDepth: 2,
+                    animationDuration: 550,
+                    animationDurationUpdate: 750
+                }]
+            };
+            workflowChartInstance.setOption(option);
+        };
 
         // Initialize Icons
         lucide.createIcons();
