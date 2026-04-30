@@ -111,7 +111,6 @@
                         </button>
                     </div>
 
-                <!-- Dashboard View -->
                 <div id="view-dashboard" class="block animate-fade-in">
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
                         <div class="flex items-center gap-2 flex-wrap">
@@ -179,7 +178,6 @@
                     </div>
                 </div>
 
-                <!-- Project Summary View -->
                 <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                         <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
@@ -215,22 +213,17 @@
                     </div>
                 </div>
 
-                <!-- หน้าสรุปผู้รับผิดชอบ -->
                 <div id="view-responsible-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
-                        <!-- Sidebar ซ้าย: รายชื่อผู้รับผิดชอบ (แบ่งหน้าได้) -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
                             <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
                                 <i data-lucide="users-round" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปผู้รับผิดชอบ
                             </h2>
                             <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="resp-display-count" class="font-bold text-[#5b5fc7]">0</span> คน</p>
                             
-                            <!-- Container รายชื่อแบบระบุ Padding -->
                             <div id="responsible-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4">
-                                <!-- Cards will be injected here via JS -->
                             </div>
 
-                            <!-- Pagination สำหรับ Cards ผู้รับผิดชอบ (แสดง 6 รายการต่อหน้า) -->
                             <div id="resp-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
                                 <button onclick="changeRespCardPage(-1)" id="btn-resp-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                                 <span id="resp-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
@@ -238,11 +231,9 @@
                             </div>
                         </div>
 
-                        <!-- Content ขวา: ตารางและเครื่องมือค้นหา -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
                             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
                                 <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="resp-project-count-container">
-                                    <!-- Rendered by JS -->
                                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                                         จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">0</span> โครงการ
                                     </h3>
@@ -280,7 +271,6 @@
                                         </tr>
                                     </thead>
                                     <tbody id="responsible-summary-body" class="divide-y divide-gray-100 bg-white">
-                                        <!-- Table body injected via JS -->
                                     </tbody>
                                 </table>
                                 <div id="resp-summary-pagination"></div>
@@ -289,22 +279,17 @@
                     </div>
                 </div>
 
-                <!-- หน้าสรุปลูกค้า -->
                 <div id="view-customer-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
-                        <!-- Sidebar ซ้าย: รายชื่อลูกค้า (แบ่งหน้าได้) -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
                             <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
                                 <i data-lucide="briefcase" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปลูกค้า
                             </h2>
                             <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="cust-display-count" class="font-bold text-[#5b5fc7]">0</span> ราย</p>
                             
-                            <!-- Container รายชื่อแบบระบุ Padding -->
                             <div id="customer-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4">
-                                <!-- Cards will be injected here via JS -->
                             </div>
 
-                            <!-- Pagination สำหรับ Cards ลูกค้า -->
                             <div id="cust-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
                                 <button onclick="changeCustCardPage(-1)" id="btn-cust-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                                 <span id="cust-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
@@ -312,11 +297,9 @@
                             </div>
                         </div>
 
-                        <!-- Content ขวา: ตารางและเครื่องมือค้นหา -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
                             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
                                 <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="cust-project-count-container">
-                                    <!-- Rendered by JS -->
                                     <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                                         จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">0</span> โครงการ
                                     </h3>
@@ -354,7 +337,6 @@
                                         </tr>
                                     </thead>
                                     <tbody id="customer-summary-body" class="divide-y divide-gray-100 bg-white">
-                                        <!-- Table body injected via JS -->
                                     </tbody>
                                 </table>
                                 <div id="cust-summary-pagination"></div>
@@ -392,7 +374,6 @@
                                 รายการวันหยุด / วันลา เดือนนี้
                             </h3>
                             <div id="monthly-holidays-list" class="flex flex-col gap-3 overflow-y-auto pr-2 no-scrollbar flex-1">
-                                <!-- JS will inject holiday items here -->
                             </div>
                         </div>
                     </div>
@@ -1031,7 +1012,6 @@
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); renderProjectSummary(); }
         };
 
-        // --- เพิ่ม Event Listeners สำหรับหน้าสรุปโครงการ (Project Summary) ---
         document.getElementById('summary-search-time-type')?.addEventListener('change', (e) => {
             const type = e.target.value,
                   dateInput = document.getElementById('summary-search-date'),
@@ -1061,7 +1041,6 @@
             renderProjectSummary();
         });
 
-        // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
         let currentRespFilteredData = [];
         let currentRespFilter = 'all';
         let respCurrentPage = 1;
@@ -1314,7 +1293,6 @@
             html2pdf().set({ margin: 0.4, filename: `Responsible_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
 
-        // --- Logic สำหรับหน้า สรุปลูกค้า (Customer Summary) ---
         let currentCustFilteredData = [];
         let currentCustFilter = 'all';
         let custCurrentPage = 1;
@@ -1567,7 +1545,6 @@
             html2pdf().set({ margin: 0.4, filename: `Customer_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
 
-        // --- Note Rendering ---
         function renderNotes() {
             const list = document.getElementById('notes-list');
             if(!list) return;
@@ -2142,7 +2119,6 @@
             try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email)); showNotification(`ลบข้อมูลสิทธิ์ของ ${email} แล้ว`, "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), userData); showNotification("ย้อนกลับการลบสิทธิ์สำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
 
-        // --- เพิ่ม Event Listeners สำหรับปุ่ม Export ในหน้า สรุปโครงการ (Fix) ---
         document.getElementById('btn-summary-export-excel')?.addEventListener('click', () => {
             if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             const exportData = finalDisplayProjectData.map((p, idx) => ({ 
@@ -2162,7 +2138,6 @@
             if (finalDisplayProjectData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             showNotification("กำลังเตรียมไฟล์ PDF...", "success");
             const element = document.getElementById('projects-summary-table');
-            // ซ่อนหัวคอลัมน์ checkbox ใน PDF (หากต้องการเน้นเฉพาะชื่อโครงการและลำดับ)
             html2pdf().set({
                 margin: 0.5,
                 filename: `Project_Summary_${getThaiDateString()}.pdf`,
