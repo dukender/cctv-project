@@ -454,14 +454,184 @@
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // === Fix / Stub missing functions to make preview work without reference errors ===
-        window.renderDashboard = window.renderDashboard || function() { console.log('renderDashboard() stub called'); };
-        window.renderCalendar = window.renderCalendar || function() { console.log('renderCalendar() stub called'); };
-        window.filterAndRenderTasks = window.filterAndRenderTasks || function() { console.log('filterAndRenderTasks() stub called'); };
-        window.renderProjectSummary = window.renderProjectSummary || function() { console.log('renderProjectSummary() stub called'); };
-        window.resetFormToAddMode = window.resetFormToAddMode || function() { console.log('resetFormToAddMode() stub called'); };
-        window.loadUsersList = window.loadUsersList || function() { console.log('loadUsersList() stub called'); };
-        window.openProjectDetailModal = window.openProjectDetailModal || function() { console.log('openProjectDetailModal() stub called'); };
+        const chartColors = ['#5b5fc7', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#14b8a6', '#f97316', '#6366f1'];
+
+        // === ฟังก์ชันหลักเพื่อคำนวณและวาดกราฟ รวมถึงกราฟยี่ห้อ (Brand) ===
+        window.renderDashboard = function() {
+            let tasks = getTasksByFilter();
+            const dashTotal = document.getElementById('dash-total-projects');
+            if(dashTotal) dashTotal.textContent = tasks.length;
+            
+            let taskTypeCounts = {}, brandCounts = {}, customerCounts = {}, respCounts = {}, assignCounts = {};
+            
+            // วนลูปนับจำนวนสถิติต่างๆ รวมถึงยี่ห้อที่ถูกเลือก (enabled = true)
+            tasks.forEach(t => {
+                if(Array.isArray(t.taskType)) t.taskType.forEach(x => taskTypeCounts[x] = (taskTypeCounts[x]||0)+1);
+                if(Array.isArray(t.brands)) {
+                    t.brands.forEach(b => { 
+                        if(b.enabled && b.brand) brandCounts[b.brand] = (brandCounts[b.brand]||0)+1; 
+                    });
+                }
+                if(t.customerName) customerCounts[t.customerName] = (customerCounts[t.customerName]||0)+1;
+                if(t.responsibleName) respCounts[t.responsibleName] = (respCounts[t.responsibleName]||0)+1;
+                if(t.assignment) assignCounts[t.assignment] = (assignCounts[t.assignment]||0)+1;
+            });
+
+            const drawPie = (canvasId, legendId, dataObj, instKey) => {
+                const ctx = document.getElementById(canvasId);
+                const leg = document.getElementById(legendId);
+                if(!ctx || !leg) return;
+                if(chartInstances[instKey]) chartInstances[instKey].destroy();
+                
+                const sorted = Object.entries(dataObj).sort((a,b)=>b[1]-a[1]);
+                const labels = sorted.map(x=>x[0]);
+                const data = sorted.map(x=>x[1]);
+                
+                if(labels.length===0) { 
+                    leg.innerHTML = '<div class="text-center py-4 px-2 text-gray-400 bg-gray-50 rounded-lg text-sm border border-dashed border-gray-200">ยังไม่มีข้อมูล</div>'; 
+                    return; 
+                }
+                
+                chartInstances[instKey] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels, datasets: [{ data, backgroundColor: chartColors, borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
+                });
+                
+                let tot = data.reduce((a,b)=>a+b,0);
+                leg.innerHTML = labels.map((lbl, i) => {
+                    let color = chartColors[i % chartColors.length];
+                    let pct = Math.round((data[i]/tot)*100);
+                    return `<div class="flex items-center justify-between text-sm py-1.5 border-b border-gray-50 last:border-0"><div class="flex items-center gap-2 overflow-hidden"><span class="w-3 h-3 rounded-full shrink-0" style="background-color:${color}"></span><span class="truncate text-gray-700 font-medium" title="${lbl}">${lbl}</span></div><div class="font-bold text-gray-800 ml-2 shrink-0">${data[i]} <span class="text-[10px] text-gray-400 font-normal">(${pct}%)</span></div></div>`;
+                }).join('');
+            };
+
+            drawPie('chart-tasktype', 'legend-tasktype', taskTypeCounts, 'tasktype');
+            drawPie('chart-brand', 'legend-brand', brandCounts, 'brand'); // เรียกใช้เพื่อวาดกราฟยี่ห้อ
+            drawPie('chart-customer', 'legend-customer', customerCounts, 'customer');
+            drawPie('chart-responsible', 'legend-responsible', respCounts, 'responsible');
+            drawPie('chart-assignment', 'legend-assignment', assignCounts, 'assignment');
+        };
+
+        window.renderCalendar = function() { /* เก็บไว้เป็น stub ก่อนสำหรับปฏิทิน */ };
+
+        // === ฟังก์ชันแสดงรายการงาน (ตารางรวม) ===
+        window.filterAndRenderTasks = function() {
+            let tasks = getTasksByFilter();
+            const tbody = document.getElementById('tasks-table-body');
+            const emptyState = document.getElementById('tasks-empty-state');
+            if(!tbody) return;
+            
+            tbody.innerHTML = '';
+            if(tasks.length === 0) {
+                tbody.parentElement.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            } else {
+                tbody.parentElement.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                tasks.forEach((t, i) => {
+                    let tr = document.createElement('tr');
+                    tr.className = 'hover:bg-gray-50 transition-colors border-b border-gray-50';
+                    let brandStr = Array.isArray(t.brands) ? t.brands.filter(b=>b.enabled).map(b=>`<span class="bg-indigo-50 text-[#5b5fc7] px-1.5 py-0.5 rounded text-[10px] shadow-sm">${b.brand||'ไม่ระบุ'}</span>`).join(' ') : '-';
+                    let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : '-';
+                    
+                    tr.innerHTML = `
+                        <td class="px-4 py-3 text-center text-gray-500 font-medium">${i+1}</td>
+                        <td class="px-6 py-3 font-bold text-gray-800">${t.taskName}</td>
+                        <td class="px-6 py-3 text-gray-600">${t.projectName || '-'}</td>
+                        <td class="px-6 py-3 text-gray-600">${t.responsibleName || '-'}</td>
+                        <td class="px-6 py-3 text-gray-600">${t.customerName || '-'}</td>
+                        <td class="px-6 py-3 text-gray-600">${t.workLocation || '-'}</td>
+                        <td class="px-6 py-3 text-gray-600"><div class="flex flex-wrap gap-1">${typeStr}</div><div class="mt-1 flex flex-wrap gap-1">${brandStr}</div></td>
+                        <td class="px-6 py-3 text-right action-cell">
+                            <button onclick="editTask('${t.id}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-1.5 rounded transition-colors mr-1"><i data-lucide="edit-2" class="w-4 h-4"></i></button>
+                            <button onclick="deleteTask('${t.id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                lucide.createIcons();
+                applyRoleUI();
+            }
+        };
+
+        // === ฟังก์ชันแสดงหน้าสรุปโครงการ ===
+        window.renderProjectSummary = function() {
+            const tasks = getTasksByFilter();
+            const tbody = document.getElementById('projects-summary-body');
+            if(!tbody) return;
+            
+            let projMap = {};
+            tasks.forEach(t => {
+                let p = t.projectName || 'ไม่ได้ระบุโครงการ';
+                if(!projMap[p]) projMap[p] = { name: p, total: 0, latest: '', progress: 0, won: 0, lost: 0 };
+                projMap[p].total++;
+                if(!projMap[p].latest || t.receiveDate > projMap[p].latest) projMap[p].latest = t.receiveDate;
+            });
+            
+            const sorted = Object.values(projMap).sort((a,b)=>b.total - a.total);
+            tbody.innerHTML = '';
+            if(sorted.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-500 bg-gray-50/50">ไม่มีข้อมูลโครงการ</td></tr>';
+            } else {
+                sorted.forEach((p, i) => {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 border-b border-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center font-medium text-gray-500">${i+1}</td>
+                            <td class="px-4 py-3 text-center text-sm text-gray-600">${p.latest ? formatDate(p.latest) : '-'}</td>
+                            <td class="px-6 py-3 font-bold text-gray-800">${p.name}</td>
+                            <td class="px-4 py-3 text-center text-blue-600 font-semibold bg-blue-50/30">${p.total}</td>
+                            <td class="px-4 py-3 text-center text-green-600 font-semibold bg-green-50/30">-</td>
+                            <td class="px-4 py-3 text-center text-red-600 font-semibold bg-red-50/30">-</td>
+                        </tr>
+                    `;
+                });
+            }
+        };
+
+        // === ฟังก์ชันสำหรับเพิ่มและแก้ไขข้อมูล ===
+        window.resetFormToAddMode = function() {
+            currentEditTaskId = null;
+            document.getElementById('task-form').reset();
+            document.getElementById('receiveDate').value = getThaiDateString();
+            selectedTaskTypes = []; renderTaskTypeChips();
+            currentBrandEquips = []; renderBrandEquipList();
+            document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่";
+        };
+
+        window.editTask = function(id) {
+            const t = allTasks.find(x => x.id === id);
+            if(!t) return;
+            currentEditTaskId = id;
+            document.getElementById('taskName').value = t.taskName || '';
+            document.getElementById('projectNameInput').value = t.projectName || '';
+            document.getElementById('receiveDate').value = t.receiveDate || getThaiDateString();
+            document.getElementById('responsibleName').value = t.responsibleName || '';
+            document.getElementById('assignment').value = t.assignment || '';
+            document.getElementById('customerName').value = t.customerName || '';
+            document.getElementById('customerPhone').value = t.customerPhone || '';
+            document.getElementById('workLocation').value = t.workLocation || '';
+            
+            selectedTaskTypes = Array.isArray(t.taskType) ? [...t.taskType] : [];
+            renderTaskTypeChips();
+            
+            currentBrandEquips = Array.isArray(t.brands) ? JSON.parse(JSON.stringify(t.brands)) : [];
+            renderBrandEquipList();
+            
+            switchTab('manage');
+        };
+
+        window.deleteTask = async function(id) {
+            if(confirm('คุณต้องการลบงานนี้ใช่หรือไม่?')) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id));
+                    showNotification('ลบงานเรียบร้อยแล้ว', 'success');
+                } catch(e) { showNotification('เกิดข้อผิดพลาดในการลบ', 'error'); }
+            }
+        };
+
+        window.loadUsersList = function() { /* stub */ };
+        window.openProjectDetailModal = function(pName) { /* stub */ };
 
         // === Inject Summary Subpages Automatically ===
         const summaryTabsConfig = [
