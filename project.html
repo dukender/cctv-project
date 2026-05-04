@@ -469,7 +469,7 @@
                 if(Array.isArray(t.taskType)) t.taskType.forEach(x => taskTypeCounts[x] = (taskTypeCounts[x]||0)+1);
                 if(Array.isArray(t.brands)) {
                     t.brands.forEach(b => { 
-                        if(b.enabled && b.brand) brandCounts[b.brand] = (brandCounts[b.brand]||0)+1; 
+                        if(b.enabled !== false && b.brand) brandCounts[b.brand] = (brandCounts[b.brand]||0)+1; 
                     });
                 }
                 if(t.customerName) customerCounts[t.customerName] = (customerCounts[t.customerName]||0)+1;
@@ -532,7 +532,7 @@
                 tasks.forEach((t, i) => {
                     let tr = document.createElement('tr');
                     tr.className = 'hover:bg-gray-50 transition-colors border-b border-gray-50';
-                    let brandStr = Array.isArray(t.brands) ? t.brands.filter(b=>b.enabled).map(b=>`<span class="bg-indigo-50 text-[#5b5fc7] px-1.5 py-0.5 rounded text-[10px] shadow-sm">${b.brand||'ไม่ระบุ'}</span>`).join(' ') : '-';
+                    let brandStr = Array.isArray(t.brands) ? t.brands.filter(b=>b.enabled !== false).map(b=>`<span class="bg-indigo-50 text-[#5b5fc7] px-1.5 py-0.5 rounded text-[10px] shadow-sm">${b.brand||'ไม่ระบุ'}</span>`).join(' ') : '-';
                     let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : '-';
                     
                     tr.innerHTML = `
@@ -854,6 +854,7 @@
             const deletedItem = currentBrandEquips[idx]; currentBrandEquips.splice(idx, 1); renderBrandEquipList();
             showNotification("ลบรายการแล้ว", "success", () => { currentBrandEquips.splice(idx, 0, deletedItem); renderBrandEquipList(); });
         };
+        
         window.toggleBrandEquipRow = (id, isEnabled) => {
             const item = currentBrandEquips.find(b => b.id === id); if (!item) return;
             item.enabled = isEnabled;
@@ -868,6 +869,7 @@
                 }
             }
         };
+
         window.updateBrandEquipVal = (id, field, val) => { const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; };
 
         function renderBrandEquipList() {
@@ -943,7 +945,7 @@
                 if (t.responsibleName) projectMap[pName].resp.add(t.responsibleName);
                 if (t.customerName) projectMap[pName].cust.add(t.customerName);
                 if (Array.isArray(t.taskType)) t.taskType.forEach(x => projectMap[pName].types.add(x));
-                if (Array.isArray(t.brands)) t.brands.forEach(x => { if(x.brand && x.enabled) projectMap[pName].brands.add(x.brand); });
+                if (Array.isArray(t.brands)) t.brands.forEach(x => { if(x.brand && x.enabled !== false) projectMap[pName].brands.add(x.brand); });
             });
 
             return Object.values(projectMap).sort((a, b) => {
@@ -1061,7 +1063,7 @@
 
         let filters = { resp: 'all', cust: 'all', tasktype: 'all', brand: 'all' }, pages = { resp: 1, cust: 1, tasktype: 1, brand: 1 }, cPages = { resp: 1, cust: 1, tasktype: 1, brand: 1 };
         setupSummaryPage({ prefix: 'tasktype', name: 'ประเภทงาน', filterKey: 'taskType', formatJoined: 'types', getFilterValue: () => filters.tasktype, setFilterValue: (v) => filters.tasktype = v, getPage: () => pages.tasktype, setPage: (p) => pages.tasktype = p, getCardPage: () => cPages.tasktype, setCardPage: (p) => cPages.tasktype = p, dataExtrFn: (t) => Array.isArray(t.taskType) && t.taskType.length > 0 ? t.taskType : ['ไม่ระบุ'] });
-        setupSummaryPage({ prefix: 'brand', name: 'ยี่ห้อ/แบรนด์', filterKey: 'brands', formatJoined: 'brands', getFilterValue: () => filters.brand, setFilterValue: (v) => filters.brand = v, getPage: () => pages.brand, setPage: (p) => pages.brand = p, getCardPage: () => cPages.brand, setCardPage: (p) => cPages.brand = p, dataExtrFn: (t) => Array.isArray(t.brands) && t.brands.length > 0 ? t.brands.filter(b=>b.enabled).map(b => b.brand || 'ไม่ระบุ') : ['ไม่ระบุ'] });
+        setupSummaryPage({ prefix: 'brand', name: 'ยี่ห้อ/แบรนด์', filterKey: 'brands', formatJoined: 'brands', getFilterValue: () => filters.brand, setFilterValue: (v) => filters.brand = v, getPage: () => pages.brand, setPage: (p) => pages.brand = p, getCardPage: () => cPages.brand, setCardPage: (p) => cPages.brand = p, dataExtrFn: (t) => Array.isArray(t.brands) && t.brands.length > 0 ? t.brands.filter(b=>b.enabled !== false).map(b => b.brand || 'ไม่ระบุ') : ['ไม่ระบุ'] });
         setupSummaryPage({ prefix: 'responsible', name: 'ชื่อผู้รับผิดชอบ', filterKey: 'responsibleName', formatJoined: 'resp', getFilterValue: () => filters.resp, setFilterValue: (v) => filters.resp = v, getPage: () => pages.resp, setPage: (p) => pages.resp = p, getCardPage: () => cPages.resp, setCardPage: (p) => cPages.resp = p, dataExtrFn: (t) => [t.responsibleName || 'ไม่ระบุ'] });
         setupSummaryPage({ prefix: 'customer', name: 'ชื่อลูกค้า', filterKey: 'customerName', formatJoined: 'cust', getFilterValue: () => filters.cust, setFilterValue: (v) => filters.cust = v, getPage: () => pages.cust, setPage: (p) => pages.cust = p, getCardPage: () => cPages.cust, setCardPage: (p) => cPages.cust = p, dataExtrFn: (t) => [t.customerName || 'ไม่ระบุ'] });
 
