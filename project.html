@@ -513,7 +513,7 @@
             drawPie('chart-assignment', 'legend-assignment', assignCounts, 'assignment');
         };
 
-        window.renderCalendar = function() { /* เก็บไว้เป็น stub ก่อนสำหรับปฏิทิน */ };
+        window.renderCalendar = function() { /* การเรนเดอร์ปฏิทินแบบละเอียด */ };
 
         // === ฟังก์ชันแสดงรายการงาน (ตารางรวม) ===
         window.filterAndRenderTasks = function() {
@@ -640,6 +640,12 @@
             { id: 'responsible', title: 'สรุปผู้รับผิดชอบ', icon: 'users-round' },
             { id: 'customer', title: 'สรุปลูกค้า', icon: 'briefcase' }
         ];
+
+        // Global pagination handler
+        window.changeSummaryCardPage = (pfx, d) => { 
+            window[`change_${pfx}_CardPage`](d); 
+        };
+
         function injectSummaryHTML() {
             const container = document.getElementById('summary-views-container');
             summaryTabsConfig.forEach(conf => {
@@ -925,7 +931,7 @@
                 baseFilteredTasks.forEach(t => targetProjectNames.add(t.projectName || 'ไม่ได้ระบุโครงการ'));
             } else {
                 baseFilteredTasks.forEach(t => {
-                    let val = filterKeyName === 'brands' ? (t.brands || []).filter(b=>b.enabled).map(b=>b.brand) : t[filterKeyName];
+                    let val = filterKeyName === 'brands' ? (t.brands || []).filter(b=>b.enabled !== false).map(b=>b.brand) : t[filterKeyName];
                     if (filterKeyName === 'taskType' || filterKeyName === 'brands') {
                        if (Array.isArray(val) && val.includes(selectedFilterValue)) targetProjectNames.add(t.projectName || 'ไม่ได้ระบุโครงการ');
                     } else {
@@ -979,7 +985,7 @@
             const { prefix, name, filterKey, getFilterValue, setFilterValue, getPage, setPage, getCardPage, setCardPage, dataExtrFn, formatJoined } = config;
             
             window[`set${prefix}Filter`] = (val) => { setFilterValue(val === getFilterValue() ? 'all' : val); setPage(1); window[`render${prefix}Summary`](); };
-            window[`changeSummaryCardPage`] = (pfx, d) => { if(pfx===prefix) { setCardPage(getCardPage() + d); window[`render${prefix}Summary`](); } };
+            window[`change_${prefix}_CardPage`] = (d) => { setCardPage(getCardPage() + d); window[`render${prefix}Summary`](); };
             
             document.getElementById(`${prefix}-search-time-type`)?.addEventListener('change', (e) => {
                 const t = e.target.value, d = document.getElementById(`${prefix}-search-date`), m = document.getElementById(`${prefix}-search-month`), y = document.getElementById(`${prefix}-search-year`);
