@@ -13,16 +13,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
+        tailwind.config = { 
+            theme: { 
+                extend: { 
+                    fontFamily: { 
+                        sans: ['Sarabun', 'sans-serif'] 
+                    } 
+                } 
+            } 
+        }
     </script>
     <style>
-        body { background-color: #f8f9fc; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { 
+            background-color: #f8f9fc; 
+        }
+        .no-scrollbar::-webkit-scrollbar { 
+            display: none; 
+        }
+        .no-scrollbar { 
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
+    <!-- Login View -->
     <div id="view-login" class="fixed inset-0 bg-[#eef1ff] z-[200] flex flex-col items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8 text-center border border-gray-100 relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-[#8b5cf6]"></div>
@@ -32,14 +49,25 @@
             <h1 class="text-2xl font-bold text-gray-800 mb-2">เข้าสู่ระบบ (Login)</h1>
             <p class="text-gray-500 text-sm mb-8">Daily Task Log System</p>
             <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl mb-3 transition-colors shadow-sm">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">เข้าสู่ระบบด้วย Google
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">
+                เข้าสู่ระบบด้วย Google
             </button>
             <button id="btn-login-microsoft" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors shadow-sm mb-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>เข้าสู่ระบบด้วย Hotmail / Outlook
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21">
+                    <path fill="#f25022" d="M0 0h10v10H0z"/>
+                    <path fill="#7fba00" d="M11 0h10v10H11z"/>
+                    <path fill="#00a4ef" d="M0 11h10v10H0z"/>
+                    <path fill="#ffb900" d="M11 11h10v10H11z"/>
+                </svg>
+                เข้าสู่ระบบด้วย Hotmail / Outlook
             </button>
             <div class="text-xs text-gray-400 text-left bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p class="font-semibold text-gray-600 mb-2 border-b border-gray-200 pb-1"><i data-lucide="shield" class="w-3 h-3 inline"></i> ระดับสิทธิ์การใช้งานในระบบ:</p>
-                <ul class="list-disc pl-4 space-y-1.5 text-gray-500"><li>หากอีเมลไม่ได้รับสิทธิ์จากผู้ดูแลระบบ จะไม่สามารถเข้าใช้งานได้</li></ul>
+                <p class="font-semibold text-gray-600 mb-2 border-b border-gray-200 pb-1">
+                    <i data-lucide="shield" class="w-3 h-3 inline"></i> ระดับสิทธิ์การใช้งานในระบบ:
+                </p>
+                <ul class="list-disc pl-4 space-y-1.5 text-gray-500">
+                    <li>หากอีเมลไม่ได้รับสิทธิ์จากผู้ดูแลระบบ จะไม่สามารถเข้าใช้งานได้</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -51,11 +79,14 @@
                     <button id="btn-toggle-menu" class="p-1.5 sm:p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors lg:opacity-50 lg:cursor-default lg:hover:bg-transparent" title="เมนู">
                         <i data-lucide="menu" class="w-6 h-6"></i>
                     </button>
-                    <div class="w-10 h-10 bg-[#5b5fc7] rounded-lg flex items-center justify-center shadow-inner shrink-0"><i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i></div>
+                    <div class="w-10 h-10 bg-[#5b5fc7] rounded-lg flex items-center justify-center shadow-inner shrink-0">
+                        <i data-lucide="clipboard-list" class="w-6 h-6 text-white"></i>
+                    </div>
                     <div>
                         <h1 class="hidden sm:block font-bold text-xl text-gray-800 leading-tight">Daily Task Log</h1>
                         <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5">
-                            <span class="w-2 h-2 rounded-full bg-green-500" id="network-indicator"></span><span class="hidden sm:inline"><span id="user-status">กำลังเชื่อมต่อ...</span></span>
+                            <span class="w-2 h-2 rounded-full bg-green-500" id="network-indicator"></span>
+                            <span class="hidden sm:inline"><span id="user-status">กำลังเชื่อมต่อ...</span></span>
                         </div>
                     </div>
                 </div>
@@ -73,7 +104,9 @@
                         <p class="text-xs text-[#5b5fc7] font-semibold uppercase tracking-wider" id="display-user-role">[USER]</p>
                     </div>
                     <div class="h-8 w-px bg-gray-200 mx-1"></div>
-                    <button id="btn-logout" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="ออกจากระบบ"><i data-lucide="log-out" class="w-5 h-5"></i></button>
+                    <button id="btn-logout" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors" title="ออกจากระบบ">
+                        <i data-lucide="log-out" class="w-5 h-5"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -81,341 +114,440 @@
         <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full relative">
             <div id="sidebar-backdrop" class="absolute inset-0 bg-black/20 z-20 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
 
+            <!-- Sidebar Menu (Reordered) -->
             <aside id="sidebar-menu" class="absolute lg:relative left-0 top-0 h-full w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent z-30 lg:z-10 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl lg:shadow-none">
                 <div class="p-2 lg:p-4 h-full flex flex-col">
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
-                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
-                        <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
+                        
+                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20">
+                            <i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ
+                        </button>
+                        
+                        <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ
+                        </button>
                         
                         <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="tag" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปประเภทงาน</span>
                         </button>
+                        
                         <button id="tab-brand-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="cpu" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปยี่ห้อ/แบรนด์</span>
                         </button>
+
                         <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span>
                         </button>
+                        
                         <button id="tab-customer-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
                         </button>
 
-                        <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 mt-1"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
-                        <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
-                        <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
-                        <button id="tab-manage" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน</button>
+                        <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน
+                        </button>
+                        
+                        <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน
+                        </button>
+                        
+                        <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only">
+                            <i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้
+                        </button>
+                        
+                        <button id="tab-manage" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน
+                        </button>
                     </div>
                 </div>
             </aside>
-            <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
-                <div class="w-full px-2 sm:px-6 py-4 sm:py-6 relative">
+			<main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
+                <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
                         <button id="btn-add-task-top" onclick="document.getElementById('tab-manage').click()" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
                             <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
                         </button>
                     </div>
-					<!-- Dashboard View -->
-                <div id="view-dashboard" class="block animate-fade-in">
-                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <label class="font-bold text-gray-700 text-sm flex items-center gap-1"><i data-lucide="filter" class="w-4 h-4 text-[#5b5fc7]"></i> กรองตาม</label>
-                            <select id="dash-year-select" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[120px]"><option value="all">ทุกปีทั้งหมด</option></select>
-                            <select id="dash-month-select" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[140px]">
-                                <option value="all">ทุกเดือนทั้งหมด</option><option value="01">มกราคม</option><option value="02">กุมภาพันธ์</option><option value="03">มีนาคม</option><option value="04">เมษายน</option><option value="05">พฤษภาคม</option><option value="06">มิถุนายน</option><option value="07">กรกฎาคม</option><option value="08">สิงหาคม</option><option value="09">กันยายน</option><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
-                            </select>
-                            <button id="btn-reset-dash-filter" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors ml-1" title="รีเซ็ตการกรอง"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                        </div>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <div class="flex items-center bg-gray-100 p-1 rounded-lg">
-                                <button id="btn-view-month" class="px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all">รายเดือน</button>
-                                <button id="btn-view-week" class="px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all">รายสัปดาห์</button>
-                            </div>
-                            <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                <button id="btn-export-dash-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
-                                <button id="btn-export-dash-jpg" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors relative"><i data-lucide="file-image" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-blue-600 px-0.5 rounded-sm border border-blue-200 leading-none">JPG</span></button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
-                            <div class="flex flex-col md:flex-row gap-6">
-                                <div class="md:w-1/4 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 pr-0 md:pr-4">
-                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-500"></i> สถิติงานตามเวลา <span class="text-xs font-normal text-gray-500">(<span id="dash-time-label">รายเดือน</span>)</span></h3>
-                                    <div class="flex-1 flex flex-col justify-center gap-4">
-                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-3xl font-bold text-[#5b5fc7]" id="dash-total-projects">0</p></div>
-                                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-100"><p class="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">โครงการที่ไม่มีชื่อ</p><p class="text-3xl font-bold text-orange-600" id="dash-no-project">0</p></div>
-                                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-100"><p class="text-xs font-semibold text-teal-600 uppercase tracking-wider mb-1">โครงการตามตัวกรอง</p><p class="text-3xl font-bold text-teal-600" id="dash-filtered-projects">0</p></div>
-                                    </div>
-                                </div>
-                                <div class="md:w-3/4 flex flex-col min-h-[250px]"><div class="relative flex-1 w-full"><canvas id="chart-time"></canvas></div></div>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-                                <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)</h3>
-                                <div class="relative min-w-[240px] w-full sm:w-auto z-20" id="dash-project-dropdown-wrapper">
-                                    <div class="flex items-center w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus-within:ring-1 focus-within:ring-teal-500 focus-within:bg-white transition-colors cursor-text shadow-sm h-[34px]">
-                                        <input type="text" id="dash-project-input" class="flex-1 bg-transparent outline-none text-sm font-medium w-full text-gray-700 placeholder-gray-700 truncate" placeholder="ทุกโครงการทั้งหมด" autocomplete="off">
-                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors ml-1" id="dash-project-dropdown-btn"></i>
-                                    </div>
-                                    <div id="dash-project-dropdown-list" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden right-0"><ul class="max-h-60 overflow-y-auto py-1 text-sm font-medium text-gray-700" id="dash-project-options-ul"></ul></div>
-                                </div>
-                            </div>
-                            <div class="relative h-80 w-full"><canvas id="chart-project"></canvas></div>
-                        </div>
-                        
-                        <!-- กราฟวงกลมและสัดส่วนยี่ห้อ -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
-                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-tasktype"></canvas></div><div id="legend-tasktype" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-teal-500"></i> สัดส่วนตามยี่ห้อ/แบรนด์</h3>
-                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-brand"></canvas></div><div id="legend-brand" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i> สัดส่วนตามชื่อลูกค้า</h3>
-                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-customer"></canvas></div><div id="legend-customer" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามผู้รับผิดชอบ</h3>
-                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-responsible"></canvas></div><div id="legend-responsible" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
-                        </div>
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col lg:col-span-2">
-                            <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
-                            <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-assignment"></canvas></div><div id="legend-assignment" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Project Summary View -->
-                <div id="view-project-summary" class="hidden animate-fade-in pb-10">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                            <div><h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="layout-list" class="w-6 h-6 text-[#5b5fc7]"></i> สรุปรายชื่อโครงการทั้งหมด</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูล <span id="summary-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p></div>
-                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                                <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="summary-search-input" placeholder="ค้นหาชื่อโครงการ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
-                                <select id="summary-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                <input type="date" id="summary-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
-                                <input type="month" id="summary-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
-                                <select id="summary-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                <button id="btn-summary-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                    <!-- Dashboard View -->
+                    <div id="view-dashboard" class="block animate-fade-in">
+                        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <label class="font-bold text-gray-700 text-sm flex items-center gap-1"><i data-lucide="filter" class="w-4 h-4 text-[#5b5fc7]"></i> กรองตาม</label>
+                                <select id="dash-year-select" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[120px]">
+                                    <option value="all">ทุกปีทั้งหมด</option>
+                                </select>
+                                <select id="dash-month-select" class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#5b5fc7] text-sm font-medium transition-shadow cursor-pointer min-w-[140px]">
+                                    <option value="all">ทุกเดือนทั้งหมด</option>
+                                    <option value="01">มกราคม</option>
+                                    <option value="02">กุมภาพันธ์</option>
+                                    <option value="03">มีนาคม</option>
+                                    <option value="04">เมษายน</option>
+                                    <option value="05">พฤษภาคม</option>
+                                    <option value="06">มิถุนายน</option>
+                                    <option value="07">กรกฎาคม</option>
+                                    <option value="08">สิงหาคม</option>
+                                    <option value="09">กันยายน</option>
+                                    <option value="10">ตุลาคม</option>
+                                    <option value="11">พฤศจิกายน</option>
+                                    <option value="12">ธันวาคม</option>
+                                </select>
+                                <button id="btn-reset-dash-filter" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors ml-1" title="รีเซ็ตการกรอง">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <div class="flex items-center bg-gray-100 p-1 rounded-lg">
+                                    <button id="btn-view-month" class="px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all">รายเดือน</button>
+                                    <button id="btn-view-week" class="px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all">รายสัปดาห์</button>
+                                </div>
                                 <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                    <button id="btn-summary-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                    <button id="btn-summary-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    <button id="btn-export-dash-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                        <span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span>
+                                    </button>
+                                    <button id="btn-export-dash-jpg" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors relative">
+                                        <i data-lucide="file-image" class="w-5 h-5"></i>
+                                        <span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-blue-600 px-0.5 rounded-sm border border-blue-200 leading-none">JPG</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
-                            <div id="card-sum-all" onclick="setSummaryFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-xl font-bold text-gray-800" id="summary-total">0 ( 0% )</p></div>
-                            <div id="card-sum-prog" onclick="setSummaryFilter('in_progress')" class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p><p class="text-xl font-bold text-blue-700" id="summary-progress">0 ( 0% )</p></div>
-                            <div id="card-sum-won" onclick="setSummaryFilter('won')" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p><p class="text-xl font-bold text-green-700" id="summary-won">0 ( 0% )</p></div>
-                            <div id="card-sum-lost" onclick="setSummaryFilter('lost')" class="bg-red-50 p-4 rounded-lg border border-red-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p><p class="text-xl font-bold text-red-700" id="summary-lost">0 ( 0% )</p></div>
-                        </div>
-                        <div class="overflow-x-auto min-h-[300px]">
-                            <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
-                                <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                    <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-4 py-4 font-semibold text-center w-32">กำลังดำเนินการ</th><th class="px-4 py-4 font-semibold text-center w-32">ได้งาน</th><th class="px-4 py-4 font-semibold text-center w-32">ไม่ได้งาน</th></tr>
-                                </thead>
-                                <tbody id="projects-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
-                            </table>
-                            <div id="summary-pagination"></div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
+                                <div class="flex flex-col md:flex-row gap-6">
+                                    <div class="md:w-1/4 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 pr-0 md:pr-4">
+                                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                            <i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-500"></i> สถิติงานตามเวลา 
+                                            <span class="text-xs font-normal text-gray-500">(<span id="dash-time-label">รายเดือน</span>)</span>
+                                        </h3>
+                                        <div class="flex-1 flex flex-col justify-center gap-4">
+                                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p>
+                                                <p class="text-3xl font-bold text-[#5b5fc7]" id="dash-total-projects">0</p>
+                                            </div>
+                                            <div class="bg-orange-50 p-4 rounded-lg border border-orange-100">
+                                                <p class="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">โครงการที่ไม่มีชื่อ</p>
+                                                <p class="text-3xl font-bold text-orange-600" id="dash-no-project">0</p>
+                                            </div>
+                                            <div class="bg-teal-50 p-4 rounded-lg border border-teal-100">
+                                                <p class="text-xs font-semibold text-teal-600 uppercase tracking-wider mb-1">โครงการตามตัวกรอง</p>
+                                                <p class="text-3xl font-bold text-teal-600" id="dash-filtered-projects">0</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="md:w-3/4 flex flex-col min-h-[250px]">
+                                        <div class="relative flex-1 w-full">
+                                            <canvas id="chart-time"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
+                                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                                    <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                        <i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)
+                                    </h3>
+                                    <div class="relative min-w-[240px] w-full sm:w-auto z-20" id="dash-project-dropdown-wrapper">
+                                        <div class="flex items-center w-full px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus-within:ring-1 focus-within:ring-teal-500 focus-within:bg-white transition-colors cursor-text shadow-sm h-[34px]">
+                                            <input type="text" id="dash-project-input" class="flex-1 bg-transparent outline-none text-sm font-medium w-full text-gray-700 placeholder-gray-700 truncate" placeholder="ทุกโครงการทั้งหมด" autocomplete="off">
+                                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-teal-600 transition-colors ml-1" id="dash-project-dropdown-btn"></i>
+                                        </div>
+                                        <div id="dash-project-dropdown-list" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden right-0">
+                                            <ul class="max-h-60 overflow-y-auto py-1 text-sm font-medium text-gray-700" id="dash-project-options-ul"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="relative h-80 w-full"><canvas id="chart-project"></canvas></div>
+                            </div>
+
+                            <!-- กราฟวงกลม สัดส่วนต่างๆ -->
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
+                                <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                    <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-tasktype"></canvas></div>
+                                    <div id="legend-tasktype" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-teal-500"></i> สัดส่วนตามยี่ห้อ/แบรนด์</h3>
+                                <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                    <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-brand"></canvas></div>
+                                    <div id="legend-brand" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="briefcase" class="w-5 h-5 text-amber-500"></i> สัดส่วนตามชื่อลูกค้า</h3>
+                                <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                    <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-customer"></canvas></div>
+                                    <div id="legend-customer" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามผู้รับผิดชอบ</h3>
+                                <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                    <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-responsible"></canvas></div>
+                                    <div id="legend-responsible" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col lg:col-span-2">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
+                                <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0">
+                                    <div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-assignment"></canvas></div>
+                                    <div id="legend-assignment" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
+					<!-- Container สำหรับหน้า Summary ทั่วไปที่จะถูกสร้างอัตโนมัติด้วย JavaScript -->
+                    <!-- ประกอบด้วยหน้า: โครงการ, ประเภทงาน, ยี่ห้อ/แบรนด์, ผู้รับผิดชอบ, และลูกค้า -->
+                    <div id="summary-views-container"></div>
 
-                <!-- Container รับ HTML ที่ JS จะสร้างให้อัตโนมัติ (ประเภทงาน, แบรนด์, ผู้รับผิดชอบ, ลูกค้า) -->
-                <div id="summary-views-container"></div>
-				<!-- Calendar View -->
-                <div id="view-calendar" class="hidden animate-fade-in">
-                    <div class="flex flex-col xl:flex-row gap-6 items-start">
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full xl:w-8/12 flex-1">
-                            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                                <div class="flex items-center gap-4"><h2 id="calendar-month-year" class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2></div>
-                                <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end">
-                                    <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-0 sm:mr-2 flex-1 sm:flex-none justify-center"><i data-lucide="calendar-off" class="w-4 h-4"></i> เพิ่มวันหยุด/ลา</button>
-                                    <div class="flex gap-2"><button id="prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><button id="today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button><button id="next-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-7 gap-px mb-2 text-center text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                <div class="text-red-500 py-2">อา.</div><div class="py-2">จ.</div><div class="py-2">อ.</div><div class="py-2">พ.</div><div class="py-2">พฤ.</div><div class="py-2">ศ.</div><div class="text-indigo-500 py-2">ส.</div>
-                            </div>
-                            <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
-                        </div>
-
-                        <div class="w-full xl:w-4/12 shrink-0 flex flex-col gap-6">
-                            <!-- Leave Quota Container ถูกย้ายมาด้านขวาบน -->
-                            <div id="leave-quota-container" class="hidden flex-col items-start bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm w-full">
-                                <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3 w-full"><i data-lucide="clipboard-check" class="w-5 h-5 text-[#5b5fc7]"></i><span class="font-bold text-gray-800">สิทธิ์วันลาคงเหลือ ปี <span id="quota-year-display"></span></span></div>
-                                <div class="flex flex-col gap-3 w-full text-sm font-medium text-gray-600">
-                                    <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
-                                        <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> ลาพักร้อน</span>
-                                        <span class="flex items-center gap-1"><input type="number" id="quota-vacation" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-green-500 outline-none font-bold text-green-700" onchange="updateQuota('vacation', this.value)"> วัน</span>
+                    <!-- Calendar View -->
+                    <div id="view-calendar" class="hidden animate-fade-in">
+                        <div class="flex flex-col xl:flex-row gap-6 items-start">
+                            
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full xl:w-8/12 flex-1">
+                                <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                                    <div class="flex items-center gap-4">
+                                        <h2 id="calendar-month-year" class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2>
                                     </div>
-                                    <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
-                                        <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-500"></span> ลากิจ</span>
-                                        <span class="flex items-center gap-1"><input type="number" id="quota-personal" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 outline-none font-bold text-orange-700" onchange="updateQuota('personal', this.value)"> วัน</span>
-                                    </div>
-                                    <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
-                                        <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-purple-500"></span> ลาป่วย</span>
-                                        <span class="flex items-center gap-1"><input type="number" id="quota-sick" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-purple-500 outline-none font-bold text-purple-700" onchange="updateQuota('sick', this.value)"> วัน</span>
+                                    <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                                        <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-0 sm:mr-2 flex-1 sm:flex-none justify-center">
+                                            <i data-lucide="calendar-off" class="w-4 h-4"></i> เพิ่มวันหยุด/ลา
+                                        </button>
+                                        <div class="flex gap-2">
+                                            <button id="prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                                            <button id="today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button>
+                                            <button id="next-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="grid grid-cols-7 gap-px mb-2 text-center text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <div class="text-red-500 py-2">อา.</div><div class="py-2">จ.</div><div class="py-2">อ.</div><div class="py-2">พ.</div><div class="py-2">พฤ.</div><div class="py-2">ศ.</div><div class="text-indigo-500 py-2">ส.</div>
+                                </div>
+                                <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
                             </div>
 
-                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 max-h-[850px] overflow-hidden flex flex-col w-full">
-                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0">
-                                    <i data-lucide="calendar-heart" class="w-5 h-5 text-red-500"></i>
-                                    รายการวันหยุด / วันลา เดือนนี้
-                                </h3>
-                                <div id="monthly-holidays-list" class="flex flex-col gap-3 overflow-y-auto pr-2 no-scrollbar flex-1"></div>
+                            <div class="w-full xl:w-4/12 shrink-0 flex flex-col gap-6">
+                                <!-- Leave Quota ย้ายมาไว้ขวาบน เหนือรายการวันหยุด -->
+                                <div id="leave-quota-container" class="hidden flex-col items-start bg-white border border-gray-200 shadow-sm rounded-xl p-4 sm:p-6 w-full">
+                                    <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3 w-full">
+                                        <i data-lucide="clipboard-check" class="w-5 h-5 text-[#5b5fc7]"></i>
+                                        <span class="font-bold text-gray-800">สิทธิ์วันลาคงเหลือ ปี <span id="quota-year-display"></span></span>
+                                    </div>
+                                    <div class="flex flex-col gap-3 w-full text-sm font-medium text-gray-600">
+                                        <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
+                                            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-green-500"></span> ลาพักร้อน</div>
+                                            <div class="flex items-center gap-1"><input type="number" id="quota-vacation" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-green-500 outline-none font-bold text-green-700" onchange="updateQuota('vacation', this.value)"> วัน</div>
+                                        </div>
+                                        <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
+                                            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-500"></span> ลากิจ</div>
+                                            <div class="flex items-center gap-1"><input type="number" id="quota-personal" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 outline-none font-bold text-orange-700" onchange="updateQuota('personal', this.value)"> วัน</div>
+                                        </div>
+                                        <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
+                                            <div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-purple-500"></span> ลาป่วย</div>
+                                            <div class="flex items-center gap-1"><input type="number" id="quota-sick" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-purple-500 outline-none font-bold text-purple-700" onchange="updateQuota('sick', this.value)"> วัน</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 max-h-[600px] overflow-hidden flex flex-col w-full">
+                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0">
+                                        <i data-lucide="calendar-heart" class="w-5 h-5 text-red-500"></i>
+                                        รายการวันหยุด / วันลา เดือนนี้
+                                    </h3>
+                                    <div id="monthly-holidays-list" class="flex flex-col gap-3 overflow-y-auto pr-2 no-scrollbar flex-1">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="view-list" class="hidden animate-fade-in">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
-                            <div><h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-[#5b5fc7]"></i> รายการงานทั้งหมด</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูลทั้งหมด <span id="task-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p></div>
-                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                                <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="search-input" placeholder="ค้นหาข้อความ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
-                                <select id="search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                <input type="date" id="search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
-                                <input type="month" id="search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
-                                <select id="search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                <button id="btn-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                    <button id="btn-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                    <button id="btn-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                    <!-- List View -->
+                    <div id="view-list" class="hidden animate-fade-in">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                            <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
+                                <div>
+                                    <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-[#5b5fc7]"></i> รายการงานทั้งหมด</h2>
+                                    <p class="text-sm text-gray-500 mt-1">แสดงข้อมูลทั้งหมด <span id="task-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]">
+                                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="search-input" placeholder="ค้นหาข้อความ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]">
+                                    </div>
+                                    <select id="search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] bg-white flex-1 sm:flex-none">
+                                        <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
+                                    </select>
+                                    <input type="date" id="search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block">
+                                    <input type="month" id="search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden">
+                                    <select id="search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden min-w-[120px]">
+                                        <option value="">ทุกปีทั้งหมด</option>
+                                    </select>
+                                    <button id="btn-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md relative">
+                                            <i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span>
+                                        </button>
+                                        <button id="btn-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md relative">
+                                            <i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="overflow-x-auto min-h-[400px]">
-                            <table class="w-full text-left text-sm whitespace-nowrap" id="tasks-table">
-                                <thead class="bg-white border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wider">
-                                    <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-6 py-4 font-semibold">ชื่องาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th><th class="px-6 py-4 font-semibold">ลูกค้า</th><th class="px-6 py-4 font-semibold">สถานที่</th><th class="px-6 py-4 font-semibold">ประเภทงาน</th><th class="px-6 py-4 font-semibold text-right action-cell">จัดการ</th></tr>
-                                </thead>
-                                <tbody id="tasks-table-body" class="divide-y divide-gray-100"></tbody>
-                            </table>
-                            <div id="tasks-empty-state" class="hidden text-center py-20 text-gray-400">
-                                <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="inbox" class="w-8 h-8 text-gray-300"></i></div>
-                                <p class="text-lg font-medium text-gray-600">ยังไม่มีรายการงาน</p><p class="text-sm mt-1">เริ่มเพิ่มงานใหม่เพื่อบันทึกข้อมูลของคุณ</p>
-                            </div>
-                            <div id="list-pagination"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Users View (ลบแถบสีด้านบนออกตามโจทย์) -->
-                <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
-                        <div class="p-4 sm:p-8">
-                            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2"><i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)</h2>
-                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
-                                <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-gray-500"></i> เพิ่ม / แก้ไขสิทธิ์ผู้ใช้</h3>
-                                <form id="user-role-form" class="flex flex-col md:flex-row gap-4 items-end">
-                                    <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">อีเมลผู้ใช้งาน</label><input type="email" id="manageUserEmail" required placeholder="เช่น newuser@jescqtec.com" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"></div>
-                                    <div class="w-full md:w-1/3">
-                                        <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">ระดับสิทธิ์ (Role)</label>
-                                        <select id="manageUserRole" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"><option value="user">User (จัดการงานตัวเอง)</option><option value="monitor">Monitor (ดูได้อย่างเดียว)</option><option value="admin">Admin (จัดการได้ทั้งหมด)</option><option value="unauthorized">ระงับการใช้งาน (Unauthorized)</option></select>
-                                    </div>
-                                    <div class="w-full md:w-auto"><button type="submit" id="btn-save-user" class="w-full md:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md flex items-center justify-center gap-2 text-sm h-[38px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกสิทธิ์</button></div>
-                                </form>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="users-table-admin">
-                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">อีเมล (Email)</th><th class="px-6 py-4 font-semibold">ระดับสิทธิ์ (Role)</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-right">จัดการ</th></tr></thead>
-                                    <tbody id="users-table-body-admin" class="divide-y divide-gray-100"></tbody>
+                            <div class="overflow-x-auto min-h-[400px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap" id="tasks-table">
+                                    <thead class="bg-white border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
+                                            <th class="px-6 py-4 font-semibold">ชื่องาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th>
+                                            <th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th><th class="px-6 py-4 font-semibold">ลูกค้า</th>
+                                            <th class="px-6 py-4 font-semibold">สถานที่</th><th class="px-6 py-4 font-semibold">ประเภทงาน</th>
+                                            <th class="px-6 py-4 font-semibold text-right action-cell">จัดการ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasks-table-body" class="divide-y divide-gray-100"></tbody>
                                 </table>
+                                <div id="tasks-empty-state" class="hidden text-center py-20 text-gray-400">
+                                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4"><i data-lucide="inbox" class="w-8 h-8 text-gray-300"></i></div>
+                                    <p class="text-lg font-medium text-gray-600">ยังไม่มีรายการงาน</p><p class="text-sm mt-1">เริ่มเพิ่มงานใหม่เพื่อบันทึกข้อมูลของคุณ</p>
+                                </div>
+                                <div id="list-pagination"></div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Add/Edit Task View (แบ่งซ้าย-ขวา) -->
-                <div id="view-manage" class="hidden animate-fade-in pb-10">
-                    <form id="task-form" class="flex flex-col xl:flex-row gap-6 items-start mx-auto w-full max-w-7xl">
-                        
-                        <!-- ฝั่งซ้าย: แบบฟอร์มข้อมูลหลัก -->
-                        <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative w-full">
-                            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-indigo-400"></div>
+					<!-- Users View (ลบแถบสีด้านบนออกตามโจทย์) -->
+                    <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
                             <div class="p-4 sm:p-8">
-                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2 mb-8 mt-2"><i data-lucide="file-edit" class="w-6 h-6 text-[#5b5fc7]"></i><span id="form-title">เพิ่มรายละเอียดงานใหม่</span></h2>
-                                <div class="space-y-6 sm:space-y-8">
-                                    <div class="flex items-start gap-3">
-                                        <div class="mt-2 text-gray-400 hidden sm:block"><i data-lucide="circle" class="w-6 h-6"></i></div>
-                                        <div class="flex-1"><input type="text" id="taskName" required placeholder="เพิ่มชื่องาน" class="w-full text-xl sm:text-2xl font-semibold px-2 py-1 border-0 border-b-2 border-transparent hover:border-gray-200 focus:border-[#5b5fc7] bg-transparent focus:bg-gray-50 focus:outline-none transition-colors placeholder-gray-400"></div>
-                                    </div>
-                                    <div class="pl-0 sm:pl-9 mt-2">
-                                        <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider"><i data-lucide="folder" class="w-4 h-4"></i> ชื่อโครงการ</label>
-                                        <div class="relative w-full" id="project-dropdown-wrapper">
-                                            <div class="flex items-center w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
-                                                <input type="text" id="projectNameInput" class="flex-1 bg-transparent outline-none text-sm w-full" placeholder="พิมพ์เพื่อค้นหา หรือพิมพ์ใหม่เพื่อเพิ่ม..." autocomplete="off">
-                                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" id="project-dropdown-btn"></i>
+                                <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2"><i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)</h2>
+                                <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
+                                    <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-gray-500"></i> เพิ่ม / แก้ไขสิทธิ์ผู้ใช้</h3>
+                                    <form id="user-role-form" class="flex flex-col md:flex-row gap-4 items-end">
+                                        <div class="w-full md:w-1/2">
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">อีเมลผู้ใช้งาน</label>
+                                            <input type="email" id="manageUserEmail" required placeholder="เช่น newuser@jescqtec.com" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm">
+                                        </div>
+                                        <div class="w-full md:w-1/3">
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">ระดับสิทธิ์ (Role)</label>
+                                            <select id="manageUserRole" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm">
+                                                <option value="user">User (จัดการงานตัวเอง)</option>
+                                                <option value="monitor">Monitor (ดูได้อย่างเดียว)</option>
+                                                <option value="admin">Admin (จัดการได้ทั้งหมด)</option>
+                                                <option value="unauthorized">ระงับการใช้งาน (Unauthorized)</option>
+                                            </select>
+                                        </div>
+                                        <div class="w-full md:w-auto">
+                                            <button type="submit" id="btn-save-user" class="w-full md:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md flex items-center justify-center gap-2 text-sm h-[38px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกสิทธิ์</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="users-table-admin">
+                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                            <tr><th class="px-6 py-4 font-semibold">อีเมล (Email)</th><th class="px-6 py-4 font-semibold">ระดับสิทธิ์ (Role)</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-right">จัดการ</th></tr>
+                                        </thead>
+                                        <tbody id="users-table-body-admin" class="divide-y divide-gray-100"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add/Edit Task View (แบ่งซ้าย-ขวา ยี่ห้อ/แบรนด์) -->
+                    <div id="view-manage" class="hidden animate-fade-in pb-10">
+                        <form id="task-form" class="flex flex-col xl:flex-row gap-6 items-start mx-auto w-full max-w-7xl">
+                            
+                            <!-- ฝั่งซ้าย: ฟอร์มหลัก -->
+                            <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden relative w-full">
+                                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-indigo-400"></div>
+                                <div class="p-4 sm:p-8">
+                                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2 mb-8 mt-2"><i data-lucide="file-edit" class="w-6 h-6 text-[#5b5fc7]"></i><span id="form-title">เพิ่มรายละเอียดงานใหม่</span></h2>
+                                    <div class="space-y-6 sm:space-y-8">
+                                        <div class="flex items-start gap-3">
+                                            <div class="mt-2 text-gray-400 hidden sm:block"><i data-lucide="circle" class="w-6 h-6"></i></div>
+                                            <div class="flex-1"><input type="text" id="taskName" required placeholder="เพิ่มชื่องาน" class="w-full text-xl sm:text-2xl font-semibold px-2 py-1 border-0 border-b-2 border-transparent hover:border-gray-200 focus:border-[#5b5fc7] bg-transparent focus:bg-gray-50 focus:outline-none transition-colors placeholder-gray-400"></div>
+                                        </div>
+                                        
+                                        <div class="pl-0 sm:pl-9 mt-2">
+                                            <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider"><i data-lucide="folder" class="w-4 h-4"></i> ชื่อโครงการ</label>
+                                            <div class="relative w-full" id="project-dropdown-wrapper">
+                                                <div class="flex items-center w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
+                                                    <input type="text" id="projectNameInput" class="flex-1 bg-transparent outline-none text-sm w-full" placeholder="พิมพ์เพื่อค้นหา หรือพิมพ์ใหม่เพื่อเพิ่ม..." autocomplete="off">
+                                                    <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-gray-600" id="project-dropdown-btn"></i>
+                                                </div>
+                                                <div id="project-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="project-options-ul"></ul></div>
                                             </div>
-                                            <div id="project-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="project-options-ul"></ul></div>
                                         </div>
-                                    </div>
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-6 pl-0 sm:pl-9">
-                                        <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="calendar" class="w-4 h-4"></i> วันรับงาน</label><input type="date" id="receiveDate" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
-                                        <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบงาน</label><input type="text" id="responsibleName" required placeholder="ชื่อผู้รับผิดชอบ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
-                                        <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="arrow-right-left" class="w-4 h-4"></i> การมอบหมาย</label><input type="text" id="assignment" placeholder="มอบหมายให้ใครต่อ / สถานะ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
-                                        <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="map-pin" class="w-4 h-4"></i> สถานที่ปฏิบัติงาน</label><input type="text" id="workLocation" placeholder="ระบุสถานที่" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
-                                    </div>
-                                    <div class="pl-0 sm:pl-9 mt-4">
-                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                                            <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider"><i data-lucide="briefcase" class="w-4 h-4"></i> ข้อมูลลูกค้า</label>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="text" id="customerName" placeholder="ชื่อลูกค้า" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"><input type="tel" id="customerPhone" placeholder="เบอร์โทรศัพท์" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"></div>
+                                        
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-6 pl-0 sm:pl-9">
+                                            <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="calendar" class="w-4 h-4"></i> วันรับงาน</label><input type="date" id="receiveDate" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
+                                            <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบงาน</label><input type="text" id="responsibleName" required placeholder="ชื่อผู้รับผิดชอบ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
+                                            <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="arrow-right-left" class="w-4 h-4"></i> การมอบหมาย</label><input type="text" id="assignment" placeholder="มอบหมายให้ใครต่อ / สถานะ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
+                                            <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="map-pin" class="w-4 h-4"></i> สถานที่ปฏิบัติงาน</label><input type="text" id="workLocation" placeholder="ระบุสถานที่" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
                                         </div>
-                                    </div>
-                                    <div class="pl-0 sm:pl-9 mt-4">
-                                        <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="tag" class="w-4 h-4"></i> ประเภทงานที่ทำ</label>
-                                        <div class="relative w-full mb-4" id="tasktype-dropdown-wrapper">
-                                            <div class="flex flex-wrap items-center gap-1.5 w-full px-2 py-1.5 min-h-[42px] bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text" id="tasktype-input-area">
-                                                <div id="tasktype-chips-container" class="flex flex-wrap gap-1.5"></div>
-                                                <input type="text" id="taskTypeInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="พิมพ์เพื่อค้นหา หรือเพิ่มใหม่..." autocomplete="off">
+                                        
+                                        <div class="pl-0 sm:pl-9 mt-4">
+                                            <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                                                <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider"><i data-lucide="briefcase" class="w-4 h-4"></i> ข้อมูลลูกค้า</label>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <input type="text" id="customerName" placeholder="ชื่อลูกค้า" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm">
+                                                    <input type="tel" id="customerPhone" placeholder="เบอร์โทรศัพท์" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm">
+                                                </div>
                                             </div>
-                                            <div id="tasktype-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="tasktype-options-ul"></ul></div>
                                         </div>
-                                        <div class="mt-4" id="notes-container">
-                                            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3 select-none w-fit"><i data-lucide="list-checks" class="w-4 h-4 text-[#5b5fc7]"></i> บันทึกย่อ / รายละเอียดงาน</label>
-                                            <div class="bg-gray-50 border border-gray-200 rounded-md p-4 transition-all"><div id="notes-list" class="space-y-3"></div></div>
+                                        
+                                        <div class="pl-0 sm:pl-9 mt-4">
+                                            <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="tag" class="w-4 h-4"></i> ประเภทงานที่ทำ</label>
+                                            <div class="relative w-full mb-4" id="tasktype-dropdown-wrapper">
+                                                <div class="flex flex-wrap items-center gap-1.5 w-full px-2 py-1.5 min-h-[42px] bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text" id="tasktype-input-area">
+                                                    <div id="tasktype-chips-container" class="flex flex-wrap gap-1.5"></div>
+                                                    <input type="text" id="taskTypeInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="พิมพ์เพื่อค้นหา หรือเพิ่มใหม่..." autocomplete="off">
+                                                </div>
+                                                <div id="tasktype-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="tasktype-options-ul"></ul></div>
+                                            </div>
+                                            <div class="mt-4" id="notes-container">
+                                                <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-3 select-none w-fit"><i data-lucide="list-checks" class="w-4 h-4 text-[#5b5fc7]"></i> บันทึกย่อ / รายละเอียดงาน</label>
+                                                <div class="bg-gray-50 border border-gray-200 rounded-md p-4 transition-all"><div id="notes-list" class="space-y-3"></div></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- ฝั่งขวา: Card ยี่ห้อ/อุปกรณ์ ที่เพิ่มใหม่ -->
-                        <div class="w-full xl:w-[450px] shrink-0 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col xl:max-h-[850px] sticky top-6">
-                            <div class="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-xl">
-                                <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i> ยี่ห้อ / แบรนด์สินค้า</h3>
-                                <button type="button" onclick="addBrandEquipItem()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors"><i data-lucide="plus" class="w-4 h-4"></i> เพิ่ม</button>
+                            <!-- ฝั่งขวา: Card ยี่ห้อ/อุปกรณ์ ที่เพิ่มใหม่ -->
+                            <div class="w-full xl:w-[450px] shrink-0 bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col xl:max-h-[850px] sticky top-6">
+                                <div class="p-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center rounded-t-xl">
+                                    <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="cpu" class="w-5 h-5 text-blue-500"></i> ยี่ห้อ / แบรนด์สินค้า</h3>
+                                    <button type="button" onclick="addBrandEquipItem()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-md transition-colors"><i data-lucide="plus" class="w-4 h-4"></i> เพิ่ม</button>
+                                </div>
+                                <p class="text-xs text-gray-500 px-4 pt-3">คลิกที่ Checkbox ด้านหน้าเพื่อเปิดให้กรอก หรือคลิกออกเพื่อลบ</p>
+                                <div class="p-4 overflow-y-auto flex-1 flex flex-col gap-4 bg-white" id="brand-equip-list">
+                                    <!-- Dynamic Brand/Equip rows injected here -->
+                                </div>
+                                <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
+                                    <button type="button" onclick="switchTab('list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm w-full sm:w-auto">ยกเลิก</button>
+                                    <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm text-sm min-w-[140px] w-full sm:w-auto"><i data-lucide="save" class="w-4 h-4"></i> บันทึกการแก้ไข</button>
+                                </div>
                             </div>
-                            <p class="text-xs text-gray-500 px-4 pt-3">คลิก Checkbox ด้านหน้าเพื่อเปิดใช้งาน หรือติ๊กออกเพื่อลบรายการ</p>
-                            <div class="p-4 overflow-y-auto flex-1 flex flex-col gap-4 bg-white" id="brand-equip-list">
-                                <!-- Dynamic Brand/Equip rows injected here -->
-                            </div>
-                            <div class="p-4 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl">
-                                <button type="button" onclick="switchTab('list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm w-full sm:w-auto">ยกเลิก</button>
-                                <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm text-sm min-w-[140px] w-full sm:w-auto"><i data-lucide="save" class="w-4 h-4"></i> บันทึกการแก้ไข</button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+
                 </div>
-
-            </div>
-        </main>
+            </main>
         </div>
     </div>
-	<!-- Modals -->
+	<!-- Modals (Toast, Holidays, Day Detail) -->
     <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-[120] flex items-center gap-3">
-        <span id="toast-icon"></span><span id="toast-message" class="font-medium text-sm"></span>
+        <span id="toast-icon"></span>
+        <span id="toast-message" class="font-medium text-sm"></span>
         <button id="toast-undo-btn" class="hidden ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded transition-colors whitespace-nowrap">ย้อนกลับ</button>
     </div>
 
@@ -429,7 +561,12 @@
                 <form id="holiday-form" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">ประเภท <span class="text-red-500">*</span></label>
-                        <select id="holidayType" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 text-sm cursor-pointer"><option value="holiday">วันหยุดประจำปี / วันหยุดบริษัท</option><option value="vacation_leave">วันลาพักร้อน</option><option value="personal_leave">วันลากิจ</option><option value="sick_leave">วันลาป่วย</option><option value="leave" class="hidden">วันลาอื่นๆ (ข้อมูลเก่า)</option></select>
+                        <select id="holidayType" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 text-sm cursor-pointer">
+                            <option value="holiday">วันหยุดประจำปี / วันหยุดบริษัท</option>
+                            <option value="vacation_leave">วันลาพักร้อน</option>
+                            <option value="personal_leave">วันลากิจ</option>
+                            <option value="sick_leave">วันลาป่วย</option>
+                        </select>
                     </div>
                     <div><label class="block text-sm font-semibold text-gray-700 mb-1">วันที่ <span class="text-red-500">*</span></label><input type="date" id="holidayDate" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 text-sm"></div>
                     <div><label class="block text-sm font-semibold text-gray-700 mb-1">ชื่อวันหยุด / เหตุผลการลา <span class="text-red-500">*</span></label><input type="text" id="holidayName" required placeholder="เช่น วันขึ้นปีใหม่, ลาป่วย" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-red-500 text-sm"></div>
@@ -449,54 +586,80 @@
         </div>
     </div>
 
+    <!-- Start Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // === Inject Summary Subpages Automatically ===
+        // HTML Injector สำหรับหน้า Summary ที่ซ้ำกัน
         const summaryTabsConfig = [
+            { id: 'project', title: 'สรุปรายชื่อโครงการ', icon: 'layout-list' },
             { id: 'tasktype', title: 'สรุปประเภทงาน', icon: 'tag' },
             { id: 'brand', title: 'สรุปยี่ห้อ/แบรนด์', icon: 'cpu' },
             { id: 'responsible', title: 'สรุปผู้รับผิดชอบ', icon: 'users-round' },
             { id: 'customer', title: 'สรุปลูกค้า', icon: 'briefcase' }
         ];
+
         function injectSummaryHTML() {
             const container = document.getElementById('summary-views-container');
+            if(!container) return;
             summaryTabsConfig.forEach(conf => {
+                // ข้าม project summary เพราะมีใน HTML เดิมแล้ว
+                if(conf.id === 'project') return; 
+                
                 container.insertAdjacentHTML('beforeend', `
                 <div id="view-${conf.id}-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <!-- Sidebar ซ้ายของหน้า Summary -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
-                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="${conf.icon}" class="w-5 h-5 text-[#5b5fc7]"></i> ${conf.title}</h2>
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
+                                <i data-lucide="${conf.icon}" class="w-5 h-5 text-[#5b5fc7]"></i> ${conf.title}
+                            </h2>
                             <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="${conf.id}-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
                             <div id="${conf.id}-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                            
                             <div id="${conf.id}-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
                                 <button onclick="changeSummaryCardPage('${conf.id}', -1)" id="btn-${conf.id}-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
                                 <span id="${conf.id}-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
                                 <button onclick="changeSummaryCardPage('${conf.id}', 1)" id="btn-${conf.id}-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                             </div>
                         </div>
+
+                        <!-- Content ขวาของหน้า Summary -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
                             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
                                 <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="${conf.id}-project-count-container"></div>
                                 <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-                                    <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="${conf.id}-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]"></div>
-                                    <select id="${conf.id}-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                    <input type="date" id="${conf.id}-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block">
-                                    <input type="month" id="${conf.id}-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden">
-                                    <select id="${conf.id}-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
-                                    <button id="btn-${conf.id}-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]">
+                                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="${conf.id}-search-input" placeholder="ค้นหา..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
+                                    </div>
+                                    <select id="${conf.id}-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 bg-white flex-1 sm:flex-none">
+                                        <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
+                                    </select>
+                                    <input type="date" id="${conf.id}-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 block">
+                                    <input type="month" id="${conf.id}-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden">
+                                    <select id="${conf.id}-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600 hidden min-w-[120px]">
+                                        <option value="">ทุกปีทั้งหมด</option>
+                                    </select>
+                                    <button id="btn-${conf.id}-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
                                     <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                        <button id="btn-${conf.id}-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
-                                        <button id="btn-${conf.id}-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                        <button id="btn-${conf.id}-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-${conf.id}-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
                                     </div>
                                 </div>
                             </div>
                             <div class="overflow-x-auto min-h-[200px]">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="${conf.id}-summary-table">
                                     <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                        <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">${conf.title.replace('สรุป', '')}ทั้งหมด</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th></tr>
+                                        <tr>
+                                            <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
+                                            <th class="px-4 py-4 font-semibold text-center w-28">วันที่ล่าสุด</th>
+                                            <th class="px-6 py-4 font-semibold">ชื่อโครงการ</th>
+                                            <th class="px-6 py-4 font-semibold">${conf.title.replace('สรุป', '')}ทั้งหมด</th>
+                                            <th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน</th>
+                                        </tr>
                                     </thead>
                                     <tbody id="${conf.id}-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
                                 </table>
@@ -509,79 +672,271 @@
         }
         injectSummaryHTML();
 
-        const firebaseConfig = { apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA", authDomain: "project-dailyreport.firebaseapp.com", projectId: "project-dailyreport", storageBucket: "project-dailyreport.firebasestorage.app", messagingSenderId: "777791683600", appId: "1:777791683600:web:41be9e62052d3996fd1e95" };
-        const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
-        const googleProvider = new GoogleAuthProvider(), microsoftProvider = new OAuthProvider('microsoft.com'), appId = 'cctv-project';
+        // Firebase Configuration
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA", 
+            authDomain: "project-dailyreport.firebaseapp.com", 
+            projectId: "project-dailyreport", 
+            storageBucket: "project-dailyreport.firebasestorage.app", 
+            messagingSenderId: "777791683600", 
+            appId: "1:777791683600:web:41be9e62052d3996fd1e95" 
+        };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+        const microsoftProvider = new OAuthProvider('microsoft.com');
+        const appId = 'cctv-project';
 
-        function getThaiDate() { return new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Bangkok"})); }
-        function getThaiDateString() { const d = getThaiDate(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+        function getThaiDate() { 
+            return new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Bangkok"})); 
+        }
+        
+        function getThaiDateString() { 
+            const d = getThaiDate(); 
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; 
+        }
 
-        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentBrandEquips = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allEquipTypes = [], allBrands = []; 
+        // Global Variables
+        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [];
+        let currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentBrandEquips = [];
+        let allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null;
+        let allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [];
+        let allEquipTypes = [], allBrands = []; 
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null, brand: null };
-        let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
+        
+        let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all';
+        let dashAvailableProjects = [], dashTimeView = 'month';
         let dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null, brand: null };
-        let globalEmailFilter = 'all', itemsPerPage = 20, listCurrentPage = 1, summaryCurrentPage = 1;
+        let globalEmailFilter = 'all';
+        let itemsPerPage = 20, listCurrentPage = 1, summaryCurrentPage = 1;
 
-        const statusEl = document.getElementById('user-status'), taskForm = document.getElementById('task-form');
-        const formatDate = (dateString) => { if (!dateString) return '-'; return new Date(dateString).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Bangkok' }); };
+        const summaryState = {
+            'responsible': { filter: 'all', page: 1, cardPage: 1, filteredData: [] },
+            'customer': { filter: 'all', page: 1, cardPage: 1, filteredData: [] },
+            'tasktype': { filter: 'all', page: 1, cardPage: 1, filteredData: [] },
+            'brand': { filter: 'all', page: 1, cardPage: 1, filteredData: [] }
+        };
 
-        let toastTimeout;
+        const statusEl = document.getElementById('user-status');
+        const taskForm = document.getElementById('task-form');
+        
+        const formatDate = (dateString) => { 
+            if (!dateString) return '-'; 
+            return new Date(dateString).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Asia/Bangkok' }); 
+        };
+		let toastTimeout;
         function showNotification(msg, type = "success", undoCb = null) {
             const toast = document.getElementById('toast'), icon = document.getElementById('toast-icon'), msgEl = document.getElementById('toast-message'), undoBtn = document.getElementById('toast-undo-btn');
             clearTimeout(toastTimeout);
-            const newUndoBtn = undoBtn.cloneNode(true); undoBtn.parentNode.replaceChild(newUndoBtn, undoBtn);
+            const newUndoBtn = undoBtn.cloneNode(true); 
+            undoBtn.parentNode.replaceChild(newUndoBtn, undoBtn);
+            
             toast.className = `fixed top-4 right-4 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 z-[120] flex items-center gap-3 ${type === "success" ? "bg-green-600" : "bg-red-600"}`;
             icon.innerHTML = type === "success" ? `<i data-lucide="check-circle-2" class="w-5 h-5"></i>` : `<i data-lucide="alert-circle" class="w-5 h-5"></i>`;
             msgEl.textContent = msg;
-            if (undoCb) { newUndoBtn.classList.remove('hidden'); newUndoBtn.addEventListener('click', () => { undoCb(); toast.classList.add('translate-x-full', 'opacity-0'); }); } else newUndoBtn.classList.add('hidden');
-            lucide.createIcons(); toast.classList.remove('translate-x-full', 'opacity-0'); toastTimeout = setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 10000);
+            
+            if (undoCb) { 
+                newUndoBtn.classList.remove('hidden'); 
+                newUndoBtn.addEventListener('click', () => { undoCb(); toast.classList.add('translate-x-full', 'opacity-0'); }); 
+            } else {
+                newUndoBtn.classList.add('hidden');
+            }
+            
+            lucide.createIcons(); 
+            toast.classList.remove('translate-x-full', 'opacity-0'); 
+            toastTimeout = setTimeout(() => toast.classList.add('translate-x-full', 'opacity-0'), 10000);
         }
-		function updateNetworkStatus() {
-            const indicator = document.getElementById('network-indicator');
-            if (navigator.onLine && currentUser) { statusEl.textContent = 'เชื่อมต่อและซิงค์ข้อมูลแล้ว'; statusEl.className = 'text-green-600'; indicator.className = 'w-2 h-2 rounded-full bg-green-500'; } 
-            else { statusEl.textContent = 'ออฟไลน์ (Offline)'; statusEl.className = 'text-red-500 font-bold'; indicator.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse'; }
-        }
-        window.addEventListener('online', updateNetworkStatus); window.addEventListener('offline', updateNetworkStatus);
 
-        const views = { 'dashboard': document.getElementById('view-dashboard'), 'calendar': document.getElementById('view-calendar'), 'list': document.getElementById('view-list'), 'project-summary': document.getElementById('view-project-summary'), 'tasktype-summary': document.getElementById('view-tasktype-summary'), 'brand-summary': document.getElementById('view-brand-summary'), 'responsible-summary': document.getElementById('view-responsible-summary'), 'customer-summary': document.getElementById('view-customer-summary'), 'manage': document.getElementById('view-manage'), 'users': document.getElementById('view-users') };
-        const btnToggleMenu = document.getElementById('btn-toggle-menu'), sidebarMenu = document.getElementById('sidebar-menu'), sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        window.toggleMobileMenu = () => { if (window.innerWidth >= 1024) return; const isClosed = sidebarMenu.classList.contains('-translate-x-full'); if (isClosed) { sidebarMenu.classList.remove('-translate-x-full'); sidebarBackdrop.classList.remove('hidden'); setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10); } else { sidebarMenu.classList.add('-translate-x-full'); sidebarBackdrop.classList.add('opacity-0'); setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300); } };
-        btnToggleMenu?.addEventListener('click', toggleMobileMenu); sidebarBackdrop?.addEventListener('click', toggleMobileMenu);
+        function updateNetworkStatus() {
+            const indicator = document.getElementById('network-indicator');
+            if (navigator.onLine && currentUser) { 
+                statusEl.textContent = 'เชื่อมต่อและซิงค์ข้อมูลแล้ว'; 
+                statusEl.className = 'text-green-600'; 
+                indicator.className = 'w-2 h-2 rounded-full bg-green-500'; 
+            } else { 
+                statusEl.textContent = 'ออฟไลน์ (Offline)'; 
+                statusEl.className = 'text-red-500 font-bold'; 
+                indicator.className = 'w-2 h-2 rounded-full bg-red-500 animate-pulse'; 
+            }
+        }
+        window.addEventListener('online', updateNetworkStatus); 
+        window.addEventListener('offline', updateNetworkStatus);
+
+        const views = { 
+            'dashboard': document.getElementById('view-dashboard'), 
+            'calendar': document.getElementById('view-calendar'), 
+            'list': document.getElementById('view-list'), 
+            'project-summary': document.getElementById('view-project-summary'), 
+            'tasktype-summary': document.getElementById('view-tasktype-summary'), 
+            'brand-summary': document.getElementById('view-brand-summary'), 
+            'responsible-summary': document.getElementById('view-responsible-summary'), 
+            'customer-summary': document.getElementById('view-customer-summary'), 
+            'manage': document.getElementById('view-manage'), 
+            'users': document.getElementById('view-users') 
+        };
+        
+        const btnToggleMenu = document.getElementById('btn-toggle-menu');
+        const sidebarMenu = document.getElementById('sidebar-menu');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        
+        window.toggleMobileMenu = () => { 
+            if (window.innerWidth >= 1024) return; 
+            const isClosed = sidebarMenu.classList.contains('-translate-x-full'); 
+            if (isClosed) { 
+                sidebarMenu.classList.remove('-translate-x-full'); 
+                sidebarBackdrop.classList.remove('hidden'); 
+                setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10); 
+            } else { 
+                sidebarMenu.classList.add('-translate-x-full'); 
+                sidebarBackdrop.classList.add('opacity-0'); 
+                setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300); 
+            } 
+        };
+        
+        btnToggleMenu?.addEventListener('click', toggleMobileMenu); 
+        sidebarBackdrop?.addEventListener('click', toggleMobileMenu);
 
         function switchTab(activeTabId) {
             const isLeavingManage = views['manage'] && !views['manage'].classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) resetFormToAddMode();
+            
             Object.values(views).forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
-            Object.keys(views).forEach(t => { const el = document.getElementById('tab-' + t); if(el) { el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); } });
-            const activateTabBtn = (tabId) => { const el = document.getElementById('tab-' + tabId); if(el) { el.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); el.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); } };
+            Object.keys(views).forEach(t => { 
+                const el = document.getElementById('tab-' + t); 
+                if(el) { 
+                    el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); 
+                    el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); 
+                } 
+            });
+            
+            const activateTabBtn = (tabId) => { 
+                const el = document.getElementById('tab-' + tabId); 
+                if(el) { 
+                    el.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); 
+                    el.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); 
+                } 
+            };
+            
             const targetView = views[activeTabId];
             if(targetView) {
-                targetView.classList.remove('hidden'); targetView.classList.add('block'); activateTabBtn(activeTabId);
-                if (activeTabId === 'dashboard') renderDashboard(); else if (activeTabId === 'calendar') renderCalendar(); else if (activeTabId === 'list') filterAndRenderTasks(); else if (activeTabId === 'project-summary') renderProjectSummary(); else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); else if (activeTabId === 'manage') document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่";
+                targetView.classList.remove('hidden'); 
+                targetView.classList.add('block'); 
+                activateTabBtn(activeTabId);
+                
+                if (activeTabId === 'dashboard') renderDashboard(); 
+                else if (activeTabId === 'calendar') renderCalendar(); 
+                else if (activeTabId === 'list') filterAndRenderTasks(); 
+                else if (activeTabId === 'project-summary') renderProjectSummary(); 
+                else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); 
+                else if (activeTabId === 'manage') document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่";
             }
             if (window.innerWidth < 1024 && sidebarMenu && !sidebarMenu.classList.contains('-translate-x-full')) toggleMobileMenu();
             lucide.createIcons();
         }
+        
         window.switchTab = switchTab;
-        Object.keys(views).forEach(key => { document.getElementById('tab-' + key)?.addEventListener('click', () => { if (key === 'manage') { currentEditTaskId = null; resetFormToAddMode(); } switchTab(key); }); });
+        Object.keys(views).forEach(key => { 
+            document.getElementById('tab-' + key)?.addEventListener('click', () => { 
+                if (key === 'manage') { currentEditTaskId = null; resetFormToAddMode(); } 
+                switchTab(key); 
+            }); 
+        });
 
-        async function updatePresence(isOnline) { if (!currentUser || !currentUser.email) return; try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { isOnline: isOnline, lastActive: Date.now() }, { merge: true }); } catch (e) {} }
-        async function fetchUserRole(user) { const e = (user.email || '').toLowerCase(), ref = doc(db, 'artifacts', appId, 'public', 'data', 'users', e); try { const snap = await getDoc(ref); if (snap.exists()) { let r = snap.data().role || 'unauthorized'; if (e === 'dukender7188@gmail.com' && r !== 'admin') { r = 'admin'; await updateDoc(ref, { role: 'admin' }); } return r; } else { if (e === 'dukender7188@gmail.com') { await setDoc(ref, { email: e, role: 'admin', createdAt: Date.now() }); return 'admin'; } return 'unauthorized'; } } catch(e) { return e === 'dukender7188@gmail.com' ? 'admin' : 'unauthorized'; } }
-
-        function applyRoleUI() {
-            const roleRestrictedActions = document.querySelectorAll('.role-restricted-action'), actionCells = document.querySelectorAll('.action-cell'), tabManage = document.getElementById('tab-manage'), adminOnlyActions = document.querySelectorAll('.admin-only'), globalFilterWrapper = document.getElementById('admin-user-filter-wrapper');
-            if (currentUserRole === 'admin') { adminOnlyActions.forEach(el => el.style.display = ''); document.getElementById('tab-users')?.classList.remove('hidden'); } else { adminOnlyActions.forEach(el => el.style.display = 'none'); document.getElementById('tab-users')?.classList.add('hidden'); }
-            if (currentUserRole === 'admin' || currentUserRole === 'monitor') globalFilterWrapper?.classList.remove('hidden'); else globalFilterWrapper?.classList.add('hidden');
-            if (currentUserRole === 'monitor') { roleRestrictedActions.forEach(el => el.style.display = 'none'); actionCells.forEach(el => el.style.display = 'none'); if(tabManage) tabManage.style.display = 'none'; } else { roleRestrictedActions.forEach(el => el.style.display = ''); actionCells.forEach(el => el.style.display = ''); }
+        async function updatePresence(isOnline) { 
+            if (!currentUser || !currentUser.email) return; 
+            try { 
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { isOnline: isOnline, lastActive: Date.now() }, { merge: true }); 
+            } catch (e) {} 
+        }
+        
+        async function fetchUserRole(user) { 
+            const e = (user.email || '').toLowerCase();
+            const ref = doc(db, 'artifacts', appId, 'public', 'data', 'users', e); 
+            try { 
+                const snap = await getDoc(ref); 
+                if (snap.exists()) { 
+                    let r = snap.data().role || 'unauthorized'; 
+                    if (e === 'dukender7188@gmail.com' && r !== 'admin') { 
+                        r = 'admin'; await updateDoc(ref, { role: 'admin' }); 
+                    } 
+                    return r; 
+                } else { 
+                    if (e === 'dukender7188@gmail.com') { 
+                        await setDoc(ref, { email: e, role: 'admin', createdAt: Date.now() }); return 'admin'; 
+                    } 
+                    return 'unauthorized'; 
+                } 
+            } catch(e) { 
+                return e === 'dukender7188@gmail.com' ? 'admin' : 'unauthorized'; 
+            } 
         }
 
-        function filterDataByRole(dataList) { return (currentUserRole === 'admin' || currentUserRole === 'monitor') ? dataList : dataList.filter(item => item.ownerId === currentUser.uid); }
-        function populateEmailDropdowns() { const emailFilterSelect = document.getElementById('global-user-filter'); if (!emailFilterSelect || (currentUserRole !== 'admin' && currentUserRole !== 'monitor')) return; const currentVal = globalEmailFilter; const emailsSet = new Set(); allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); }); let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>'; Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; }); emailFilterSelect.innerHTML = optionsHtml; if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; } }
+        function applyRoleUI() {
+            const roleRestrictedActions = document.querySelectorAll('.role-restricted-action'), 
+                  actionCells = document.querySelectorAll('.action-cell'), 
+                  tabManage = document.getElementById('tab-manage'), 
+                  adminOnlyActions = document.querySelectorAll('.admin-only'), 
+                  globalFilterWrapper = document.getElementById('admin-user-filter-wrapper');
+            
+            if (currentUserRole === 'admin') { 
+                adminOnlyActions.forEach(el => el.style.display = ''); 
+                document.getElementById('tab-users')?.classList.remove('hidden'); 
+            } else { 
+                adminOnlyActions.forEach(el => el.style.display = 'none'); 
+                document.getElementById('tab-users')?.classList.add('hidden'); 
+            }
+            
+            if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
+                globalFilterWrapper?.classList.remove('hidden'); 
+            } else {
+                globalFilterWrapper?.classList.add('hidden');
+            }
+            
+            if (currentUserRole === 'monitor') { 
+                roleRestrictedActions.forEach(el => el.style.display = 'none'); 
+                actionCells.forEach(el => el.style.display = 'none'); 
+                if(tabManage) tabManage.style.display = 'none'; 
+            } else { 
+                roleRestrictedActions.forEach(el => el.style.display = ''); 
+                actionCells.forEach(el => el.style.display = ''); 
+            }
+        }
 
-        function getTasksByFilter() { return globalEmailFilter === 'all' ? allTasks : allTasks.filter(t => t.ownerEmail === globalEmailFilter); }
-        function getHolidaysByFilter() { return globalEmailFilter === 'all' ? allHolidays : allHolidays.filter(h => h.ownerEmail === globalEmailFilter); }
+        function filterDataByRole(dataList) { 
+            return (currentUserRole === 'admin' || currentUserRole === 'monitor') ? dataList : dataList.filter(item => item.ownerId === currentUser.uid); 
+        }
         
-        document.getElementById('global-user-filter')?.addEventListener('change', (e) => { globalEmailFilter = e.target.value; if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); if (!views['calendar'].classList.contains('hidden')) renderCalendar(); if (!views['list'].classList.contains('hidden')) filterAndRenderTasks(); if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary(); summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); }); });
+        function populateEmailDropdowns() { 
+            const emailFilterSelect = document.getElementById('global-user-filter'); 
+            if (!emailFilterSelect || (currentUserRole !== 'admin' && currentUserRole !== 'monitor')) return; 
+            const currentVal = globalEmailFilter; 
+            const emailsSet = new Set(); 
+            allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); }); 
+            let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>'; 
+            Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; }); 
+            emailFilterSelect.innerHTML = optionsHtml; 
+            if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; } 
+        }
+
+        function getTasksByFilter() { 
+            return globalEmailFilter === 'all' ? allTasks : allTasks.filter(t => t.ownerEmail === globalEmailFilter); 
+        }
+        function getHolidaysByFilter() { 
+            return globalEmailFilter === 'all' ? allHolidays : allHolidays.filter(h => h.ownerEmail === globalEmailFilter); 
+        }
+        
+        document.getElementById('global-user-filter')?.addEventListener('change', (e) => { 
+            globalEmailFilter = e.target.value; 
+            if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); 
+            if (!views['calendar'].classList.contains('hidden')) renderCalendar(); 
+            if (!views['list'].classList.contains('hidden')) filterAndRenderTasks(); 
+            if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary(); 
+            summaryTabsConfig.forEach(c => { 
+                if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); 
+            }); 
+        });
+
         document.getElementById('btn-login-google')?.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
         document.getElementById('btn-login-microsoft')?.addEventListener('click', async () => { try { await signInWithPopup(auth, microsoftProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน", "error"); } });
         document.getElementById('btn-logout')?.addEventListener('click', async () => { await updatePresence(false); signOut(auth); });
@@ -592,68 +947,189 @@
             if (user) {
                 currentUserRole = await fetchUserRole(user);
                 if (currentUserRole === 'unauthorized') { signOut(auth); showNotification("อีเมลนี้ไม่มีสิทธิ์เข้าใช้งาน", "error"); return; }
-                currentUser = user; unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => { currentUserData = docSnap.exists() ? docSnap.data() : null; if (!views['calendar'].classList.contains('hidden')) renderCalendar(); });
-                document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ'; document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
-                loginView.classList.add('hidden'); mainApp.classList.remove('hidden'); updateNetworkStatus(); document.getElementById('receiveDate').value = getThaiDateString();
-                applyRoleUI(); loadTasks(); loadHolidays(); loadOptions(); if (currentUserRole === 'admin' || currentUserRole === 'monitor') loadUsersList();
-                updatePresence(true); if (presenceInterval) clearInterval(presenceInterval); presenceInterval = setInterval(() => updatePresence(true), 60000); switchTab('list');
+                
+                currentUser = user; 
+                unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => { 
+                    currentUserData = docSnap.exists() ? docSnap.data() : null; 
+                    if (!views['calendar'].classList.contains('hidden')) renderCalendar(); 
+                });
+                
+                document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ'; 
+                document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
+                
+                loginView.classList.add('hidden'); 
+                mainApp.classList.remove('hidden'); 
+                updateNetworkStatus(); 
+                
+                document.getElementById('receiveDate').value = getThaiDateString();
+                applyRoleUI(); 
+                loadTasks(); 
+                loadHolidays(); 
+                loadOptions(); 
+                
+                if (currentUserRole === 'admin' || currentUserRole === 'monitor') loadUsersList();
+                updatePresence(true); 
+                
+                if (presenceInterval) clearInterval(presenceInterval); 
+                presenceInterval = setInterval(() => updatePresence(true), 60000); 
+                
+                switchTab('list');
             } else {
-                currentUser = null; currentUserRole = 'user'; loginView.classList.remove('hidden'); mainApp.classList.add('hidden');
-                if (presenceInterval) clearInterval(presenceInterval); if (unsubscribeTasks) unsubscribeTasks(); if (unsubscribeHolidays) unsubscribeHolidays(); if (unsubscribeUser) unsubscribeUser();
+                currentUser = null; currentUserRole = 'user'; 
+                loginView.classList.remove('hidden'); 
+                mainApp.classList.add('hidden');
+                
+                if (presenceInterval) clearInterval(presenceInterval); 
+                if (unsubscribeTasks) unsubscribeTasks(); 
+                if (unsubscribeHolidays) unsubscribeHolidays(); 
+                if (unsubscribeUser) unsubscribeUser();
             }
         });
 
         function loadOptions() {
             if (!currentUser) return;
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), (snap) => { allProjects = []; snap.forEach(d => allProjects.push({id: d.id, ...d.data()})); allProjects.sort((a,b) => a.createdAt - b.createdAt); if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary(); });
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), (snap) => { allTaskTypes = []; snap.forEach(d => allTaskTypes.push({id: d.id, ...d.data()})); allTaskTypes.sort((a,b) => a.name.localeCompare(b.name, 'th')); });
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_equip_types'), (snap) => { allEquipTypes = []; snap.forEach(d => allEquipTypes.push({id: d.id, ...d.data()})); allEquipTypes.sort((a,b) => a.name.localeCompare(b.name, 'th')); });
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_brands'), (snap) => { allBrands = []; snap.forEach(d => allBrands.push({id: d.id, ...d.data()})); allBrands.sort((a,b) => a.name.localeCompare(b.name, 'th')); });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), (snap) => { 
+                allProjects = []; snap.forEach(d => allProjects.push({id: d.id, ...d.data()})); 
+                allProjects.sort((a,b) => a.createdAt - b.createdAt); 
+                if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary(); 
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), (snap) => { 
+                allTaskTypes = []; snap.forEach(d => allTaskTypes.push({id: d.id, ...d.data()})); 
+                allTaskTypes.sort((a,b) => a.name.localeCompare(b.name, 'th')); 
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_equip_types'), (snap) => { 
+                allEquipTypes = []; snap.forEach(d => allEquipTypes.push({id: d.id, ...d.data()})); 
+                allEquipTypes.sort((a,b) => a.name.localeCompare(b.name, 'th')); 
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_brands'), (snap) => { 
+                allBrands = []; snap.forEach(d => allBrands.push({id: d.id, ...d.data()})); 
+                allBrands.sort((a,b) => a.name.localeCompare(b.name, 'th')); 
+            });
         }
 
-        function loadHolidays() { if (!currentUser) return; unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => { let hols = []; snapshot.forEach(doc => { hols.push({ id: doc.id, ...doc.data() }); }); allHolidays = filterDataByRole(hols); renderCalendar(); }, (error) => console.error(error)); }
+        function loadTasks() {
+            if (!currentUser) return;
+            unsubscribeTasks = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), (snapshot) => {
+                let tasks = []; 
+                snapshot.forEach((doc) => tasks.push({ id: doc.id, ...doc.data() }));
+                tasks = filterDataByRole(tasks); 
+                tasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); 
+                allTasks = tasks; 
+                populateEmailDropdowns();
+                
+                const yearsSet = new Set(); 
+                tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); });
+                const sortedYears = Array.from(yearsSet).sort().reverse();
+                
+                const updateYearOptions = (id) => { 
+                    const el = document.getElementById(id); 
+                    if(!el) return; 
+                    const cv = el.value; 
+                    el.innerHTML = '<option value="">ทุกปีทั้งหมด</option>'; 
+                    sortedYears.forEach(y => el.innerHTML += `<option value="${y}">${y}</option>`); 
+                    if(sortedYears.includes(cv)) el.value = cv; 
+                };
+                
+                ['search-year', 'summary-search-year', ...summaryTabsConfig.map(c=>`${c.id}-search-year`)].forEach(updateYearOptions);
+                
+                filterAndRenderTasks(); 
+                renderCalendar();   
+                if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); 
+                if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary();
+                summaryTabsConfig.forEach(c => { 
+                    if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); 
+                });
+            }, (error) => { 
+                statusEl.textContent = 'เกิดข้อผิดพลาดในการโหลดข้อมูล'; 
+                statusEl.className = 'text-red-500 font-bold'; 
+            });
+        }
+
+        function loadHolidays() { 
+            if (!currentUser) return; 
+            unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => { 
+                let hols = []; 
+                snapshot.forEach(doc => { hols.push({ id: doc.id, ...doc.data() }); }); 
+                allHolidays = filterDataByRole(hols); 
+                renderCalendar(); 
+            }, (error) => console.error(error)); 
+        }
 
         async function addGenericOption(collectionName, name, setterCb) {
             if(!currentUser || currentUserRole === 'monitor' || !name) return;
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email }); if (setterCb) setterCb(name); showNotification(`เพิ่มรายการ "${name}" สำเร็จ`); } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มรายการ", "error"); }
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email }); 
+                if (setterCb) setterCb(name); 
+                showNotification(`เพิ่มรายการ "${name}" สำเร็จ`); 
+            } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มรายการ", "error"); }
         }
 
         window.deleteOptionData = async (collectionName, docId) => {
             if(!currentUser || currentUserRole === 'monitor') return;
             let targetArray = collectionName === 'daily_projects' ? allProjects : collectionName === 'daily_task_types' ? allTaskTypes : collectionName === 'daily_equip_types' ? allEquipTypes : allBrands;
-            let itemToRestore = targetArray.find(t => t.id === docId); if (!itemToRestore) return;
+            let itemToRestore = targetArray.find(t => t.id === docId); 
+            if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับสำเร็จ", "success"); } catch (e) { showNotification("ผิดพลาด", "error"); } });
-            } catch(e) { showNotification("ผิดพลาด", "error"); }
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); 
+                showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => { 
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); 
+                        showNotification("ย้อนกลับสำเร็จ", "success"); 
+                    } catch (e) { showNotification("ผิดพลาด", "error"); } 
+                });
+            } catch(e) { showNotification("ผิดพลาดในการลบ", "error"); }
         };
 
         function setupDropdown(inputId, listId, ulId, dataArray, collectionName, selectCallback) {
             const input = document.getElementById(inputId), list = document.getElementById(listId), ul = document.getElementById(ulId);
             if (!input || !list || !ul) return;
+            
             const renderList = (query = '') => {
-                ul.innerHTML = ''; const q = query.toLowerCase().trim();
+                ul.innerHTML = ''; 
+                const q = query.toLowerCase().trim();
                 let availableData = inputId === 'taskTypeInput' ? dataArray.filter(t => !selectedTaskTypes.includes(t.name)) : dataArray;
                 const filtered = availableData.filter(t => t.name.toLowerCase().includes(q));
-                if (q && !dataArray.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') ul.innerHTML += `<li class="px-4 py-2 hover:bg-indigo-50 text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" data-add="${q}"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
-                if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
-                else filtered.forEach(t => {
-                    const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" data-del="${t.id}" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
-                    ul.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" data-sel="${t.name}">${t.name}</span>${delBtn}</li>`;
-                });
+                
+                if (q && !dataArray.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
+                    ul.innerHTML += `<li class="px-4 py-2 hover:bg-indigo-50 text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" data-add="${q}"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+                }
+                
+                if (filtered.length === 0 && !q) {
+                    ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+                } else {
+                    filtered.forEach(t => {
+                        const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" data-del="${t.id}" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                        ul.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" data-sel="${t.name}">${t.name}</span>${delBtn}</li>`;
+                    });
+                }
                 lucide.createIcons(); list.classList.remove('hidden');
             };
-            input.addEventListener('focus', () => renderList(input.value)); input.addEventListener('input', (e) => renderList(e.target.value));
+            
+            input.addEventListener('focus', () => renderList(input.value)); 
+            input.addEventListener('input', (e) => renderList(e.target.value));
+            
             ul.addEventListener('mousedown', (e) => {
                 e.preventDefault(); e.stopPropagation();
                 const addTarget = e.target.closest('[data-add]'), selTarget = e.target.closest('[data-sel]'), delTarget = e.target.closest('[data-del]');
-                if (delTarget) { deleteOptionData(collectionName, delTarget.dataset.del); setTimeout(() => renderList(input.value), 100); } 
-                else if (addTarget) { const newName = addTarget.dataset.add; if(collectionName === 'daily_projects') input.value = 'กำลังเพิ่ม...'; addGenericOption(collectionName, newName, selectCallback); list.classList.add('hidden'); } 
-                else if (selTarget) { selectCallback(selTarget.dataset.sel); list.classList.add('hidden'); }
+                
+                if (delTarget) { 
+                    deleteOptionData(collectionName, delTarget.dataset.del); 
+                    setTimeout(() => renderList(input.value), 100); 
+                } else if (addTarget) { 
+                    const newName = addTarget.dataset.add; 
+                    if(collectionName === 'daily_projects') input.value = 'กำลังเพิ่ม...'; 
+                    addGenericOption(collectionName, newName, selectCallback); 
+                    list.classList.add('hidden'); 
+                } else if (selTarget) { 
+                    selectCallback(selTarget.dataset.sel); 
+                    list.classList.add('hidden'); 
+                }
             });
             return renderList;
         }
-		const renderProjectDD = setupDropdown('projectNameInput', 'project-dropdown-list', 'project-options-ul', allProjects, 'daily_projects', (name) => { document.getElementById('projectNameInput').value = name; });
+
+        const renderProjectDD = setupDropdown('projectNameInput', 'project-dropdown-list', 'project-options-ul', allProjects, 'daily_projects', (name) => { document.getElementById('projectNameInput').value = name; });
         const renderTaskTypeDD = setupDropdown('taskTypeInput', 'tasktype-dropdown-list', 'tasktype-options-ul', allTaskTypes, 'daily_task_types', (name) => {
             if (!selectedTaskTypes.includes(name)) { selectedTaskTypes.push(name); selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); renderTaskTypeChips(); }
             const input = document.getElementById('taskTypeInput'); if(input) { input.value = ''; input.focus(); }
@@ -669,21 +1145,34 @@
         window.removeTaskType = (tag) => { selectedTaskTypes = selectedTaskTypes.filter(t => t !== tag); renderTaskTypeChips(); };
 
         // --- Brand/Equip Management ---
-        window.addBrandEquipItem = (data = { id: Date.now().toString() + Math.random(), equip: '', brand: '', enabled: true }) => { currentBrandEquips.push(data); renderBrandEquipList(); };
+        window.addBrandEquipItem = (data = { id: Date.now().toString() + Math.random(), equip: '', brand: '', enabled: true, deleted: false }) => { 
+            currentBrandEquips.push(data); renderBrandEquipList(); 
+        };
+        
         window.removeBrandEquip = (id) => {
             const idx = currentBrandEquips.findIndex(b => b.id === id); if (idx === -1) return;
-            const deletedItem = currentBrandEquips[idx]; currentBrandEquips.splice(idx, 1); renderBrandEquipList();
-            showNotification("ลบรายการแล้ว", "success", () => { currentBrandEquips.splice(idx, 0, deletedItem); renderBrandEquipList(); });
+            const deletedItem = currentBrandEquips[idx]; 
+            currentBrandEquips.splice(idx, 1); 
+            renderBrandEquipList();
+            showNotification("ลบรายการแล้ว", "success", () => { 
+                currentBrandEquips.splice(idx, 0, deletedItem); renderBrandEquipList(); 
+            });
         };
+        
         window.toggleBrandEquipRow = (id, isEnabled) => {
             const item = currentBrandEquips.find(b => b.id === id); if (!item) return;
-            if(!isEnabled) { window.removeBrandEquip(id); } // ติ๊กออกคือลบ
+            if(!isEnabled) { window.removeBrandEquip(id); } // ติ๊กออกคือการลบรายการพร้อมแสดงปุ่ม Undo
         };
-        window.updateBrandEquipVal = (id, field, val) => { const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; };
+        
+        window.updateBrandEquipVal = (id, field, val) => { 
+            const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; 
+        };
 
         function renderBrandEquipList() {
             const listEl = document.getElementById('brand-equip-list'); if (!listEl) return; listEl.innerHTML = '';
-            if (currentBrandEquips.length === 0) { listEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">ยังไม่มีรายการ<br>คลิก "เพิ่ม" เพื่อเริ่มใส่ข้อมูล</div>`; return; }
+            if (currentBrandEquips.length === 0) { 
+                listEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">ยังไม่มีรายการ<br>คลิก "เพิ่ม" เพื่อเริ่มใส่ข้อมูล</div>`; return; 
+            }
             currentBrandEquips.forEach((item, index) => {
                 const id = item.id, div = document.createElement('div');
                 div.className = `bg-white border-2 border-indigo-100 rounded-xl p-3 shadow-sm relative group transition-all ring-1 ring-indigo-50`;
@@ -714,6 +1203,7 @@
                     </div>
                 `;
                 listEl.appendChild(div);
+                
                 setupDropdown(`equip-input-${id}`, `equip-list-${id}`, `equip-ul-${id}`, allEquipTypes, 'daily_equip_types', (name) => { document.getElementById(`equip-input-${id}`).value = name; updateBrandEquipVal(id, 'equip', name); });
                 setupDropdown(`brand-input-${id}`, `brand-list-${id}`, `brand-ul-${id}`, allBrands, 'daily_brands', (name) => { document.getElementById(`brand-input-${id}`).value = name; updateBrandEquipVal(id, 'brand', name); });
             });
@@ -722,11 +1212,16 @@
 
         document.addEventListener('mousedown', (e) => {
             const closeIfOutside = (wId, lId) => { const w = document.getElementById(wId), l = document.getElementById(lId); if (w && l && !w.contains(e.target)) l.classList.add('hidden'); };
-            closeIfOutside('project-dropdown-wrapper', 'project-dropdown-list'); closeIfOutside('tasktype-dropdown-wrapper', 'tasktype-dropdown-list'); closeIfOutside('dash-project-dropdown-wrapper', 'dash-project-dropdown-list');
-            currentBrandEquips.forEach(b => { closeIfOutside(`equip-wrapper-${b.id}`, `equip-list-${b.id}`); closeIfOutside(`brand-wrapper-${b.id}`, `brand-list-${b.id}`); });
+            closeIfOutside('project-dropdown-wrapper', 'project-dropdown-list'); 
+            closeIfOutside('tasktype-dropdown-wrapper', 'tasktype-dropdown-list'); 
+            closeIfOutside('dash-project-dropdown-wrapper', 'dash-project-dropdown-list');
+            
+            currentBrandEquips.forEach(b => { 
+                closeIfOutside(`equip-wrapper-${b.id}`, `equip-list-${b.id}`); 
+                closeIfOutside(`brand-wrapper-${b.id}`, `brand-list-${b.id}`); 
+            });
         });
-
-        // Summary View Generic Generator
+		// Summary View Generic Generator (รวมชื่อด้วยคอมม่าคั่น)
         function generateAggregatedProjectTable(baseFilteredTasks, selectedFilterValue, filterKeyName) {
             let targetProjectNames = new Set();
             if (selectedFilterValue === 'all') {
@@ -762,7 +1257,6 @@
             });
         }
 
-        // Shared Summary Filter Builder
         function getCommonFilteredTasks(prefix) {
             let tasksToUse = getTasksByFilter();
             const searchInput = document.getElementById(`${prefix}-search-input`)?.value.toLowerCase() || '';
@@ -777,13 +1271,13 @@
                 else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
                 else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
 
-                let brandStr = Array.isArray(t.brands) ? t.brands.map(b => `${b.equip} ${b.brand}`).join(' ') : '';
+                let brandStr = Array.isArray(t.brands) ? t.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(' ') : '';
                 const searchString = [t.taskName, t.projectName, t.responsibleName, t.customerName, Array.isArray(t.taskType) ? t.taskType.join(' ') : t.taskType, brandStr].join(' ').toLowerCase();
-                const matchText = searchInput ? searchString.includes(searchInput) : true;
-                return matchTime && matchText;
+                return matchTime && (searchInput ? searchString.includes(searchInput) : true);
             });
         }
-		function setupSummaryPage(config) {
+
+        function setupSummaryPage(config) {
             const { prefix, name, filterKey, getFilterValue, setFilterValue, getPage, setPage, getCardPage, setCardPage, dataExtrFn, formatJoined } = config;
             
             window[`set${prefix}Filter`] = (val) => { setFilterValue(val === getFilterValue() ? 'all' : val); setPage(1); window[`render${prefix}Summary`](); };
@@ -857,6 +1351,7 @@
                     let textColors = { resp: 'text-indigo-600', cust: 'text-amber-600', types: 'text-pink-600', brands: 'text-teal-600' };
                     paginatedTable.forEach((row, i) => {
                         const htmlName = row.pName === 'ไม่ได้ระบุโครงการ' ? `<span class="text-gray-500 italic">${row.pName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="openProjectDetailModal('${row.pName.replace(/'/g, "\\'")}')">${row.pName}</span>`;
+                        // เชื่อมชื่อด้วยคอมม่าคั่นตามโจทย์
                         const joinedItems = Array.from(row[formatJoined]).join(', ') || '-';
                         tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-3 text-center font-medium text-gray-500">${startIdx + i + 1}</td><td class="px-4 py-3 text-center text-sm text-gray-600">${row.latest ? formatDate(row.latest) : '-'}</td><td class="px-6 py-3">${htmlName}</td><td class="px-6 py-3 font-medium ${textColors[formatJoined]} max-w-xs truncate" title="${joinedItems}">${joinedItems}</td><td class="px-4 py-3 text-center font-semibold text-gray-800">${row.count}</td></tr>`;
                     });
@@ -875,38 +1370,188 @@
         setupSummaryPage({ prefix: 'responsible', name: 'ชื่อผู้รับผิดชอบ', filterKey: 'responsibleName', formatJoined: 'resp', getFilterValue: () => filters.resp, setFilterValue: (v) => filters.resp = v, getPage: () => pages.resp, setPage: (p) => pages.resp = p, getCardPage: () => cPages.resp, setCardPage: (p) => cPages.resp = p, dataExtrFn: (t) => [t.responsibleName || 'ไม่ระบุ'] });
         setupSummaryPage({ prefix: 'customer', name: 'ชื่อลูกค้า', filterKey: 'customerName', formatJoined: 'cust', getFilterValue: () => filters.cust, setFilterValue: (v) => filters.cust = v, getPage: () => pages.cust, setPage: (p) => pages.cust = p, getCardPage: () => cPages.cust, setCardPage: (p) => cPages.cust = p, dataExtrFn: (t) => [t.customerName || 'ไม่ระบุ'] });
 
-        function loadTasks() {
-            if (!currentUser) return;
-            unsubscribeTasks = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), (snapshot) => {
-                let tasks = []; snapshot.forEach((doc) => tasks.push({ id: doc.id, ...doc.data() }));
-                tasks = filterDataByRole(tasks); tasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)); allTasks = tasks; populateEmailDropdowns();
-                const yearsSet = new Set(); tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); }); const sortedYears = Array.from(yearsSet).sort().reverse();
-                const updateYearOptions = (id) => { const el = document.getElementById(id); if(!el) return; const cv = el.value; el.innerHTML = '<option value="">ทุกปีทั้งหมด</option>'; sortedYears.forEach(y => el.innerHTML += `<option value="${y}">${y}</option>`); if(sortedYears.includes(cv)) el.value = cv; };
-                ['search-year', 'summary-search-year', ...summaryTabsConfig.map(c=>`${c.id}-search-year`)].forEach(updateYearOptions);
-                filterAndRenderTasks(); renderCalendar();   
-                if (!views['dashboard'].classList.contains('hidden')) renderDashboard(); 
-                if (!views['project-summary'].classList.contains('hidden')) renderProjectSummary();
-                summaryTabsConfig.forEach(c => { if (!document.getElementById(`view-${c.id}-summary`).classList.contains('hidden')) window[`render${c.id}Summary`](); });
-            }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาด'; statusEl.className = 'text-red-500 font-bold'; });
+        function renderTasks(tasks) {
+            const tableBody = document.getElementById('tasks-table-body'), emptyState = document.getElementById('tasks-empty-state'), tableEl = document.getElementById('tasks-table'), countEl = document.getElementById('task-count'), paginationContainer = document.getElementById('list-pagination');
+            if (!tableBody || !emptyState || !tableEl || !countEl) return;
+            countEl.textContent = tasks.length;
+            if (tasks.length === 0) { tableEl.classList.add('hidden'); emptyState.classList.remove('hidden'); if(paginationContainer) paginationContainer.innerHTML = ''; return; }
+            
+            const totalPages = Math.ceil(tasks.length / itemsPerPage) || 1; if (listCurrentPage > totalPages) listCurrentPage = totalPages;
+            const startIndex = (listCurrentPage - 1) * itemsPerPage, endIndex = startIndex + itemsPerPage, paginatedTasks = tasks.slice(startIndex, endIndex);
+            
+            tableEl.classList.remove('hidden'); emptyState.classList.add('hidden'); tableBody.innerHTML = '';
+            
+            paginatedTasks.forEach((task, index) => {
+                const globalIndex = startIndex + index + 1, tr = document.createElement('tr'); tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
+                let typeArray = Array.isArray(task.taskType) ? [...task.taskType] : (task.taskType ? [task.taskType] : []); typeArray.sort((a, b) => a.localeCompare(b, 'th'));
+                let displayTaskTypeHtml = typeArray.length > 0 ? typeArray.map(t => `<div class="whitespace-nowrap">- ${t}</div>`).join('') : '-';
+                
+                let actionBtns = (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid)) ? `<button onclick="editTask('${task.id}')" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="แก้ไขงาน"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="deleteTask('${task.id}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="ลบงาน"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
+                tr.innerHTML = `<td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td><td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td><td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td><td class="px-6 py-4 text-right action-cell"><div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${actionBtns}</div></td>`;
+                tableBody.appendChild(tr);
+            });
+            
+            if (paginationContainer) {
+                if (tasks.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, tasks.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tasks.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToListPage(${listCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${listCurrentPage} / ${totalPages}</div><button onclick="goToListPage(${listCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                else paginationContainer.innerHTML = '';
+            }
+            lucide.createIcons(); applyRoleUI();
+        }
+
+        window.goToListPage = (page) => { listCurrentPage = page; renderTasks(filteredTasks); };
+
+        function filterAndRenderTasks() {
+            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type')?.value || 'day', searchDate = document.getElementById('search-date')?.value, searchMonth = document.getElementById('search-month')?.value, searchYear = document.getElementById('search-year')?.value, searchText = searchInput?.value.toLowerCase() || '';
+            filteredTasks = getTasksByFilter().filter(task => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = task.receiveDate === searchDate; 
+                else if (timeType === 'month' && searchMonth) matchTime = task.receiveDate && task.receiveDate.startsWith(searchMonth); 
+                else if (timeType === 'year' && searchYear) matchTime = task.receiveDate && task.receiveDate.startsWith(searchYear);
+                
+                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || '');
+                const brandStr = Array.isArray(task.brands) ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(' ') : '';
+                const searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr, brandStr].join(' ').toLowerCase();
+                const notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
+                
+                return matchTime && (searchText ? `${searchString} ${notesString}`.includes(searchText) : true);
+            });
+            renderTasks(filteredTasks);
+        }
+
+        document.getElementById('search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value, dateInput = document.getElementById('search-date'), monthInput = document.getElementById('search-month'), yearInput = document.getElementById('search-year');
+            if(dateInput) { if(type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+            if(monthInput) { if(type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+            if(yearInput) { if(type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+            if (dateInput) dateInput.value = ''; if (monthInput) monthInput.value = ''; if (yearInput) yearInput.value = ''; listCurrentPage = 1; filterAndRenderTasks();
+        });
+
+        document.getElementById('search-input')?.addEventListener('input', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        document.getElementById('search-date')?.addEventListener('change', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        document.getElementById('search-month')?.addEventListener('change', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        document.getElementById('search-year')?.addEventListener('change', () => { listCurrentPage = 1; filterAndRenderTasks(); });
+        
+        document.getElementById('btn-reset-search')?.addEventListener('click', () => { 
+            const searchInput = document.getElementById('search-input'), timeType = document.getElementById('search-time-type'); 
+            if (searchInput) searchInput.value = ''; 
+            if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } 
+            listCurrentPage = 1; filterAndRenderTasks(); 
+        });
+
+        function resetFormToAddMode() {
+            if (taskForm) taskForm.reset(); 
+            currentEditTaskId = null; 
+            const projInputEl = document.getElementById('projectNameInput'); if(projInputEl) projInputEl.value = '';
+            selectedTaskTypes = []; renderTaskTypeChips(); 
+            const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
+            currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }]; renderNotes();
+            currentBrandEquips = []; renderBrandEquipList();
+            
+            document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่"; 
+            document.getElementById('submit-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; 
+            lucide.createIcons();
         }
 
         taskForm?.addEventListener('submit', async (e) => {
             e.preventDefault(); if (!currentUser || currentUserRole === 'monitor') return;
-            const submitBtn = document.getElementById('submit-btn'); submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
+            const submitBtn = document.getElementById('submit-btn'); 
+            submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
+            
             const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
             const taskData = { 
-                taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', 
-                taskType: selectedTaskTypes, brands: currentBrandEquips, receiveDate: document.getElementById('receiveDate')?.value || '', 
-                responsibleName: document.getElementById('responsibleName')?.value || '', assignment: document.getElementById('assignment')?.value || '', 
-                customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', 
-                workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, updatedAt: Date.now() 
+                taskName: document.getElementById('taskName')?.value || '', 
+                projectName: document.getElementById('projectNameInput')?.value || '', 
+                taskType: selectedTaskTypes, 
+                brands: currentBrandEquips.filter(b=>b.enabled), // Save only enabled items
+                receiveDate: document.getElementById('receiveDate')?.value || '', 
+                responsibleName: document.getElementById('responsibleName')?.value || '', 
+                assignment: document.getElementById('assignment')?.value || '', 
+                customerName: document.getElementById('customerName')?.value || '', 
+                customerPhone: document.getElementById('customerPhone')?.value || '', 
+                workLocation: document.getElementById('workLocation')?.value || '', 
+                notes: notesToSave, 
+                updatedAt: Date.now() 
             };
+            
             try {
-                if (currentEditTaskId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); showNotification("อัปเดตงานเรียบร้อยแล้ว"); }
-                else { taskData.createdAt = Date.now(); taskData.ownerId = currentUser.uid; taskData.ownerEmail = currentUser.email; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); }
+                if (currentEditTaskId) { 
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); 
+                    showNotification("อัปเดตงานเรียบร้อยแล้ว"); 
+                }
+                else { 
+                    taskData.createdAt = Date.now(); 
+                    taskData.ownerId = currentUser.uid; 
+                    taskData.ownerEmail = currentUser.email; 
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); 
+                    showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); 
+                }
                 resetFormToAddMode(); switchTab('list');
-            } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } finally { submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; submitBtn.disabled = false; lucide.createIcons(); }
+            } catch (error) { 
+                showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); 
+            } finally { 
+                submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; 
+                submitBtn.disabled = false; lucide.createIcons(); 
+            }
         });
+
+        window.editTask = (taskId) => {
+            if (currentUserRole === 'monitor') return; 
+            const task = allTasks.find(t => t.id === taskId); if(!task) return;
+            if (currentUserRole === 'user' && task.ownerId !== currentUser.uid) return showNotification("คุณแก้ไขได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
+            document.getElementById('day-detail-modal')?.classList.add('hidden');
+            
+            ['taskName', 'receiveDate', 'responsibleName', 'assignment', 'customerName', 'customerPhone', 'workLocation'].forEach(field => { 
+                const el = document.getElementById(field); if (el) el.value = task[field] || ''; 
+            });
+            
+            const projInputEl = document.getElementById('projectNameInput'); if (projInputEl) projInputEl.value = task.projectName || '';
+            if (Array.isArray(task.taskType)) { selectedTaskTypes = [...task.taskType]; selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); } 
+            else if (task.taskType && typeof task.taskType === 'string') selectedTaskTypes = [task.taskType]; else selectedTaskTypes = [];
+            renderTaskTypeChips();
+            
+            if (Array.isArray(task.brands)) { currentBrandEquips = JSON.parse(JSON.stringify(task.brands)); } else currentBrandEquips = [];
+            renderBrandEquipList();
+
+            if (task.notes && task.notes.length > 0) { 
+                currentNotes = JSON.parse(JSON.stringify(task.notes)); 
+                const lastNote = currentNotes[currentNotes.length - 1]; 
+                if (lastNote && lastNote.completed) currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }); 
+            } else {
+                currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
+            }
+            renderNotes(); 
+            currentEditTaskId = taskId; switchTab('manage');
+        };
+
+        window.deleteTask = async (id) => {
+            if (!currentUser || currentUserRole === 'monitor') return;
+            const taskToRestore = allTasks.find(t => t.id === id); if (!taskToRestore) return;
+            if (currentUserRole === 'user' && taskToRestore.ownerId !== currentUser.uid) return showNotification("คุณลบได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
+            
+            const { id: docId, ...taskData } = taskToRestore; 
+            document.getElementById('day-detail-modal')?.classList.add('hidden');
+            const projectName = taskData.projectName; 
+            let projectToDeleteId = null, projectToDeleteData = null;
+            
+            if (projectName) {
+                const remainingTasks = allTasks.filter(t => t.projectName === projectName && t.id !== id);
+                if (remainingTasks.length === 0) { 
+                    const projObj = allProjects.find(p => p.name === projectName); 
+                    if (projObj) { projectToDeleteId = projObj.id; const { id: pId, ...pData } = projObj; projectToDeleteData = pData; } 
+                }
+            }
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id));
+                if (projectToDeleteId) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId));
+                showNotification("ลบงานเรียบร้อยแล้ว", "success", async () => { 
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id), taskData); 
+                        if (projectToDeleteId && projectToDeleteData) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId), projectToDeleteData); 
+                        showNotification("ย้อนกลับการลบสำเร็จ", "success"); 
+                    } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } 
+                });
+            } catch (error) { showNotification("เกิดข้อผิดพลาดในการลบงาน", "error"); }
+        };
 
         // Initialize Icons
         lucide.createIcons();
