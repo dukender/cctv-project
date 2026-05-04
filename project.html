@@ -258,11 +258,11 @@
                                     </div>
                                     <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
                                         <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-orange-500"></span> ลากิจ</span>
-                                        <span class="flex items-center gap-1"><input type="number" id="quota-vacation" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 outline-none font-bold text-orange-700" onchange="updateQuota('personal', this.value)"> วัน</span>
+                                        <span class="flex items-center gap-1"><input type="number" id="quota-personal" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-orange-500 outline-none font-bold text-orange-700" onchange="updateQuota('personal', this.value)"> วัน</span>
                                     </div>
                                     <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100">
                                         <span class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-purple-500"></span> ลาป่วย</span>
-                                        <span class="flex items-center gap-1"><input type="number" id="quota-vacation" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-purple-500 outline-none font-bold text-purple-700" onchange="updateQuota('sick', this.value)"> วัน</span>
+                                        <span class="flex items-center gap-1"><input type="number" id="quota-sick" class="w-14 h-7 text-center bg-white border border-gray-300 rounded focus:ring-1 focus:ring-purple-500 outline-none font-bold text-purple-700" onchange="updateQuota('sick', this.value)"> วัน</span>
                                     </div>
                                 </div>
                             </div>
@@ -856,7 +856,17 @@
         };
         window.toggleBrandEquipRow = (id, isEnabled) => {
             const item = currentBrandEquips.find(b => b.id === id); if (!item) return;
-            if(!isEnabled) { window.removeBrandEquip(id); } // ติ๊กออกคือลบ
+            item.enabled = isEnabled;
+            const rowDiv = document.getElementById(`equip-row-${id}`);
+            if (rowDiv) {
+                if (isEnabled) {
+                    rowDiv.classList.remove('opacity-40', 'bg-gray-100', 'grayscale');
+                    rowDiv.classList.add('bg-white');
+                } else {
+                    rowDiv.classList.add('opacity-40', 'bg-gray-100', 'grayscale');
+                    rowDiv.classList.remove('bg-white');
+                }
+            }
         };
         window.updateBrandEquipVal = (id, field, val) => { const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; };
 
@@ -865,10 +875,11 @@
             if (currentBrandEquips.length === 0) { listEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">ยังไม่มีรายการ<br>คลิก "เพิ่ม" เพื่อเริ่มใส่ข้อมูล</div>`; return; }
             currentBrandEquips.forEach((item, index) => {
                 const id = item.id, div = document.createElement('div');
-                div.className = `bg-white border-2 border-indigo-100 rounded-xl p-3 shadow-sm relative group transition-all ring-1 ring-indigo-50`;
+                div.id = `equip-row-${id}`;
+                div.className = `border-2 border-indigo-100 rounded-xl p-3 shadow-sm relative group transition-all ring-1 ring-indigo-50 ${item.enabled !== false ? 'bg-white' : 'bg-gray-100 opacity-40 grayscale'}`;
                 div.innerHTML = `
                     <div class="flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
-                        <input type="checkbox" checked class="w-4 h-4 cursor-pointer text-[#5b5fc7] focus:ring-[#5b5fc7] rounded accent-[#5b5fc7]" onchange="toggleBrandEquipRow('${id}', this.checked)">
+                        <input type="checkbox" ${item.enabled !== false ? 'checked' : ''} class="w-4 h-4 cursor-pointer text-[#5b5fc7] focus:ring-[#5b5fc7] rounded accent-[#5b5fc7]" onchange="toggleBrandEquipRow('${id}', this.checked)">
                         <span class="text-xs font-bold text-gray-700">รายการที่ ${index + 1}</span>
                         <button type="button" onclick="removeBrandEquip('${id}')" class="ml-auto p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-50 hover:bg-red-50 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </div>
