@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Task Log - Professional Edition</title>
-    <link rel="preconnect" href="[https://fonts.googleapis.com](https://fonts.googleapis.com)">
-    <link rel="preconnect" href="[https://fonts.gstatic.com](https://fonts.gstatic.com)" crossorigin>
-    <link href="[https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap](https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap)" rel="stylesheet">
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <script src="[https://unpkg.com/lucide@latest](https://unpkg.com/lucide@latest)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js](https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js)"></script>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
-    <script src="[https://cdn.jsdelivr.net/npm/chart.js](https://cdn.jsdelivr.net/npm/chart.js)"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
     </script>
@@ -33,10 +33,10 @@
             <h1 class="text-2xl font-bold text-gray-800 mb-2">เข้าสู่ระบบ (Login)</h1>
             <p class="text-gray-500 text-sm mb-8">Daily Task Log System</p>
             <button id="btn-login-google" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl mb-3 transition-colors shadow-sm">
-                <img src="[https://www.svgrepo.com/show/475656/google-color.svg](https://www.svgrepo.com/show/475656/google-color.svg)" class="w-5 h-5" alt="Google">เข้าสู่ระบบด้วย Google
+                <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google">เข้าสู่ระบบด้วย Google
             </button>
             <button id="btn-login-microsoft" class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors shadow-sm mb-6">
-                <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>เข้าสู่ระบบด้วย Hotmail / Outlook
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 21 21"><path fill="#f25022" d="M0 0h10v10H0z"/><path fill="#7fba00" d="M11 0h10v10H11z"/><path fill="#00a4ef" d="M0 11h10v10H0z"/><path fill="#ffb900" d="M11 11h10v10H11z"/></svg>เข้าสู่ระบบด้วย Hotmail / Outlook
             </button>
             <div class="text-xs text-gray-400 text-left bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <p class="font-semibold text-gray-600 mb-2 border-b border-gray-200 pb-1"><i data-lucide="shield" class="w-3 h-3 inline"></i> ระดับสิทธิ์การใช้งานในระบบ:</p>
@@ -87,6 +87,7 @@
                 <div class="p-2 lg:p-4 h-full flex flex-col">
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
                         <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
+                        
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
                         
                         <!-- 5. จัดเรียงเมนูย่อยใหม่ตามลำดับ -->
@@ -114,7 +115,7 @@
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
                 <div class="w-full px-2 sm:px-6 py-4 sm:py-6 relative">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
-                        <button onclick="window.resetFormToAddMode(); window.switchTab('manage');" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
+                        <button id="btn-add-task-top" onclick="window.resetFormToAddMode(); window.switchTab('manage');" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
                             <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
                         </button>
                     </div>
@@ -193,7 +194,6 @@
                         </div>
                     </div>
 
-
                     <!-- ================= Project Summary View ================= -->
                     <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -232,7 +232,6 @@
 
                     <!-- Container สำหรับหน้า Summary 4 หน้าที่จะถูกเพิ่มด้วย JS (Types, Brands, Responsible, Customer) -->
                     <div id="summary-views-container"></div>
-
 
                     <!-- ================= Calendar View ================= -->
                     <div id="view-calendar" class="hidden animate-fade-in pb-10">
@@ -312,11 +311,9 @@
                         </div>
                     </div>
 
-
-                    <!-- ================= Users View ================= -->
+                    <!-- ================= Users View (ลบแถบสีด้านบนออกตามโจทย์) ================= -->
                     <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
-                            <!-- 1. ลบแถบสีด้านบนออกแล้ว -->
                             <div class="p-4 sm:p-8">
                                 <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2"><i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)</h2>
                                 <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
@@ -340,7 +337,7 @@
                         </div>
                     </div>
 
-                    <!-- ================= Add/Edit Task View (Manage) ================= -->
+                    <!-- ================= Add/Edit Task View (แบ่งซ้าย-ขวา) ================= -->
                     <div id="view-manage" class="hidden animate-fade-in pb-10">
                         <form id="task-form" class="flex flex-col xl:flex-row gap-6 items-start mx-auto w-full max-w-7xl">
                             
@@ -417,7 +414,6 @@
         </div>
     </div>
 
-
     <!-- Modals -->
     <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full opacity-0 z-[120] flex items-center gap-3">
         <span id="toast-icon"></span><span id="toast-message" class="font-medium text-sm"></span>
@@ -456,9 +452,9 @@
 
     <!-- ================= Scripts ================= -->
     <script type="module">
-        import { initializeApp } from "[https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js](https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js)";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "[https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js](https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js)";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "[https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js](https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js)";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // === 1. Auto Create Summary Pages via JS ===
         const summaryTabsConfig = [
@@ -517,7 +513,7 @@
         }
         injectSummaryHTML();
 
-
+        // === 2. Firebase Database Setup ===
         const firebaseConfig = { apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA", authDomain: "project-dailyreport.firebaseapp.com", projectId: "project-dailyreport", storageBucket: "project-dailyreport.firebasestorage.app", messagingSenderId: "777791683600", appId: "1:777791683600:web:41be9e62052d3996fd1e95" };
         const app = initializeApp(firebaseConfig), auth = getAuth(app), db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider(), microsoftProvider = new OAuthProvider('microsoft.com'), appId = 'cctv-project';
@@ -1360,33 +1356,6 @@
                         }
                     }
                     let actionBtns = (currentUserRole === 'admin' || currentUserRole === 'user') ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="window.editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="window.deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
-                    tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><h4 class="font-bold text-gray-800 text-lg mb-1 group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandsDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5 col-span-1 sm:col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
-                });
-                tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
-            }
-            lucide.createIcons(); modal.classList.remove('hidden'); modal.classList.add('flex');
-        };
-
-        window.openProjectDetailModal = (projectName) => {
-            const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), projectTasks = getTasksByFilter().filter(t => t.projectName === projectName);
-            title.innerHTML = `<i data-lucide="folder-open" class="w-5 h-5"></i> โครงการ: ${projectName} ${projectTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${projectTasks.length} งาน )</span>` : ''}`;
-            content.innerHTML = '';
-            if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
-            else {
-                projectTasks.sort((a, b) => (b.receiveDate || '').localeCompare(a.receiveDate || '')); let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
-                projectTasks.forEach((task) => {
-                    let taskTypeDisplay = Array.isArray(task.taskType) ? task.taskType.join(', ') : (task.taskType || '-');
-                    let brandsDisplay = Array.isArray(task.brands) && task.brands.length > 0 ? task.brands.filter(b=>b.enabled).map(b => `${b.equip} ${b.brand}`).join(', ') : '-';
-                    let notesHtml = '';
-                    if (task.notes && task.notes.length > 0) {
-                        const validNotes = task.notes.filter(n => n.text.trim() !== '' || n.completed);
-                        if(validNotes.length > 0) {
-                            notesHtml = `<div class="mt-3 pt-3 border-t border-gray-100 space-y-2">`;
-                            validNotes.forEach(note => notesHtml += `<div class="flex items-start gap-2 text-sm"><div class="mt-0.5">${note.completed ? `<i data-lucide="check-square" class="w-4 h-4 text-[#5b5fc7]"></i>` : `<i data-lucide="square" class="w-4 h-4 text-gray-400"></i>`}</div><div class="flex-1 text-gray-700">${note.text}</div>${note.completedAt ? `<span class="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded shrink-0">${note.completedAt}</span>` : ''}</div>`);
-                            notesHtml += `</div>`;
-                        }
-                    }
-                    let actionBtns = (currentUserRole === 'admin' || currentUserRole === 'user') ? `<div class="flex gap-2 mt-4 pt-3 border-t border-gray-100"><button onclick="window.editTask('${task.id}')" class="flex-1 bg-white border border-gray-300 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="edit-3" class="w-4 h-4"></i> แก้ไข</button><button onclick="window.deleteTask('${task.id}')" class="flex-1 bg-white border border-red-200 text-red-600 px-3 py-1.5 rounded-md hover:bg-red-50 text-sm font-medium transition-colors flex items-center justify-center gap-1.5 shadow-sm"><i data-lucide="trash-2" class="w-4 h-4"></i> ลบ</button></div>` : '';
                     tasksGridHtml += `<div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col"><div class="absolute left-0 top-0 bottom-0 w-1 bg-[#5b5fc7]"></div><div class="flex justify-between items-start mb-1"><h4 class="font-bold text-gray-800 text-lg group-hover:text-[#5b5fc7] transition-colors">${task.taskName}</h4><span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded font-medium shrink-0 ml-2 border border-gray-200">${formatDate(task.receiveDate)}</span></div><p class="text-sm text-gray-600 mb-2 flex items-center gap-1.5"><i data-lucide="briefcase" class="w-4 h-4 text-gray-400"></i> ${task.projectName || '-'}</p><div class="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4 text-sm mt-3 bg-gray-50 p-3 rounded-md border border-gray-100"><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="tag" class="w-4 h-4"></i> ประเภท: <span class="text-gray-800 font-medium ml-1 truncate">${taskTypeDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="box" class="w-4 h-4"></i> แบรนด์: <span class="text-gray-800 font-medium ml-1 truncate">${brandsDisplay}</span></div><div class="text-gray-500 flex items-center gap-1.5"><i data-lucide="user" class="w-4 h-4"></i> รับผิดชอบ: <span class="text-gray-800 font-medium ml-1 truncate">${task.responsibleName || '-'}</span></div><div class="text-gray-500 flex items-center gap-1.5 col-span-1 sm:col-span-2"><i data-lucide="users" class="w-4 h-4"></i> ลูกค้า: <span class="text-gray-800 font-medium ml-1 truncate">${task.customerName || '-'}</span></div></div><div class="flex-1">${notesHtml}</div><div class="mt-auto">${actionBtns}</div></div>`;
                 });
                 tasksGridHtml += '</div>'; content.innerHTML += tasksGridHtml;
@@ -1418,6 +1387,31 @@
                 tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-6 py-4 font-medium text-gray-800">${u.email}</td><td class="px-6 py-4">${roleBadge}</td><td class="px-6 py-4">${onlineStatusHtml}</td><td class="px-6 py-4 text-right"><button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
             });
             lucide.createIcons();
+        };
+
+        document.getElementById('user-role-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (currentUserRole !== 'admin') return showNotification("คุณไม่มีสิทธิ์จัดการผู้ใช้งาน", "error");
+            const emailInput = document.getElementById('manageUserEmail').value.toLowerCase().trim();
+            const roleInput = document.getElementById('manageUserRole').value;
+            const btn = document.getElementById('btn-save-user');
+            if (emailInput === 'dukender7188@gmail.com' && roleInput !== 'admin') return showNotification("ไม่สามารถลดสิทธิ์ผู้ดูแลระบบสูงสุดได้", "error");
+            
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; btn.disabled = true;
+            try {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailInput), { email: emailInput, role: roleInput, updatedAt: Date.now() }, { merge: true });
+                showNotification(`บันทึกสิทธิ์สำหรับ ${emailInput} สำเร็จ`);
+                document.getElementById('user-role-form').reset();
+            } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } 
+            finally { btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกสิทธิ์`; btn.disabled = false; lucide.createIcons(); }
+        });
+
+        window.editUserRole = (email, role) => { if (email === 'dukender7188@gmail.com') return; document.getElementById('manageUserEmail').value = email; document.getElementById('manageUserRole').value = role; document.getElementById('manageUserEmail').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+        window.deleteUserRole = async (email) => {
+            if (currentUserRole !== 'admin' || email === 'dukender7188@gmail.com') return;
+            const userToRestore = allUsers.find(u => u.email === email); if (!userToRestore) return;
+            const { id: docId, ...userData } = userToRestore;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email)); showNotification(`ลบข้อมูลสิทธิ์ของ ${email} แล้ว`, "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), userData); showNotification("ย้อนกลับการลบสิทธิ์สำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
 
         // DOM Loaded Init
