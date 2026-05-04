@@ -122,7 +122,7 @@
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
                 <div class="w-full px-2 sm:px-6 py-4 sm:py-6 relative">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
-                        <button id="btn-add-task-top" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
+                        <button onclick="window.resetFormToAddMode(); window.switchTab('manage');" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
                             <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
                         </button>
                     </div>
@@ -220,10 +220,10 @@
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
-                                <div id="card-sum-all" onclick="setSummaryFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-xl font-bold text-gray-800" id="summary-total">0 ( 0% )</p></div>
-                                <div id="card-sum-prog" onclick="setSummaryFilter('in_progress')" class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p><p class="text-xl font-bold text-blue-700" id="summary-progress">0 ( 0% )</p></div>
-                                <div id="card-sum-won" onclick="setSummaryFilter('won')" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p><p class="text-xl font-bold text-green-700" id="summary-won">0 ( 0% )</p></div>
-                                <div id="card-sum-lost" onclick="setSummaryFilter('lost')" class="bg-red-50 p-4 rounded-lg border border-red-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p><p class="text-xl font-bold text-red-700" id="summary-lost">0 ( 0% )</p></div>
+                                <div id="card-sum-all" onclick="window.setSummaryFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-xl font-bold text-gray-800" id="summary-total">0 ( 0% )</p></div>
+                                <div id="card-sum-prog" onclick="window.setSummaryFilter('in_progress')" class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p><p class="text-xl font-bold text-blue-700" id="summary-progress">0 ( 0% )</p></div>
+                                <div id="card-sum-won" onclick="window.setSummaryFilter('won')" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p><p class="text-xl font-bold text-green-700" id="summary-won">0 ( 0% )</p></div>
+                                <div id="card-sum-lost" onclick="window.setSummaryFilter('lost')" class="bg-red-50 p-4 rounded-lg border border-red-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p><p class="text-xl font-bold text-red-700" id="summary-lost">0 ( 0% )</p></div>
                             </div>
                             <div class="overflow-x-auto min-h-[300px]">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
@@ -237,7 +237,7 @@
                         </div>
                     </div>
 
-                    <!-- Container รับ HTML ที่ JS จะสร้างให้อัตโนมัติ (ประเภทงาน, แบรนด์, ผู้รับผิดชอบ, ลูกค้า) -->
+                    <!-- Container สำหรับหน้า Summary ที่จะถูกเพิ่มด้วย JS -->
                     <div id="summary-views-container"></div>
 
                     <!-- ================= Calendar View ================= -->
@@ -258,7 +258,7 @@
                             </div>
 
                             <div class="w-full xl:w-4/12 shrink-0 flex flex-col gap-6">
-                                <!-- 6. ย้ายกล่อง "สิทธิ์วันลาคงเหลือ" ไปไว้มุมขวาบน เหนือรายการวันหยุด -->
+                                <!-- 6. ย้ายกล่อง "สิทธิ์วันลาคงเหลือ" ไปไว้ขวาบน -->
                                 <div id="leave-quota-container" class="hidden flex-col items-start bg-white border border-gray-200 rounded-xl p-4 sm:p-6 shadow-sm w-full">
                                     <div class="flex items-center gap-2 mb-4 border-b border-gray-100 pb-3 w-full"><i data-lucide="clipboard-check" class="w-5 h-5 text-[#5b5fc7]"></i><span class="font-bold text-gray-800">สิทธิ์วันลาคงเหลือ ปี <span id="quota-year-display"></span></span></div>
                                     <div class="flex flex-col gap-3 w-full text-sm font-medium text-gray-600">
@@ -458,12 +458,13 @@
         </div>
     </div>
 
+    <!-- ================= Scripts ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // === Inject Summary Subpages Automatically ===
+        // === 1. Auto Create Summary Pages via JS ===
         const summaryTabsConfig = [
             { id: 'tasktype', title: 'สรุปประเภทงาน', icon: 'tag' },
             { id: 'brand', title: 'สรุปยี่ห้อ/แบรนด์', icon: 'cpu' },
@@ -555,30 +556,49 @@
         }
         window.addEventListener('online', updateNetworkStatus); window.addEventListener('offline', updateNetworkStatus);
 
-        const views = { 'dashboard': document.getElementById('view-dashboard'), 'calendar': document.getElementById('view-calendar'), 'list': document.getElementById('view-list'), 'project-summary': document.getElementById('view-project-summary'), 'tasktype-summary': document.getElementById('view-tasktype-summary'), 'brand-summary': document.getElementById('view-brand-summary'), 'responsible-summary': document.getElementById('view-responsible-summary'), 'customer-summary': document.getElementById('view-customer-summary'), 'manage': document.getElementById('view-manage'), 'users': document.getElementById('view-users') };
+        // === 3. Navigation (Tab Switching) ===
+        const viewsList = ['dashboard', 'calendar', 'list', 'project-summary', 'tasktype-summary', 'brand-summary', 'responsible-summary', 'customer-summary', 'manage', 'users'];
         const btnToggleMenu = document.getElementById('btn-toggle-menu'), sidebarMenu = document.getElementById('sidebar-menu'), sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        window.toggleMobileMenu = () => { if (window.innerWidth >= 1024) return; const isClosed = sidebarMenu.classList.contains('-translate-x-full'); if (isClosed) { sidebarMenu.classList.remove('-translate-x-full'); sidebarBackdrop.classList.remove('hidden'); setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10); } else { sidebarMenu.classList.add('-translate-x-full'); sidebarBackdrop.classList.add('opacity-0'); setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300); } };
+        
+        window.toggleMobileMenu = () => { 
+            if (window.innerWidth >= 1024) return; 
+            const isClosed = sidebarMenu.classList.contains('-translate-x-full'); 
+            if (isClosed) { sidebarMenu.classList.remove('-translate-x-full'); sidebarBackdrop.classList.remove('hidden'); setTimeout(() => sidebarBackdrop.classList.remove('opacity-0'), 10); } 
+            else { sidebarMenu.classList.add('-translate-x-full'); sidebarBackdrop.classList.add('opacity-0'); setTimeout(() => sidebarBackdrop.classList.add('hidden'), 300); } 
+        };
         btnToggleMenu?.addEventListener('click', window.toggleMobileMenu); sidebarBackdrop?.addEventListener('click', window.toggleMobileMenu);
 
         window.switchTab = function(activeTabId) {
             const isLeavingManage = !document.getElementById('view-manage')?.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) window.resetFormToAddMode();
-            Object.values(views).forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
-            Object.keys(views).forEach(t => { const el = document.getElementById('tab-' + t); if(el) { el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); } });
-            const activateTabBtn = (tabId) => { const el = document.getElementById('tab-' + tabId); if(el) { el.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); el.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); } };
-            const targetView = views[activeTabId];
+            
+            viewsList.forEach(id => { 
+                const v = document.getElementById('view-' + id), t = document.getElementById('tab-' + id);
+                if (v) { v.classList.add('hidden'); v.classList.remove('block'); }
+                if (t) { t.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); t.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); }
+            });
+
+            const targetView = document.getElementById('view-' + activeTabId), targetTab = document.getElementById('tab-' + activeTabId);
             if(targetView) {
-                targetView.classList.remove('hidden'); targetView.classList.add('block'); activateTabBtn(activeTabId);
-                if (activeTabId === 'dashboard') window.renderDashboard(); else if (activeTabId === 'calendar') window.renderCalendar(); else if (activeTabId === 'list') window.filterAndRenderTasks(); else if (activeTabId === 'project-summary') window.renderProjectSummary(); else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); else if (activeTabId === 'manage') { const t = document.getElementById('form-title'); if (t) t.innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
+                targetView.classList.remove('hidden'); targetView.classList.add('block'); 
+                if(targetTab) { targetTab.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); targetTab.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); }
+                
+                if (activeTabId === 'dashboard') window.renderDashboard(); 
+                else if (activeTabId === 'calendar') window.renderCalendar(); 
+                else if (activeTabId === 'list') window.filterAndRenderTasks(); 
+                else if (activeTabId === 'project-summary') window.renderProjectSummary(); 
+                else if (['tasktype','brand','responsible','customer'].includes(activeTabId.replace('-summary',''))) window[`render${activeTabId.replace('-summary','')}Summary`](); 
+                else if (activeTabId === 'manage') { const t = document.getElementById('form-title'); if (t) t.innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
             }
             if (window.innerWidth < 1024 && !sidebarMenu.classList.contains('-translate-x-full')) window.toggleMobileMenu();
             lucide.createIcons();
         };
 
-        // ผูกคลิกกับเมนู
-        Object.keys(views).forEach(key => { document.getElementById('tab-' + key)?.addEventListener('click', () => { if (key === 'manage') { currentEditTaskId = null; window.resetFormToAddMode(); } window.switchTab(key); }); });
+        // Attach click events
+        viewsList.forEach(key => { document.getElementById('tab-' + key)?.addEventListener('click', () => { if (key === 'manage') { currentEditTaskId = null; window.resetFormToAddMode(); } window.switchTab(key); }); });
         document.getElementById('btn-add-task-top')?.addEventListener('click', () => { currentEditTaskId = null; window.resetFormToAddMode(); window.switchTab('manage'); });
 
+        // === 4. Authentication & Global Filters ===
         async function updatePresence(isOnline) { if (!currentUser || !currentUser.email) return; try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { isOnline: isOnline, lastActive: Date.now() }, { merge: true }); } catch (e) {} }
         async function fetchUserRole(user) { 
             const e = (user.email || '').toLowerCase(), ref = doc(db, 'artifacts', appId, 'public', 'data', 'users', e); 
@@ -594,7 +614,13 @@
         }
 
         function filterDataByRole(dataList) { return (currentUserRole === 'admin' || currentUserRole === 'monitor') ? dataList : dataList.filter(item => item.ownerId === currentUser.uid); }
-        function populateEmailDropdowns() { const emailFilterSelect = document.getElementById('global-user-filter'); if (!emailFilterSelect || (currentUserRole !== 'admin' && currentUserRole !== 'monitor')) return; const currentVal = globalEmailFilter; const emailsSet = new Set(); allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); }); let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>'; Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; }); emailFilterSelect.innerHTML = optionsHtml; if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; } }
+        
+        function populateEmailDropdowns() { 
+            const emailFilterSelect = document.getElementById('global-user-filter'); if (!emailFilterSelect || (currentUserRole !== 'admin' && currentUserRole !== 'monitor')) return; 
+            const currentVal = globalEmailFilter; const emailsSet = new Set(); allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); }); 
+            let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>'; Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; }); 
+            emailFilterSelect.innerHTML = optionsHtml; if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; } 
+        }
 
         function getTasksByFilter() { return globalEmailFilter === 'all' ? allTasks : allTasks.filter(t => t.ownerEmail === globalEmailFilter); }
         function getHolidaysByFilter() { return globalEmailFilter === 'all' ? allHolidays : allHolidays.filter(h => h.ownerEmail === globalEmailFilter); }
@@ -619,10 +645,16 @@
                 currentUserRole = await fetchUserRole(user);
                 if (currentUserRole === 'unauthorized') { signOut(auth); showNotification("อีเมลนี้ไม่มีสิทธิ์เข้าใช้งาน", "error"); return; }
                 
-                currentUser = user; unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => { currentUserData = docSnap.exists() ? docSnap.data() : null; if (!document.getElementById('view-calendar').classList.contains('hidden')) window.renderCalendar(); });
+                currentUser = user; 
+                unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => { 
+                    currentUserData = docSnap.exists() ? docSnap.data() : null; if (!document.getElementById('view-calendar').classList.contains('hidden')) window.renderCalendar(); 
+                });
+                
                 document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ'; document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
                 loginView.classList.add('hidden'); mainApp.classList.remove('hidden'); updateNetworkStatus(); document.getElementById('receiveDate').value = getThaiDateString();
-                applyRoleUI(); loadTasks(); loadHolidays(); loadOptions(); if (currentUserRole === 'admin' || currentUserRole === 'monitor') window.loadUsersList();
+                
+                applyRoleUI(); loadTasks(); loadHolidays(); loadOptions(); 
+                if (currentUserRole === 'admin' || currentUserRole === 'monitor') window.loadUsersList();
                 updatePresence(true); if (presenceInterval) clearInterval(presenceInterval); presenceInterval = setInterval(() => updatePresence(true), 60000); 
                 window.switchTab('list');
             } else {
@@ -631,6 +663,7 @@
             }
         });
 
+        // === 5. Data Loading & Dropdowns ===
         function loadOptions() {
             if (!currentUser) return;
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), (snap) => { allProjects = []; snap.forEach(d => allProjects.push({id: d.id, ...d.data()})); allProjects.sort((a,b) => a.createdAt - b.createdAt); if (!document.getElementById('view-project-summary').classList.contains('hidden')) window.renderProjectSummary(); });
@@ -643,7 +676,7 @@
 
         async function addGenericOption(collectionName, name, setterCb) {
             if(!currentUser || currentUserRole === 'monitor' || !name) return;
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email }); if (setterCb) setterCb(name); showNotification(`เพิ่มรายการ "${name}" สำเร็จ`); } catch (e) {}
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', collectionName), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email }); if (setterCb) setterCb(name); showNotification(`เพิ่มรายการ "${name}" สำเร็จ`); } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มรายการ", "error"); }
         }
 
         window.deleteOptionData = async (collectionName, docId) => {
@@ -652,8 +685,8 @@
             let itemToRestore = targetArray.find(t => t.id === docId); if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับสำเร็จ", "success"); } catch (e) {} });
-            } catch(e) {}
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId)); showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับสำเร็จ", "success"); } catch (e) { showNotification("ผิดพลาด", "error"); } });
+            } catch(e) { showNotification("ผิดพลาดในการลบ", "error"); }
         };
 
         function setupDropdown(inputId, listId, ulId, dataArray, collectionName, selectCallback) {
@@ -663,21 +696,41 @@
                 ul.innerHTML = ''; const q = query.toLowerCase().trim();
                 let availableData = inputId === 'taskTypeInput' ? dataArray.filter(t => !selectedTaskTypes.includes(t.name)) : dataArray;
                 const filtered = availableData.filter(t => t.name.toLowerCase().includes(q));
-                if (q && !dataArray.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') ul.innerHTML += `<li class="px-4 py-2 hover:bg-indigo-50 text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" data-add="${q}"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
-                if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
-                else filtered.forEach(t => {
-                    const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" data-del="${t.id}" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
-                    ul.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" data-sel="${t.name}">${t.name}</span>${delBtn}</li>`;
-                });
+                
+                if (q && !dataArray.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
+                    ul.innerHTML += `<li class="px-4 py-2 hover:bg-indigo-50 text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" data-add="${q}"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+                }
+                
+                if (filtered.length === 0 && !q) {
+                    ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic text-sm">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+                } else {
+                    filtered.forEach(t => {
+                        const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" data-del="${t.id}" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                        ul.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" data-sel="${t.name}">${t.name}</span>${delBtn}</li>`;
+                    });
+                }
                 lucide.createIcons(); list.classList.remove('hidden');
             };
-            input.addEventListener('focus', () => renderList(input.value)); input.addEventListener('input', (e) => renderList(e.target.value));
+            
+            input.addEventListener('focus', () => renderList(input.value)); 
+            input.addEventListener('input', (e) => renderList(e.target.value));
+            
             ul.addEventListener('mousedown', (e) => {
                 e.preventDefault(); e.stopPropagation();
                 const addTarget = e.target.closest('[data-add]'), selTarget = e.target.closest('[data-sel]'), delTarget = e.target.closest('[data-del]');
-                if (delTarget) { window.deleteOptionData(collectionName, delTarget.dataset.del); setTimeout(() => renderList(input.value), 100); } 
-                else if (addTarget) { const newName = addTarget.dataset.add; if(collectionName === 'daily_projects') input.value = 'กำลังเพิ่ม...'; addGenericOption(collectionName, newName, selectCallback); list.classList.add('hidden'); } 
-                else if (selTarget) { selectCallback(selTarget.dataset.sel); list.classList.add('hidden'); }
+                
+                if (delTarget) { 
+                    window.deleteOptionData(collectionName, delTarget.dataset.del); 
+                    setTimeout(() => renderList(input.value), 100); 
+                } else if (addTarget) { 
+                    const newName = addTarget.dataset.add; 
+                    if(collectionName === 'daily_projects') input.value = 'กำลังเพิ่ม...'; 
+                    addGenericOption(collectionName, newName, selectCallback); 
+                    list.classList.add('hidden'); 
+                } else if (selTarget) { 
+                    selectCallback(selTarget.dataset.sel); 
+                    list.classList.add('hidden'); 
+                }
             });
             return renderList;
         }
@@ -697,23 +750,36 @@
         }
         window.removeTaskType = (tag) => { selectedTaskTypes = selectedTaskTypes.filter(t => t !== tag); window.renderTaskTypeChips(); };
 
-        // --- Brand/Equip Management ---
-        window.addBrandEquipItem = (data = { id: Date.now().toString() + Math.random(), equip: '', brand: '', enabled: true }) => { currentBrandEquips.push(data); window.renderBrandEquipList(); };
+        // --- 6. Brand & Equipment Logic ---
+        window.addBrandEquipItem = (data = { id: Date.now().toString() + Math.random(), equip: '', brand: '', enabled: true, deleted: false }) => { 
+            currentBrandEquips.push(data); window.renderBrandEquipList(); 
+        };
+        
         window.removeBrandEquip = (id) => {
             const idx = currentBrandEquips.findIndex(b => b.id === id); if (idx === -1) return;
-            const deletedItem = currentBrandEquips[idx]; currentBrandEquips.splice(idx, 1); window.renderBrandEquipList();
-            showNotification("ลบรายการแล้ว", "success", () => { currentBrandEquips.splice(idx, 0, deletedItem); window.renderBrandEquipList(); });
+            const deletedItem = currentBrandEquips[idx]; 
+            currentBrandEquips.splice(idx, 1); 
+            window.renderBrandEquipList();
+            showNotification("ลบรายการแล้ว", "success", () => { 
+                currentBrandEquips.splice(idx, 0, deletedItem); window.renderBrandEquipList(); 
+            });
         };
+        
         window.toggleBrandEquipRow = (id, isEnabled) => {
             const item = currentBrandEquips.find(b => b.id === id); if (!item) return;
             item.enabled = isEnabled; // ถ้าติ๊กออกคือการซ่อน (Soft delete/Undo)
             window.renderBrandEquipList();
         };
-        window.updateBrandEquipVal = (id, field, val) => { const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; };
+        
+        window.updateBrandEquipVal = (id, field, val) => { 
+            const item = currentBrandEquips.find(b => b.id === id); if (item) item[field] = val; 
+        };
 
         window.renderBrandEquipList = function() {
             const listEl = document.getElementById('brand-equip-list'); if (!listEl) return; listEl.innerHTML = '';
-            if (currentBrandEquips.length === 0) { listEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">ยังไม่มีรายการ<br>คลิก "เพิ่ม" เพื่อเริ่มใส่ข้อมูล</div>`; return; }
+            if (currentBrandEquips.length === 0) { 
+                listEl.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">ยังไม่มีรายการ<br>คลิก "เพิ่ม" เพื่อเริ่มใส่ข้อมูล</div>`; return; 
+            }
             currentBrandEquips.forEach((item, index) => {
                 const id = item.id, div = document.createElement('div');
                 div.className = `bg-white border-2 ${item.enabled ? 'border-indigo-100 ring-1 ring-indigo-50' : 'border-gray-200 opacity-50 grayscale'} rounded-xl p-3 shadow-sm relative group transition-all`;
@@ -754,8 +820,14 @@
 
         document.addEventListener('mousedown', (e) => {
             const closeIfOutside = (wId, lId) => { const w = document.getElementById(wId), l = document.getElementById(lId); if (w && l && !w.contains(e.target)) l.classList.add('hidden'); };
-            closeIfOutside('project-dropdown-wrapper', 'project-dropdown-list'); closeIfOutside('tasktype-dropdown-wrapper', 'tasktype-dropdown-list'); closeIfOutside('dash-project-dropdown-wrapper', 'dash-project-dropdown-list');
-            currentBrandEquips.forEach(b => { closeIfOutside(`equip-wrapper-${b.id}`, `equip-list-${b.id}`); closeIfOutside(`brand-wrapper-${b.id}`, `brand-list-${b.id}`); });
+            closeIfOutside('project-dropdown-wrapper', 'project-dropdown-list'); 
+            closeIfOutside('tasktype-dropdown-wrapper', 'tasktype-dropdown-list'); 
+            closeIfOutside('dash-project-dropdown-wrapper', 'dash-project-dropdown-list');
+            
+            currentBrandEquips.forEach(b => { 
+                closeIfOutside(`equip-wrapper-${b.id}`, `equip-list-${b.id}`); 
+                closeIfOutside(`brand-wrapper-${b.id}`, `brand-list-${b.id}`); 
+            });
         });
 
         // Summary View Generic Generator
@@ -1016,7 +1088,13 @@
                     });
                 }
             };
-            drawPieChart('tasktype', counts.taskType, 10); drawPieChart('brand', counts.brand, 10); drawPieChart('customer', counts.customer, 10); drawPieChart('responsible', counts.responsible, 10); drawPieChart('assignment', counts.assignment, 10);
+            
+            // 3. กราฟโดนัทแบรนด์ ถัดจากกราฟประเภทงาน (เรียงตามที่ส่งตัวแปรไป)
+            drawPieChart('tasktype', counts.taskType, 10); 
+            drawPieChart('brand', counts.brand, 10); 
+            drawPieChart('customer', counts.customer, 10); 
+            drawPieChart('responsible', counts.responsible, 10); 
+            drawPieChart('assignment', counts.assignment, 10);
         };
 
         window.renderProjectSummary = function() {
@@ -1075,7 +1153,7 @@
 
         window.updateProjectStatus = async (projectId, statusType, isChecked) => {
             const newStatus = isChecked ? statusType : ''; 
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาด", "error"); window.renderProjectSummary(); }
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); window.renderProjectSummary(); }
         };
 
         ['summary-search-time-type', 'summary-search-date', 'summary-search-month', 'summary-search-year'].forEach(id => {
@@ -1153,7 +1231,7 @@
              const emailToUpdate = (currentUserRole === 'admin' || currentUserRole === 'monitor') ? globalEmailFilter : currentUser.email.toLowerCase();
              if (!emailToUpdate || emailToUpdate === 'all') return;
              const year = currentCalendarDate.getFullYear().toString(), used = calculateUsedLeaves(year), newTotal = parseInt(newRemaining || 0) + used[type];
-             try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailToUpdate), { leaveQuotas: { [year]: { [type]: newTotal } } }, { merge: true }); showNotification("อัปเดตสิทธิ์วันลาแล้ว"); } catch(e) { showNotification("ผิดพลาด", "error"); }
+             try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailToUpdate), { leaveQuotas: { [year]: { [type]: newTotal } } }, { merge: true }); showNotification("อัปเดตสิทธิ์วันลาเรียบร้อยแล้ว"); } catch(e) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); }
         };
 
         window.renderCalendar = function() {
@@ -1236,9 +1314,19 @@
                         if (h.holidayType === 'vacation_leave') { typeText = 'ประเภทวันลา : ลาพักร้อน'; typeColor = 'text-green-600 bg-green-50 border-green-200'; }
                         else if (h.holidayType === 'personal_leave' || h.holidayType === 'leave') { typeText = 'ประเภทวันลา : ลากิจ'; typeColor = 'text-orange-600 bg-orange-50 border-orange-200'; }
                         else if (h.holidayType === 'sick_leave') { typeText = 'ประเภทวันลา : ลาป่วย'; typeColor = 'text-purple-600 bg-purple-50 border-purple-200'; }
+
                         const dateObj = new Date(h.holidayDate);
                         const thaiDateStr = dateObj.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
-                        holidayListContainer.innerHTML += `<div class="p-3.5 rounded-lg border ${typeColor} shadow-sm flex flex-col gap-1.5 relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1.5 ${typeColor.replace('text-', 'bg-').split(' ')[0]}"></div><div class="font-bold text-gray-800 pl-2 text-sm">วันที่ ${thaiDateStr}</div><div class="text-gray-600 pl-2 text-sm leading-relaxed"><span class="font-semibold ${typeColor.split(' ')[0]}">${typeText}</span> / ${h.holidayName}</div></div>`;
+
+                        holidayListContainer.innerHTML += `
+                            <div class="p-3.5 rounded-lg border ${typeColor} shadow-sm flex flex-col gap-1.5 relative overflow-hidden">
+                                <div class="absolute left-0 top-0 bottom-0 w-1.5 ${typeColor.replace('text-', 'bg-').split(' ')[0]}"></div>
+                                <div class="font-bold text-gray-800 pl-2 text-sm">วันที่ ${thaiDateStr}</div>
+                                <div class="text-gray-600 pl-2 text-sm leading-relaxed">
+                                    <span class="font-semibold ${typeColor.split(' ')[0]}">${typeText}</span> / ${h.holidayName}
+                                </div>
+                            </div>
+                        `;
                     });
                 }
             }
