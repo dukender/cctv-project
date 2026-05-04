@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
     <script>
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
     </script>
@@ -20,7 +21,6 @@
         body { background-color: #f8f9fc; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
@@ -87,24 +87,31 @@
             <aside id="sidebar-menu" class="absolute lg:relative left-0 top-0 h-full w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent z-30 lg:z-10 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl lg:shadow-none">
                 <div class="p-2 lg:p-4 h-full flex flex-col">
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
-                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
-                        <button id="tab-project" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
-                        <button id="tab-tasktype" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                        <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
+                        
+                        <!-- Project Summaries Group -->
+                        <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
+                        
+                        <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="tags" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปประเภทงาน</span>
                         </button>
-                        <button id="tab-brand" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                        
+                        <button id="tab-brand-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="package" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปยี่ห้อ/แบรนด์</span>
                         </button>
-                        <button id="tab-responsible" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+
+                        <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span>
                         </button>
-                        <button id="tab-customer" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+
+                        <button id="tab-customer-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
                         </button>
+
                         <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
                         <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
                         <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
@@ -114,18 +121,15 @@
             </aside>
 
             <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
-                <div class="w-full px-2 sm:px-6 py-4 sm:py-6 relative pb-20">
-                    
-                    <!-- Floating Add Task Button -->
+                <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
-                        <button onclick="switchTab('manage')" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
+                        <button id="btn-add-task-top" onclick="switchTab('manage')" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
                             <i data-lucide="plus" class="w-5 h-5"></i> เพิ่มงาน
                         </button>
                     </div>
 
                     <!-- 1. Dashboard View -->
-                    <div id="view-dashboard" class="hidden animate-fade-in">
-                        <!-- Filters -->
+                    <div id="view-dashboard" class="block animate-fade-in">
                         <div class="flex flex-col sm:flex-row justify-between items-center mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200 gap-4">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <label class="font-bold text-gray-700 text-sm flex items-center gap-1"><i data-lucide="filter" class="w-4 h-4 text-[#5b5fc7]"></i> กรองตาม</label>
@@ -163,6 +167,7 @@
                                     <div class="md:w-3/4 flex flex-col min-h-[250px]"><div class="relative flex-1 w-full"><canvas id="chart-time"></canvas></div></div>
                                 </div>
                             </div>
+                            
                             <!-- Project Chart -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
                                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
@@ -177,15 +182,19 @@
                                 </div>
                                 <div class="relative h-80 w-full"><canvas id="chart-project"></canvas></div>
                             </div>
-                            <!-- Pie Charts -->
+
+                            <!-- Doughnut Charts -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                                 <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สัดส่วนตามประเภทงาน</h3>
                                 <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-tasktype"></canvas></div><div id="legend-tasktype" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
                             </div>
+                            
+                            <!-- Brand Chart -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                                 <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="package" class="w-5 h-5 text-blue-500"></i> สัดส่วนตามยี่ห้อ/แบรนด์</h3>
                                 <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-brand"></canvas></div><div id="legend-brand" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
                             </div>
+
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col">
                                 <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-violet-500"></i> สัดส่วนตามชื่อผู้รับผิดชอบ</h3>
                                 <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-responsible"></canvas></div><div id="legend-responsible" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
@@ -198,9 +207,8 @@
                     </div>
 
                     <!-- 2. Project Summary View -->
-                    <div id="view-project-summary" class="hidden animate-fade-in">
+                    <div id="view-project-summary" class="hidden animate-fade-in pb-10">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <!-- Filters -->
                             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
                                 <div><h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="layout-list" class="w-6 h-6 text-[#5b5fc7]"></i> สรุปรายชื่อโครงการทั้งหมด</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูล <span id="summary-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p></div>
                                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -216,14 +224,12 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Cards -->
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
                                 <div id="card-sum-all" onclick="setSummaryFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-xl font-bold text-gray-800" id="summary-total">0</p></div>
                                 <div id="card-sum-prog" onclick="setSummaryFilter('in_progress')" class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p><p class="text-xl font-bold text-blue-700" id="summary-progress">0</p></div>
                                 <div id="card-sum-won" onclick="setSummaryFilter('won')" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p><p class="text-xl font-bold text-green-700" id="summary-won">0</p></div>
                                 <div id="card-sum-lost" onclick="setSummaryFilter('lost')" class="bg-red-50 p-4 rounded-lg border border-red-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p><p class="text-xl font-bold text-red-700" id="summary-lost">0</p></div>
                             </div>
-                            <!-- Table -->
                             <div class="overflow-x-auto min-h-[300px]">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
                                     <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
@@ -236,13 +242,177 @@
                         </div>
                     </div>
 
-                    <!-- 3. Grouped Sub-Summaries Container (Generated by JS to save space but keep logic robust) -->
-                    <div id="grouped-summaries-container"></div>
+                    <!-- 3. Sub-Menus: TaskType Summary -->
+                    <div id="view-tasktype-summary" class="hidden animate-fade-in pb-10">
+                        <div class="flex flex-col lg:flex-row gap-6 items-start">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="tags" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปประเภทงาน</h2>
+                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="tasktype-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                                <div id="tasktype-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                                <div id="tasktype-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                    <button onclick="chgCrdPge('tasktype', -1)" id="btn-tasktype-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <span id="tasktype-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                    <button onclick="chgCrdPge('tasktype', 1)" id="btn-tasktype-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="tasktype-project-count-container"></div>
+                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="tasktype-search-input" placeholder="ค้นหาชื่อประเภทงาน..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
+                                        <select id="tasktype-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                        <input type="date" id="tasktype-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                        <input type="month" id="tasktype-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                        <select id="tasktype-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                        <button id="btn-tasktype-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                            <button id="btn-tasktype-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                            <button id="btn-tasktype-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto min-h-[200px]">
+                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="tasktype-summary-table">
+                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ประเภทงาน</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th></tr>
+                                        </thead>
+                                        <tbody id="tasktype-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                    </table>
+                                    <div id="tasktype-summary-pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                    <!-- 4. Calendar View -->
-                    <div id="view-calendar" class="hidden animate-fade-in">
+                    <!-- 4. Sub-Menus: Brand Summary -->
+                    <div id="view-brand-summary" class="hidden animate-fade-in pb-10">
+                        <div class="flex flex-col lg:flex-row gap-6 items-start">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="package" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปยี่ห้อ/แบรนด์</h2>
+                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="brand-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                                <div id="brand-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                                <div id="brand-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                    <button onclick="chgCrdPge('brand', -1)" id="btn-brand-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <span id="brand-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                    <button onclick="chgCrdPge('brand', 1)" id="btn-brand-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="brand-project-count-container"></div>
+                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="brand-search-input" placeholder="ค้นหาชื่อแบรนด์..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
+                                        <select id="brand-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                        <input type="date" id="brand-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                        <input type="month" id="brand-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                        <select id="brand-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                        <button id="btn-brand-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                            <button id="btn-brand-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                            <button id="btn-brand-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto min-h-[200px]">
+                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="brand-summary-table">
+                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ยี่ห้อ/แบรนด์</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th></tr>
+                                        </thead>
+                                        <tbody id="brand-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                    </table>
+                                    <div id="brand-summary-pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Sub-Menus: Responsible Summary -->
+                    <div id="view-responsible-summary" class="hidden animate-fade-in pb-10">
+                        <div class="flex flex-col lg:flex-row gap-6 items-start">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="users-round" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปผู้รับผิดชอบ</h2>
+                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="responsible-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                                <div id="responsible-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                                <div id="responsible-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                    <button onclick="chgCrdPge('responsible', -1)" id="btn-responsible-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <span id="responsible-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                    <button onclick="chgCrdPge('responsible', 1)" id="btn-responsible-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="responsible-project-count-container"></div>
+                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="responsible-search-input" placeholder="ค้นหาชื่อผู้รับผิดชอบ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
+                                        <select id="responsible-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                        <input type="date" id="responsible-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                        <input type="month" id="responsible-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                        <select id="responsible-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                        <button id="btn-responsible-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                            <button id="btn-responsible-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                            <button id="btn-responsible-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto min-h-[200px]">
+                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="responsible-summary-table">
+                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th></tr>
+                                        </thead>
+                                        <tbody id="responsible-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                    </table>
+                                    <div id="responsible-summary-pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Sub-Menus: Customer Summary -->
+                    <div id="view-customer-summary" class="hidden animate-fade-in pb-10">
+                        <div class="flex flex-col lg:flex-row gap-6 items-start">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="briefcase" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปลูกค้า</h2>
+                                <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="customer-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
+                                <div id="customer-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                                <div id="customer-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                    <button onclick="chgCrdPge('customer', -1)" id="btn-customer-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <span id="customer-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                    <button onclick="chgCrdPge('customer', 1)" id="btn-customer-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                    <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="customer-project-count-container"></div>
+                                    <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                        <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="customer-search-input" placeholder="ค้นหาชื่อลูกค้า..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
+                                        <select id="customer-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                        <input type="date" id="customer-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                        <input type="month" id="customer-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                        <select id="customer-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                        <button id="btn-customer-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                        <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                            <button id="btn-customer-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                            <button id="btn-customer-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="overflow-x-auto min-h-[200px]">
+                                    <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="customer-summary-table">
+                                        <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                            <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ลูกค้า</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th></tr>
+                                        </thead>
+                                        <tbody id="customer-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                    </table>
+                                    <div id="customer-summary-pagination"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. Calendar View -->
+                    <div id="view-calendar" class="hidden animate-fade-in pb-10">
                         <div class="flex flex-col xl:flex-row gap-6 items-start">
-                            <!-- Left: Grid -->
                             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full xl:w-8/12 flex-1">
                                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                                     <div class="flex items-center gap-4"><h2 id="calendar-month-year" class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2></div>
@@ -256,9 +426,7 @@
                                 <div id="calendar-grid" class="grid grid-cols-7 gap-2"></div>
                             </div>
                             
-                            <!-- Right: Quota & Holidays -->
                             <div class="w-full xl:w-4/12 flex flex-col gap-6 shrink-0">
-                                <!-- Leave Quota Block (Moved to Top Right) -->
                                 <div id="leave-quota-container" class="hidden flex-col bg-white rounded-xl shadow-sm border border-gray-200 p-5 gap-4">
                                     <div class="flex items-center justify-between border-b border-gray-100 pb-3">
                                         <div class="flex items-center gap-2"><i data-lucide="clipboard-check" class="w-5 h-5 text-[#5b5fc7]"></i><span class="font-bold text-gray-800">สิทธิ์วันลาคงเหลือ ปี <span id="quota-year-display"></span></span></div>
@@ -270,7 +438,7 @@
                                         <div class="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md border border-gray-100 shadow-sm"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-purple-500"></span> ลาป่วย</div><div class="flex items-center gap-1.5"><input type="number" id="quota-sick" class="w-14 h-7 text-center bg-white border border-gray-300 rounded font-bold text-purple-700" onchange="updateQuota('sick', this.value)"> วัน</div></div>
                                     </div>
                                 </div>
-                                <!-- Holidays List -->
+                                
                                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col max-h-[500px]">
                                     <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0">
                                         <i data-lucide="calendar-heart" class="w-5 h-5 text-red-500"></i> รายการวันหยุด / วันลา เดือนนี้
@@ -281,10 +449,9 @@
                         </div>
                     </div>
 
-                    <!-- 5. List View -->
-                    <div id="view-list" class="block animate-fade-in">
+                    <!-- 8. List View -->
+                    <div id="view-list" class="block animate-fade-in pb-10">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <!-- Filters -->
                             <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
                                 <div><h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i data-lucide="list-todo" class="w-5 h-5 text-[#5b5fc7]"></i> รายการงานทั้งหมด</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูลทั้งหมด <span id="task-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p></div>
                                 <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -300,7 +467,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Table -->
                             <div class="overflow-x-auto min-h-[400px]">
                                 <table class="w-full text-left text-sm whitespace-nowrap" id="tasks-table">
                                     <thead class="bg-white border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wider">
@@ -317,7 +483,7 @@
                         </div>
                     </div>
 
-                    <!-- 6. Manage / Add Form View (Updated Layout) -->
+                    <!-- 9. Manage / Add Form View (Updated Layout) -->
                     <div id="view-manage" class="hidden animate-fade-in pb-10">
                         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 items-start">
                             
@@ -369,7 +535,7 @@
                                         </div>
                                         <div class="pl-0 sm:pl-9 pt-4 flex justify-end gap-3 border-t border-gray-100">
                                             <button type="button" onclick="switchTab('list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm">ยกเลิก</button>
-                                            <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm text-sm min-w-[140px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล</button>
+                                            <button type="button" id="submit-btn" class="px-6 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm text-sm min-w-[140px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล</button>
                                         </div>
                                     </form>
                                 </div>
@@ -405,7 +571,7 @@
                         </div>
                     </div>
 
-                    <!-- 7. Admin Users View -->
+                    <!-- 10. Admin Users View -->
                     <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
                             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-400"></div>
@@ -509,51 +675,8 @@
             { id: 'responsible', icon: 'users-round', name: 'ผู้รับผิดชอบ', getVal: (t) => [t.responsibleName || 'ไม่ระบุ'] },
             { id: 'customer', icon: 'briefcase', name: 'ลูกค้า', getVal: (t) => [t.customerName || 'ไม่ระบุ'] }
         ];
-        
-        // Generate Dynamic HTML for Grouped Summaries to avoid repetition
-        const gContainer = $('grouped-summaries-container');
-        if (gContainer) {
-            summaryTypes.forEach(t => {
-                gContainer.innerHTML += `
-                <div id="view-${t.id}-summary" class="hidden animate-fade-in pb-10">
-                    <div class="flex flex-col lg:flex-row gap-6 items-start">
-                        <!-- Left Sidebar: Cards -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
-                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="${t.icon}" class="w-5 h-5 text-[#5b5fc7]"></i> สรุป${t.name}</h2>
-                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="${t.id}-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p>
-                            <div id="${t.id}-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
-                        </div>
-                        <!-- Right Main: Table -->
-                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
-                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
-                                <div class="shrink-0" id="${t.id}-project-count-container"></div>
-                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
-                                    <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="${t.id}-search-input" placeholder="ค้นหาข้อมูล..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]"></div>
-                                    <select id="${t.id}-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
-                                    <input type="date" id="${t.id}-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm block">
-                                    <input type="month" id="${t.id}-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm hidden">
-                                    <select id="${t.id}-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm hidden"><option value="">ทุกปีทั้งหมด</option></select>
-                                    <button id="btn-${t.id}-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:bg-gray-200 border border-gray-200 rounded-md"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                                        <button id="btn-${t.id}-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white px-0.5 rounded-sm border">EXCEL</span></button>
-                                        <button id="btn-${t.id}-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white px-0.5 rounded-sm border">PDF</span></button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="overflow-x-auto min-h-[200px]">
-                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="${t.id}-summary-table">
-                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-4 py-4 text-center w-16">ลำดับ</th><th class="px-4 py-4 text-center w-28">ล่าสุด</th><th class="px-6 py-4">ชื่อโครงการ</th><th class="px-6 py-4">${t.name}</th><th class="px-4 py-4 text-center w-32">จำนวนงาน</th></tr></thead>
-                                    <tbody id="${t.id}-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
-                                </table>
-                                <div id="${t.id}-summary-pagination"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-            });
-        }
 
-        let globalSummaryState = { tasktype: {f:'all', cp:1}, brand: {f:'all', cp:1}, responsible: {f:'all', cp:1}, customer: {f:'all', cp:1} };
+        let globalSummaryState = { tasktype: {f:'all', cp:1, cdp:1}, brand: {f:'all', cp:1, cdp:1}, responsible: {f:'all', cp:1, cdp:1}, customer: {f:'all', cp:1, cdp:1} };
         let unsubTasks, unsubHols, unsubUser, presenceInterval, toastTimeout;
 
         // UI & UX Functions
@@ -576,25 +699,22 @@
         window.switchTab = (tab) => {
             if ($('view-manage') && !$('view-manage').classList.contains('hidden') && tab!=='manage') resetForm();
             
-            // Hide all views & Reset all tabs
             const allTabs = ['dashboard','project','tasktype','brand','responsible','customer','calendar','list','manage','users'];
             allTabs.forEach(t => { 
                 const isGroupSummary = summaryTypes.find(x=>x.id===t);
                 const viewId = `view-${t}` + (t==='project'?'-summary':'') + (isGroupSummary?'-summary':'');
-                const v = $(viewId), btn = $(`tab-${t}`); 
+                const v = $(viewId), btn = $(`tab-${t}` + (isGroupSummary?'-summary':'') + (t==='project'?'-summary':'')); 
                 if(v) { v.classList.add('hidden'); v.classList.remove('block'); }
                 if(btn) { btn.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); btn.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); }
             });
 
-            // Show active view & highlight tab
             const isActiveGroupSummary = summaryTypes.find(x=>x.id===tab);
             const activeViewId = `view-${tab}` + (tab==='project'?'-summary':'') + (isActiveGroupSummary?'-summary':'');
-            const vt = $(activeViewId), bt = $(`tab-${tab}`);
+            const vt = $(activeViewId), bt = $(`tab-${tab}` + (isActiveGroupSummary?'-summary':'') + (tab==='project'?'-summary':''));
             
             if(vt) { vt.classList.remove('hidden'); vt.classList.add('block'); } 
             if(bt) { bt.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800'); bt.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20'); }
 
-            // Trigger Specific Renders
             if(tab==='dashboard') renderDashboard(); 
             else if(tab==='calendar') renderCalendar(); 
             else if(tab==='list') filterAndRenderTasks(); 
@@ -606,8 +726,10 @@
             lucide.createIcons();
         };
 
-        // Attach Navigation Events
-        ['dashboard','project','tasktype','brand','responsible','customer','calendar','list','manage','users'].forEach(t=>on(`tab-${t}`,'click',()=>switchTab(t)));
+        ['dashboard','project','tasktype','brand','responsible','customer','calendar','list','manage','users'].forEach(t=> {
+            const btnId = `tab-${t}` + (summaryTypes.find(x=>x.id===t)?'-summary':'') + (t==='project'?'-summary':'');
+            on(btnId,'click',()=>switchTab(t))
+        });
 
         // Data Access Helpers
         const getTasks = () => globalEmailFilter==='all' ? allTasks : allTasks.filter(t=>t.ownerEmail===globalEmailFilter);
@@ -684,7 +806,6 @@
                     } 
                 });
                 
-                // Trigger renders
                 filterAndRenderTasks(); renderCalendar(); renderDashboard(); renderProjectSummary(); summaryTypes.forEach(type=>renderGroupedSummary(type.id));
                 populateEmailDropdowns();
             });
@@ -717,7 +838,7 @@
             on(`btn-${prefix.replace('search','') || 'reset-'}reset-search`,'click',()=>{
                 if($(`${prefix}-input`)) $(`${prefix}-input`).value=''; 
                 const tt = $(`${prefix}-time-type`); if(tt){tt.value='day';tt.dispatchEvent(new Event('change'));} 
-                if(stateObj) { stateObj.f='all'; stateObj.cp=1; } else if(prefix==='search') listCurrentPage=1; else { summaryCurrentPage=1; currentSummaryFilter='all'; }
+                if(stateObj) { stateObj.f='all'; stateObj.cp=1; stateObj.cdp=1; } else if(prefix==='search') listCurrentPage=1; else { summaryCurrentPage=1; currentSummaryFilter='all'; }
                 renderFn();
             });
         };
@@ -781,7 +902,6 @@
         function renderProjectSummary() { 
             const tasks = getTasks(), search=$('summary-search-input')?.value.toLowerCase()||'', tType=$('summary-search-time-type')?.value||'day', d=$('summary-search-date')?.value, m=$('summary-search-month')?.value, y=$('summary-search-year')?.value;
             
-            // Get projects involved in filtered tasks OR owned by user (or all if admin)
             const uP = new Set(tasks.map(t=>t.projectName).filter(Boolean));
             let vP = (currentUserRole==='admin'||currentUserRole==='monitor') ? (globalEmailFilter==='all'?allProjects:allProjects.filter(p=>p.ownerEmail===globalEmailFilter||uP.has(p.name))) : allProjects.filter(p=>p.ownerId===currentUser.uid||uP.has(p.name));
             
@@ -822,7 +942,6 @@
             const def = summaryTypes.find(x=>x.id===type); if(!def) return;
             const tasks = getTasks(), state = globalSummaryState[type], search=$(`${type}-search-input`)?.value.toLowerCase()||'', tType=$(`${type}-search-time-type`)?.value||'day', d=$(`${type}-search-date`)?.value, m=$(`${type}-search-month`)?.value, y=$(`${type}-search-year`)?.value;
             
-            // Initial Filter
             const fTasks = tasks.filter(t => {
                 let mTime = true; if(tType==='day'&&d) mTime = t.receiveDate===d; else if(tType==='month'&&m) mTime = t.receiveDate?.startsWith(m); else if(tType==='year'&&y) mTime = t.receiveDate?.startsWith(y);
                 const gVals = def.getVal(t);
@@ -830,12 +949,10 @@
                 return mTime && mTxt;
             });
 
-            // Count for Cards
             const counts={}; fTasks.forEach(t=>{ def.getVal(t).forEach(v=>{ counts[v]=(counts[v]||0)+1; }); });
             const cardData = Object.keys(counts).map(n=>({name:n, count:counts[n]})).sort((a,b)=>b.count-a.count);
             if($(`${type}-display-count`)) $(`${type}-display-count`).textContent=cardData.length;
             
-            // Render Cards (Pagination logic)
             const tCPage = Math.ceil(cardData.length/6)||1; if(state.cdp>tCPage) state.cdp=Math.max(1, tCPage);
             const cContainer=$(`${type}-cards-container`); 
             if(cContainer){ 
@@ -843,7 +960,7 @@
                 if(cardData.length === 0) {
                     cContainer.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-100 text-sm">ไม่พบข้อมูล</div>`;
                 } else {
-                    cardData.slice((state.cdp-1)*6, state.cdp*6).forEach(c=>cContainer.innerHTML+=`<div onclick="setGrSumFilter('${type}','${c.name.replace(/'/g, "\\'")}')" class="bg-indigo-50/50 p-3.5 rounded-xl border text-center cursor-pointer transition-all ${state.f===c.name?'ring-2 ring-[#5b5fc7] shadow-md border-indigo-300 scale-[1.02]':'hover:border-[#5b5fc7]/50 hover:bg-indigo-50'} flex flex-col justify-center min-h-[80px]"><p class="text-sm font-bold text-[#5b5fc7] truncate leading-tight">${c.name}</p><div class="text-2xl font-black text-gray-800 mt-1">${c.count} <span class="text-[11px] font-medium text-gray-500">งาน</span></div></div>`); 
+                    cardData.slice((state.cdp-1)*6, state.cdp*6).forEach(c=>cContainer.innerHTML+=`<div onclick="setGrSumFilter('${type}','${c.name.replace(/'/g, "\\'")}')" class="bg-indigo-50/50 p-3.5 rounded-xl border text-center cursor-pointer transition-all ${state.f===c.name?'ring-2 ring-[#5b5fc7] shadow-md border-indigo-300 scale-[1.02]':'hover:border-[#5b5fc7]/50 hover:bg-indigo-50'} flex flex-col justify-center min-h-[80px]"><p class="text-sm font-bold text-[#5b5fc7] truncate leading-tight w-full px-2" title="${c.name}">${c.name}</p><div class="text-2xl font-black text-gray-800 mt-1">${c.count} <span class="text-[11px] font-medium text-gray-500">งาน</span></div></div>`); 
                 }
             }
             
@@ -857,10 +974,8 @@
                 } else { pagEl.classList.add('hidden'); pagEl.classList.remove('flex'); } 
             }
 
-            // Filter for Table (based on active card)
             let tTasks = state.f==='all'?fTasks:fTasks.filter(t=>def.getVal(t).includes(state.f)); 
             
-            // Group By Project for Table
             const pMap={}; 
             tTasks.forEach(t=>{
                 const pk=t.projectName||'ไม่ได้ระบุโครงการ'; 
@@ -872,15 +987,13 @@
             
             printData[type] = Object.values(pMap).sort((a,b)=>a.d!==b.d ? b.d.localeCompare(a.d) : b.c-a.c);
             
-            // Update Headers/Counts
             let nCnt=0, uCnt=0; printData[type].forEach(r=>{if(r.p==='ไม่ได้ระบุโครงการ')uCnt++;else nCnt++;});
             if($(`${type}-project-count-container`)) $(`${type}-project-count-container`).innerHTML=`<h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวน: <span class="text-[#5b5fc7] text-xl px-1">${nCnt}</span> โครงการ</h3>${uCnt>0?`<span class="bg-orange-50 text-orange-700 px-2.5 py-1 rounded-md text-sm font-medium border border-orange-100 mt-2 inline-block">(+ มีงานที่ไม่ระบุโครงการอีก ${uCnt} กลุ่ม)</span>`:''}`;
 
-            // Render Table (Pagination logic)
             const tPage = Math.ceil(printData[type].length/itemsPerPage)||1; if(state.cp>tPage) state.cp=Math.max(1, tPage);
             const tb=$(`${type}-summary-body`), pContainer=$(`${type}-summary-pagination`); if(!tb)return; tb.innerHTML='';
             
-            if(!printData[type].length) tb.innerHTML=`<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลโครงการตามเงื่อนไข</td></tr>`; 
+            if(!printData[type].length) tb.innerHTML=`<tr><td colspan="5" class="p-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตามเงื่อนไข</td></tr>`; 
             else printData[type].slice((state.cp-1)*itemsPerPage, state.cp*itemsPerPage).forEach((r,i)=>{
                 const itemsStr = Array.from(r.items).join(', ');
                 tb.innerHTML+=`<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-4 text-center text-gray-500 font-medium">${(state.cp-1)*itemsPerPage+i+1}</td><td class="px-4 py-4 text-center text-sm">${formatDate(r.d)}</td><td class="px-6 py-4 font-bold ${r.p==='ไม่ได้ระบุโครงการ'?'text-gray-400 italic':'text-gray-800'}">${r.p}</td><td class="px-6 py-4 whitespace-normal min-w-[200px] leading-relaxed font-medium ${type==='brand'?'text-blue-700':type==='tasktype'?'text-pink-600':type==='customer'?'text-amber-700':'text-indigo-600'}">${itemsStr}</td><td class="px-4 py-4 text-center font-bold text-gray-700">${r.c}</td></tr>`;
@@ -907,7 +1020,6 @@
             on(btnId, 'click', () => { 
                 showNotification("กำลังเตรียมไฟล์ PDF..."); 
                 const element = $(tableId);
-                // hide checkboxes for project summary pdf
                 const isProj = tableId.includes('projects');
                 if(isProj) element.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.style.display='none');
                 html2pdf().set({margin:0.5, filename:`${tableId}_${getThaiDateString()}.pdf`, jsPDF:{orientation:'landscape'}}).from(element).save().then(()=>{
@@ -926,8 +1038,6 @@
         expPDF('btn-export-pdf', 'tasks-table');
 
         // --- 5. Manage / Form View Logic ---
-        
-        // Dropdowns (Project, TaskType, Brand)
         ['project','tasktype','brand','dash-project'].forEach(t => {
             const wrap = $(`${t}-dropdown-wrapper`), inp = $(`${t==='project'?'projectNameInput':t==='tasktype'?'taskTypeInput':t==='brand'?'equipBrand':'dash-project-input'}`), ul=$(`${t}-options-ul`), lst=$(`${t}-dropdown-list`), btn=$(`${t}-dropdown-btn`);
             const render = (q='') => {
@@ -956,7 +1066,6 @@
         window.delOpt = async (t,id) => { if(!currentUser)return; await deleteDoc(doc(db,'artifacts',appId,'public','data',t==='project'?'daily_projects':t==='brand'?'daily_brands':'daily_task_types',id)); showNotification("ลบออกจากระบบแล้ว"); };
         function renderChips() { const c=$('tasktype-chips-container'); if(c){c.innerHTML=''; selectedTaskTypes.forEach(t=>c.innerHTML+=`<span class="bg-indigo-50 text-[#5b5fc7] px-2.5 py-1 rounded text-sm border border-indigo-100 flex items-center gap-1 font-medium">${t} <i data-lucide="x" class="w-3.5 h-3.5 cursor-pointer text-[#5b5fc7] hover:text-red-500 transition-colors" onclick="selectedTaskTypes=selectedTaskTypes.filter(x=>x!=='${t}');renderChips()"></i></span>`); lucide.createIcons(); $('taskTypeInput').value='';} }
 
-        // Equipment Toggle
         let tempEquip = null;
         on('toggle-equipment', 'change', function() {
             const cont = $('equipment-fields');
@@ -974,7 +1083,6 @@
             }
         });
 
-        // Notes Logic
         window.toggleNote = (id) => { const n=currentNotes.find(x=>x.id===id); if(n) { n.completed=!n.completed; n.completedAt=n.completed?`${new Date().toLocaleDateString('th-TH',{timeZone:'Asia/Bangkok'})} ${new Date().toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Bangkok'})} น.`:null; if(n.completed&&!currentNotes.some(x=>!x.text)) currentNotes.push({id:'n'+Date.now(), text:'', completed:false}); renderNotes(); } };
         window.updateNoteText = (id, txt) => { const n=currentNotes.find(x=>x.id===id); if(n) n.text=txt; };
         window.removeNote = (id) => { currentNotes = currentNotes.filter(n=>n.id!==id); if(!currentNotes.length || currentNotes[currentNotes.length-1].completed) currentNotes.push({id:'n'+Date.now(), text:'', completed:false}); renderNotes(); };
@@ -996,8 +1104,8 @@
             $('form-title').innerText="เพิ่มรายละเอียดงานใหม่";
         }
 
-        on('task-form', 'submit', async (e)=>{ 
-            e.preventDefault(); if(currentUserRole==='monitor')return; 
+        on('submit-btn', 'click', async ()=>{ 
+            if(currentUserRole==='monitor')return; 
             const b=$('submit-btn'); b.disabled=true; b.innerHTML='<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> บันทึก...'; lucide.createIcons();
             
             const eqData = $('toggle-equipment').checked && ($('equipType').value||$('equipBrand').value) ? {type:$('equipType').value, brand:$('equipBrand').value} : null;
@@ -1008,7 +1116,7 @@
                 else { d.createdAt=Date.now(); d.ownerId=currentUser.uid; d.ownerEmail=currentUser.email; await addDoc(collection(db,'artifacts',appId,'public','data','daily_tasks'), d); showNotification("บันทึกงานใหม่สำเร็จ"); }
                 resetForm(); switchTab('list');
             } catch(error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); }
-            finally { b.disabled=false; b.innerHTML='<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล'; lucide.createIcons(); }
+            finally { b.disabled=false; b.innerHTML='<i data-lucide="save" class="w-4 h-4 mr-2 inline"></i> บันทึก'; lucide.createIcons(); }
         });
 
         window.editTask = (id) => { 
@@ -1019,7 +1127,6 @@
             if(t.equipment){ $('toggle-equipment').checked=true; $('equipment-fields').classList.remove('hidden'); $('equipment-fields').classList.add('flex'); $('equipType').value=t.equipment.type||''; $('equipBrand').value=t.equipment.brand||''; } 
             else { $('toggle-equipment').checked=false; $('equipment-fields').classList.add('hidden'); $('equipment-fields').classList.remove('flex'); $('equipType').value=''; $('equipBrand').value=''; } 
             currentNotes=t.notes?.length?t.notes:[{id:'n'+Date.now(), text:'', completed:false}]; 
-            // ensure empty row exists at end for new typing
             if(currentNotes.length && currentNotes[currentNotes.length-1].completed) currentNotes.push({id:'n'+Date.now(), text:'', completed:false});
             renderNotes(); 
             currentEditTaskId=id; switchTab('manage'); $('day-detail-modal')?.classList.add('hidden');
@@ -1029,16 +1136,37 @@
 
         // --- 6. Dashboard Charts Logic ---
         function renderDashboard() {
-            let tks = getTasks().filter(t=>{ 
+            let dashTasks = getTasks().filter(t=>{ 
                 let m=true; 
                 if(dashCurrentYear!=='all') m=t.receiveDate?.startsWith(dashCurrentYear); 
                 if(dashCurrentMonth!=='all') m=m&&t.receiveDate?.substring(5,7)===dashCurrentMonth; 
                 if(dashCurrentProject!=='all') m=m&&(t.projectName||'ไม่ได้ระบุโครงการ')===dashCurrentProject; 
                 return m; 
             });
+
+            // Cross-filtering logic (Restore from robust version)
+            function getFilteredTasksFor(excludeKey) {
+                return dashTasks.filter(t => {
+                    let match = true;
+                    if (excludeKey !== 'responsible' && dashCrossFilters.responsible && (t.responsibleName || 'ไม่ระบุ') !== dashCrossFilters.responsible) match = false;
+                    if (excludeKey !== 'customer' && dashCrossFilters.customer && (t.customerName || 'ไม่ระบุ') !== dashCrossFilters.customer) match = false;
+                    if (excludeKey !== 'assignment' && dashCrossFilters.assignment && (t.assignment || 'ไม่ระบุ') !== dashCrossFilters.assignment) match = false;
+                    if (excludeKey !== 'brand' && dashCrossFilters.brand && (t.equipment?.brand || 'ไม่ระบุ') !== dashCrossFilters.brand) match = false;
+                    
+                    let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : []);
+                    if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
+                    if (excludeKey !== 'tasktype' && dashCrossFilters.tasktype && !tTypes.includes(dashCrossFilters.tasktype)) match = false;
+                    
+                    return match;
+                });
+            }
+
+            const fullyFilteredTasks = getFilteredTasksFor('none');
             
+            // Calculate Top numbers
             const counts = {proj:{}, tasktype:{}, brand:{}, responsible:{}, customer:{}, assignment:{}, time:{}};
-            tks.forEach(t=>{ 
+            
+            fullyFilteredTasks.forEach(t=>{ 
                 if(t.receiveDate) {
                     if(dashTimeView==='month') counts.time[t.receiveDate.substring(0,7)] = (counts.time[t.receiveDate.substring(0,7)]||0)+1;
                     else {
@@ -1048,15 +1176,19 @@
                         counts.time[`${t.receiveDate.substring(0,7)}-W${w}`] = (counts.time[`${t.receiveDate.substring(0,7)}-W${w}`]||0)+1;
                     }
                 }
-                const p=t.projectName||'ไม่ได้ระบุโครงการ', r=t.responsibleName||'ไม่ระบุ', c=t.customerName||'ไม่ระบุ', a=t.assignment||'ไม่ระบุ', b=t.equipment?.brand||'ไม่ระบุ'; 
-                counts.proj[p]=(counts.proj[p]||0)+1; counts.brand[b]=(counts.brand[b]||0)+1; counts.responsible[r]=(counts.responsible[r]||0)+1; counts.customer[c]=(counts.customer[c]||0)+1; counts.assignment[a]=(counts.assignment[a]||0)+1;
-                const types = Array.isArray(t.taskType)?t.taskType:(t.taskType?[t.taskType]:['ไม่ระบุ']);
-                if(!types.length) types.push('ไม่ระบุ');
-                types.forEach(ty=>counts.tasktype[ty]=(counts.tasktype[ty]||0)+1); 
+                const p=t.projectName||'ไม่ได้ระบุโครงการ'; 
+                counts.proj[p]=(counts.proj[p]||0)+1; 
             });
+
+            // Count specifically for each chart to allow clicking to filter others
+            getFilteredTasksFor('tasktype').forEach(t => { const ty = Array.isArray(t.taskType)?t.taskType:(t.taskType?[t.taskType]:['ไม่ระบุ']); (ty.length?ty:['ไม่ระบุ']).forEach(x=>counts.tasktype[x]=(counts.tasktype[x]||0)+1); });
+            getFilteredTasksFor('brand').forEach(t => { const b=t.equipment?.brand||'ไม่ระบุ'; counts.brand[b]=(counts.brand[b]||0)+1; });
+            getFilteredTasksFor('responsible').forEach(t => { const r=t.responsibleName||'ไม่ระบุ'; counts.responsible[r]=(counts.responsible[r]||0)+1; });
+            getFilteredTasksFor('customer').forEach(t => { const c=t.customerName||'ไม่ระบุ'; counts.customer[c]=(counts.customer[c]||0)+1; });
+            getFilteredTasksFor('assignment').forEach(t => { const a=t.assignment||'ไม่ระบุ'; counts.assignment[a]=(counts.assignment[a]||0)+1; });
             
             if($('dash-total-projects')) $('dash-total-projects').textContent=Object.keys(counts.proj).length;
-            const fp = new Set(); let npc = 0; tks.forEach(t=>{ if(t.projectName && t.projectName.trim()!=='') fp.add(t.projectName); else npc++; });
+            const fp = new Set(); let npc = 0; fullyFilteredTasks.forEach(t=>{ if(t.projectName && t.projectName.trim()!=='') fp.add(t.projectName); else npc++; });
             if($('dash-no-project')) $('dash-no-project').textContent=npc; if($('dash-filtered-projects')) $('dash-filtered-projects').textContent=fp.size;
 
             // Bar Charts
@@ -1081,23 +1213,50 @@
                 chartInstances['project'] = new Chart(pCanvas, {type:'bar', data:{labels:k, datasets:[{label:'จำนวนงาน', data:v, backgroundColor:'#14b8a6', borderRadius:6}]}, options:{responsive:true, maintainAspectRatio:false, indexAxis:'y'}}); 
             }
 
-            // Pie Charts
-            const drawPie = (id, data) => { 
-                if(!$(id))return; if(chartInstances[id]) chartInstances[id].destroy(); 
-                const k=Object.keys(data).sort((a,b)=>data[b]-data[a]).slice(0,10);
-                if(!k.length) { $(id).style.display='none'; $(`legend-${id}`).innerHTML='<div class="text-gray-400 italic">ไม่มีข้อมูล</div>'; return; }
-                $(id).style.display='block';
-                const v=k.map(x=>data[x]); 
-                chartInstances[id] = new Chart($(id), {type:'doughnut', data:{labels:k, datasets:[{data:v, backgroundColor:modernColors, borderWidth:0}]}, options:{plugins:{legend:{display:false}}, cutout:'65%'}}); 
+            // Pie Charts (With Click Filtering)
+            const modernColors = ['#6366f1', '#8b5cf6', '#d946ef', '#f43f5e', '#f97316', '#eab308', '#22c55e', '#14b8a6', '#0ea5e9', '#64748b'];
+            const drawPie = (id, dataObj) => { 
+                const canvas = $(`chart-${id}`); if (!canvas) return; 
+                if(chartInstances[id]) chartInstances[id].destroy(); 
+                
+                const allKeys = Object.keys(dataObj).sort((a, b) => dataObj[b] - dataObj[a]); 
+                let finalKeys = [], finalValues = [];
+                
+                if (allKeys.length > 10) { finalKeys = allKeys.slice(0, 9); finalValues = finalKeys.map(k => dataObj[k]); finalKeys.push('อื่นๆ'); finalValues.push(allKeys.slice(9).reduce((sum, key) => sum + dataObj[key], 0)); } 
+                else { finalKeys = allKeys; finalValues = finalKeys.map(k => dataObj[k]); }
+                
+                if(!finalKeys.length) { canvas.style.display='none'; $(`legend-${id}`).innerHTML='<div class="text-gray-400 italic py-4">ไม่มีข้อมูลตามตัวกรอง</div>'; return; }
+                canvas.style.display='block';
+
+                const activeFilter = dashCrossFilters[id]; let activeIndex = activeFilter ? finalKeys.indexOf(activeFilter) : -1;
+                const originalColors = finalValues.map((_, i) => modernColors[i % modernColors.length]);
+                let bgColors = [...originalColors], offsets = Array(finalValues.length).fill(0);
+                if (activeIndex !== -1) { bgColors = originalColors.map((col, i) => i === activeIndex ? col : col + '33'); offsets[activeIndex] = 10; }
+
+                const handleChartClick = (index) => { const clickedLabel = finalKeys[index]; if (clickedLabel === 'อื่นๆ') return; dashCrossFilters[id] = dashCrossFilters[id] === clickedLabel ? null : clickedLabel; renderDashboard(); };
+
+                chartInstances[id] = new Chart(canvas, { 
+                    type:'doughnut', 
+                    data:{labels:finalKeys, datasets:[{data:finalValues, backgroundColor:bgColors, borderWidth:0, hoverOffset:4, offset:offsets}]}, 
+                    options:{responsive:true, maintainAspectRatio:false, layout:{padding:10}, onClick:(e, activeElements)=>{if(activeElements.length>0) handleChartClick(activeElements[0].index);}, plugins:{legend:{display:false}}, cutout:'65%'},
+                    plugins: [{ id: 'centerText', beforeDraw: function(chart) { if (chart.data.datasets.length === 0) return; const ctx = chart.ctx, meta = chart.getDatasetMeta(0); if (!meta.data || meta.data.length === 0) return; const centerX = meta.data[0].x, centerY = meta.data[0].y; let displayNum = (activeIndex !== -1 && finalValues[activeIndex] !== undefined) ? finalValues[activeIndex] : finalValues.reduce((a, b) => a + b, 0); const textNum = displayNum.toString(); ctx.restore(); ctx.font = "bold 2rem Sarabun, sans-serif"; ctx.fillStyle = "#dc2626"; ctx.textBaseline = "middle"; const textNumWidth = ctx.measureText(textNum).width; ctx.fillText(textNum, centerX - (textNumWidth / 2), centerY); ctx.save(); } }] 
+                }); 
+                
                 const leg=$(`legend-${id}`); 
-                if(leg) { leg.innerHTML=''; k.forEach((label,i)=>{ leg.innerHTML+=`<div class="flex items-center gap-3 py-1 hover:bg-gray-50 px-2 rounded transition-colors"><div class="w-3.5 h-3.5 rounded-sm shrink-0 shadow-sm" style="background-color:${modernColors[i%modernColors.length]}"></div><span class="text-sm font-medium text-gray-700 truncate flex-1">${label}</span><span class="text-sm font-bold text-gray-900">${v[i]}</span></div>`; }); } 
+                if(leg) { 
+                    leg.innerHTML=''; 
+                    finalKeys.forEach((label,i)=>{ 
+                        const isSelected = activeIndex === i, opacityClass = (activeIndex !== -1 && !isSelected) ? 'opacity-30' : 'opacity-100', textBold = isSelected ? 'font-bold text-gray-900' : 'font-medium text-gray-600';
+                        leg.innerHTML+=`<div class="flex items-center gap-3 py-1 hover:bg-gray-50 px-2 rounded transition-all cursor-pointer ${opacityClass} ${isSelected?'bg-gray-50':''}" onclick="if('${label}'!=='อื่นๆ') { dashCrossFilters['${id}'] = dashCrossFilters['${id}'] === '${label}' ? null : '${label}'; renderDashboard(); }"><div class="w-3.5 h-3.5 rounded-sm shrink-0 shadow-sm ${isSelected?'ring-2 ring-offset-1 ring-gray-300 scale-110':''}" style="background-color:${modernColors[i%modernColors.length]}"></div><span class="text-sm ${textBold} truncate flex-1">${label}</span><span class="text-sm font-bold text-gray-900">${finalValues[i]}</span></div>`; 
+                    }); 
+                } 
             };
-            drawPie('chart-tasktype', counts.tasktype); drawPie('chart-brand', counts.brand); drawPie('chart-customer', counts.customer); drawPie('chart-responsible', counts.responsible); drawPie('chart-assignment', counts.assignment);
+            drawPie('tasktype', counts.taskType); drawPie('brand', counts.brand); drawPie('customer', counts.customer); drawPie('responsible', counts.responsible); drawPie('assignment', counts.assignment);
         }
 
         on('dash-year-select','change',e=>{dashCurrentYear=e.target.value; renderDashboard();});
         on('dash-month-select','change',e=>{dashCurrentMonth=e.target.value; renderDashboard();});
-        on('btn-reset-dash-filter','click',()=>{ dashCurrentYear='all'; dashCurrentMonth='all'; dashCurrentProject='all'; $('dash-year-select').value='all'; $('dash-month-select').value='all'; $('dash-project-input').value=''; $('dash-project-input').placeholder='ทุกโครงการทั้งหมด'; renderDashboard();});
+        on('btn-reset-dash-filter','click',()=>{ dashCurrentYear='all'; dashCurrentMonth='all'; dashCurrentProject='all'; dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null, brand: null }; $('dash-year-select').value='all'; $('dash-month-select').value='all'; $('dash-project-input').value=''; $('dash-project-input').placeholder='ทุกโครงการทั้งหมด'; renderDashboard();});
         on('btn-view-month','click',()=>{dashTimeView='month'; $('btn-view-month').className="px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; $('btn-view-week').className="px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard();});
         on('btn-view-week','click',()=>{dashTimeView='week'; $('btn-view-week').className="px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; $('btn-view-month').className="px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard();});
 
@@ -1128,11 +1287,11 @@
                 
                 if(isTdy && !h) bgCls = 'bg-indigo-50/50 border-[#5b5fc7] border-2';
                 
-                const numCls = isTdy ? 'bg-[#5b5fc7] text-white w-7 h-7 rounded-full flex items-center justify-center font-bold' : `w-7 h-7 flex items-center justify-center font-semibold ${isWknd||h?'text-red-500':'text-gray-700'}`;
+                const numCls = isTdy ? 'bg-[#5b5fc7] text-white w-7 h-7 rounded-full flex items-center justify-center font-bold shadow-sm' : `w-7 h-7 flex items-center justify-center font-semibold ${isWknd||h?'text-red-500':'text-gray-700'}`;
 
                 g.innerHTML+=`<div onclick="openDayModal('${ds}')" class="border border-gray-200 rounded-lg p-1.5 h-[120px] cursor-pointer transition-all overflow-hidden flex flex-col group relative ${bgCls}">
                     <div class="flex justify-between items-start mb-1">
-                        <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">${currentUserRole!=='monitor'?`<button onclick="event.stopPropagation();resetForm();$('receiveDate').value='${ds}';switchTab('manage')" class="bg-white border border-gray-200 p-1 rounded hover:bg-gray-50 text-gray-500"><i data-lucide="plus" class="w-3 h-3"></i></button>`:''}</div>
+                        <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">${currentUserRole!=='monitor'?`<button onclick="event.stopPropagation();resetForm();$('receiveDate').value='${ds}';switchTab('manage')" class="bg-white border border-gray-200 p-1 rounded hover:bg-gray-50 text-gray-500 shadow-sm"><i data-lucide="plus" class="w-3 h-3"></i></button>`:''}</div>
                         <div class="${numCls} text-xs ml-auto">${i}</div>
                     </div>
                     <div class="flex-1 overflow-hidden">
@@ -1145,7 +1304,7 @@
             
             // Render Holiday List on right
             const mList = $('monthly-holidays-list'), mHols = getHols().filter(h=>h.holidayDate?.startsWith(`${y}-${String(m+1).padStart(2,'0')}`)).sort((a,b)=>a.holidayDate.localeCompare(b.holidayDate));
-            if(mList) { mList.innerHTML = mHols.length ? mHols.map(h=>`<div class="p-3 border rounded-lg ${h.holidayType==='vacation_leave'?'bg-green-50 border-green-200':h.holidayType==='sick_leave'?'bg-purple-50 border-purple-200':h.holidayType==='personal_leave'?'bg-orange-50 border-orange-200':'bg-red-50 border-red-200'} text-sm flex justify-between group relative overflow-hidden"><div class="absolute left-0 top-0 bottom-0 w-1 ${h.holidayType==='vacation_leave'?'bg-green-500':h.holidayType==='sick_leave'?'bg-purple-500':h.holidayType==='personal_leave'?'bg-orange-500':'bg-red-500'}"></div><div class="flex-1 pl-2"><div class="font-bold text-gray-800 mb-0.5">${formatDate(h.holidayDate)}</div><div class="text-gray-600 font-medium">${h.holidayName}</div></div>${(currentUserRole==='admin'||(currentUserRole==='user'&&h.ownerId===currentUser.uid))?`<button onclick="deleteHoliday('${h.id}')" class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 p-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`).join('') : '<p class="text-gray-400 text-center py-6 text-sm border border-dashed border-gray-200 rounded-lg">ไม่มีวันหยุดในเดือนนี้</p>'; }
+            if(mList) { mList.innerHTML = mHols.length ? mHols.map(h=>`<div class="p-3 border rounded-lg ${h.holidayType==='vacation_leave'?'bg-green-50 border-green-200':h.holidayType==='sick_leave'?'bg-purple-50 border-purple-200':h.holidayType==='personal_leave'?'bg-orange-50 border-orange-200':'bg-red-50 border-red-200'} text-sm flex justify-between group relative overflow-hidden shadow-sm"><div class="absolute left-0 top-0 bottom-0 w-1.5 ${h.holidayType==='vacation_leave'?'bg-green-500':h.holidayType==='sick_leave'?'bg-purple-500':h.holidayType==='personal_leave'?'bg-orange-500':'bg-red-500'}"></div><div class="flex-1 pl-2"><div class="font-bold text-gray-800 mb-0.5">${formatDate(h.holidayDate)}</div><div class="text-gray-600 font-medium">${h.holidayName}</div></div>${(currentUserRole==='admin'||(currentUserRole==='user'&&h.ownerId===currentUser.uid))?`<button onclick="deleteHoliday('${h.id}')" class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 p-2 transition-opacity"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}</div>`).join('') : '<p class="text-gray-400 text-center py-6 text-sm border border-dashed border-gray-200 rounded-lg">ไม่มีวันหยุดในเดือนนี้</p>'; }
             
             // Leave Quota Update
             const qC = $('leave-quota-container');
