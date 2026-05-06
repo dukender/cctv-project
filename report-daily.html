@@ -694,7 +694,6 @@
         window.addEventListener('offline', updateNetworkStatus);
 
         const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewTasktypeSummary = document.getElementById('view-tasktype-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewCustomerSummary = document.getElementById('view-customer-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
-        
         const btnToggleMenu = document.getElementById('btn-toggle-menu');
         const sidebarMenu = document.getElementById('sidebar-menu');
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
@@ -719,7 +718,7 @@
         function switchTab(activeTabId) {
             const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) resetFormToAddMode();
-            [viewDashboard, viewCalendar, viewList, viewProjectSummary, viewResponsibleSummary, viewCustomerSummary, viewManage, viewUsers].forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
+            [viewDashboard, viewCalendar, viewList, viewProjectSummary, viewTasktypeSummary, viewResponsibleSummary, viewCustomerSummary, viewManage, viewUsers].forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
             
             ['tab-dashboard', 'tab-calendar', 'tab-list', 'tab-project-summary', 'tab-responsible-summary', 'tab-customer-summary', 'tab-manage', 'tab-users'].forEach(t => {
                 const el = document.getElementById(t);
