@@ -214,7 +214,70 @@
                         </div>
                     </div>
                 </div>
+                    
+<!-- หน้าสรุปประเภทงาน -->
+                <div id="view-tasktype-summary" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <!-- Sidebar ซ้าย: ประเภทงาน -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
+                                <i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สรุปประเภทงาน
+                            </h2>
+                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="tasktype-display-count" class="font-bold text-pink-600">0</span> ประเภท</p>
+                            
+                            <div id="tasktype-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
 
+                            <div id="tasktype-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                <button onclick="changeTasktypeCardPage(-1)" id="btn-tasktype-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <span id="tasktype-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                <button onclick="changeTasktypeCardPage(1)" id="btn-tasktype-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Content ขวา -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="tasktype-project-count-container"></div>
+                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]">
+                                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="tasktype-search-input" placeholder="ค้นหาประเภทงาน..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow">
+                                    </div>
+                                    <select id="tasktype-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
+                                        <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
+                                    </select>
+                                    <input type="date" id="tasktype-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 block">
+                                    <input type="month" id="tasktype-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 hidden">
+                                    <select id="tasktype-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 hidden min-w-[120px]">
+                                        <option value="">ทุกปีทั้งหมด</option>
+                                    </select>
+                                    <button id="btn-tasktype-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-tasktype-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-tasktype-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="overflow-x-auto min-h-[200px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="tasktype-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
+                                            <th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th>
+                                            <th class="px-6 py-4 font-semibold">ชื่อโครงการ</th>
+                                            <th class="px-6 py-4 font-semibold">ประเภทงาน</th>
+                                            <th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasktype-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="tasktype-summary-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
                 <!-- หน้าสรุปผู้รับผิดชอบ -->
                 <div id="view-responsible-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
@@ -630,7 +693,7 @@
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
 
-        const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewCustomerSummary = document.getElementById('view-customer-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
+        const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewTasktypeSummary = document.getElementById('view-tasktype-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewCustomerSummary = document.getElementById('view-customer-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
         
         const btnToggleMenu = document.getElementById('btn-toggle-menu');
         const sidebarMenu = document.getElementById('sidebar-menu');
@@ -678,6 +741,7 @@
             else if (activeTabId === 'calendar') { viewCalendar?.classList.remove('hidden'); viewCalendar?.classList.add('block'); activateTabBtn('calendar'); renderCalendar(); }
             else if (activeTabId === 'list') { viewList?.classList.remove('hidden'); viewList?.classList.add('block'); activateTabBtn('list'); filterAndRenderTasks(); }
             else if (activeTabId === 'project-summary') { viewProjectSummary?.classList.remove('hidden'); viewProjectSummary?.classList.add('block'); activateTabBtn('project-summary'); renderProjectSummary(); }
+            else if (activeTabId === 'tasktype-summary') { viewTasktypeSummary?.classList.remove('hidden'); viewTasktypeSummary?.classList.add('block'); activateTabBtn('tasktype-summary'); renderTasktypeSummary(); }
             else if (activeTabId === 'responsible-summary') { viewResponsibleSummary?.classList.remove('hidden'); viewResponsibleSummary?.classList.add('block'); activateTabBtn('responsible-summary'); renderResponsibleSummary(); }
             else if (activeTabId === 'customer-summary') { viewCustomerSummary?.classList.remove('hidden'); viewCustomerSummary?.classList.add('block'); activateTabBtn('customer-summary'); renderCustomerSummary(); }
             else if (activeTabId === 'manage') { viewManage?.classList.remove('hidden'); viewManage?.classList.add('block'); activateTabBtn('manage'); document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
@@ -694,6 +758,7 @@
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
         document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
+        document.getElementById('tab-tasktype-summary')?.addEventListener('click', () => switchTab('tasktype-summary'));
         document.getElementById('tab-responsible-summary')?.addEventListener('click', () => switchTab('responsible-summary'));
         document.getElementById('tab-customer-summary')?.addEventListener('click', () => switchTab('customer-summary'));
         document.getElementById('tab-manage')?.addEventListener('click', () => { currentEditTaskId = null; resetFormToAddMode(); switchTab('manage'); });
@@ -753,6 +818,7 @@
             if (viewCalendar && !viewCalendar.classList.contains('hidden')) renderCalendar();
             if (viewList && !viewList.classList.contains('hidden')) filterAndRenderTasks();
             if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
+            if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
             if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
             if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
         });
@@ -832,6 +898,7 @@
                 filterAndRenderTasks(); renderCalendar();   
                 if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard(); 
                 if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
+                if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
                 if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
                 if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
             }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล'; statusEl.className = 'text-red-500 font-bold'; });
@@ -1060,7 +1127,207 @@
             summaryCurrentPage = 1;
             renderProjectSummary();
         });
+        
+// --- Logic สำหรับหน้า สรุปประเภทงาน (Task Type Summary) ---
+        let currentTasktypeFilteredData = [];
+        let currentTasktypeFilter = 'all';
+        let tasktypeCurrentPage = 1;
+        let tasktypeCardCurrentPage = 1; 
+        const tasktypeCardsPerPage = 10;  
 
+        window.setTasktypeFilter = (name) => { 
+            currentTasktypeFilter = currentTasktypeFilter === name ? 'all' : name; 
+            tasktypeCurrentPage = 1;
+            renderTasktypeSummary(); 
+        };
+        
+        window.goToTasktypeSummaryPage = (page) => { tasktypeCurrentPage = page; renderTasktypeSummary(); };
+        window.changeTasktypeCardPage = (direction) => { tasktypeCardCurrentPage += direction; renderTasktypeSummary(); };
+
+        function renderTasktypeSummary() {
+            const container = document.getElementById('tasktype-cards-container');
+            const tbody = document.getElementById('tasktype-summary-body');
+            if (!container || !tbody) return;
+
+            let tasksToUse = getTasksByFilter();
+            const searchInput = document.getElementById('tasktype-search-input')?.value.toLowerCase() || '';
+            const timeType = document.getElementById('tasktype-search-time-type')?.value || 'day';
+            const searchDate = document.getElementById('tasktype-search-date')?.value;
+            const searchMonth = document.getElementById('tasktype-search-month')?.value;
+            const searchYear = document.getElementById('tasktype-search-year')?.value;
+
+            const filteredTasks = tasksToUse.filter(t => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = t.receiveDate === searchDate;
+                else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
+                else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
+
+                let tTypes = Array.isArray(t.taskType) ? t.taskType.join(' ') : (t.taskType || '');
+                const searchString = [t.taskName || '', t.projectName || '', t.responsibleName || '', t.customerName || '', tTypes].join(' ').toLowerCase();
+                return matchTime && (searchInput ? searchString.includes(searchInput) : true);
+            });
+
+            const typeCounts = {};
+            let totalTasksCount = filteredTasks.length;
+            
+            filteredTasks.forEach(t => {
+                let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : ['ไม่ระบุ']);
+                if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
+                tTypes.forEach(type => { typeCounts[type] = (typeCounts[type] || 0) + 1; });
+            });
+
+            const typeData = Object.keys(typeCounts).map(name => ({ name: name, count: typeCounts[name], percent: totalTasksCount > 0 ? Math.round((typeCounts[name] / totalTasksCount) * 100) : 0 })).sort((a, b) => b.count - a.count);
+
+            const displayCountEl = document.getElementById('tasktype-display-count');
+            if(displayCountEl) displayCountEl.textContent = typeData.length;
+
+            const totalCardPages = Math.ceil(typeData.length / tasktypeCardsPerPage) || 1;
+            if (tasktypeCardCurrentPage > totalCardPages) tasktypeCardCurrentPage = totalCardPages;
+            
+            const startCardIndex = (tasktypeCardCurrentPage - 1) * tasktypeCardsPerPage;
+            const endCardIndex = startCardIndex + tasktypeCardsPerPage;
+            const paginatedTypeData = typeData.slice(startCardIndex, endCardIndex);
+
+            container.innerHTML = '';
+            const paginationEl = document.getElementById('tasktype-cards-pagination');
+
+            if (typeData.length === 0) {
+                 container.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-100 text-sm">ไม่พบข้อมูลประเภทงาน</div>`;
+                 if(paginationEl) { paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); }
+            } else {
+                paginatedTypeData.forEach(r => {
+                    const isSelected = currentTasktypeFilter === r.name;
+                    const ringClass = isSelected ? 'ring-2 ring-pink-500 ring-offset-1 scale-[1.01] shadow-md border-pink-500/50' : 'border-pink-100 hover:shadow-sm hover:border-pink-300/40';
+                    container.innerHTML += `
+                        <div onclick="setTasktypeFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-pink-50/30 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
+                            <p class="text-sm font-bold text-pink-600 truncate w-full leading-relaxed group-hover:text-pink-800 transition-colors" title="${r.name}">${r.name}</p>
+                            <div class="flex items-baseline justify-center gap-1.5 mt-0.5">
+                                <span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span>
+                                <span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) งาน</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if(paginationEl) {
+                    if (typeData.length > tasktypeCardsPerPage) {
+                        paginationEl.classList.remove('hidden'); paginationEl.classList.add('flex');
+                        document.getElementById('tasktype-cards-page-text').textContent = `หน้า ${tasktypeCardCurrentPage} / ${totalCardPages}`;
+                        document.getElementById('btn-tasktype-card-prev').disabled = tasktypeCardCurrentPage === 1;
+                        document.getElementById('btn-tasktype-card-next').disabled = tasktypeCardCurrentPage === totalCardPages;
+                    } else { paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); }
+                }
+            }
+
+            let tableTasks = filteredTasks;
+            if (currentTasktypeFilter !== 'all') {
+                tableTasks = filteredTasks.filter(t => {
+                    let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : ['ไม่ระบุ']);
+                    if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
+                    return tTypes.includes(currentTasktypeFilter);
+                });
+            }
+
+            const projectMap = {};
+            tableTasks.forEach(t => {
+                const pName = t.projectName || 'ไม่ได้ระบุโครงการ';
+                const key = pName;
+                if (!projectMap[key]) { projectMap[key] = { projectName: pName, taskTypes: new Set(), taskCount: 0, latestDate: t.receiveDate || '' }; }
+                let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : ['ไม่ระบุ']);
+                if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
+                tTypes.forEach(type => { if (type !== 'ไม่ระบุ') projectMap[key].taskTypes.add(type); });
+                projectMap[key].taskCount++;
+                if (t.receiveDate && t.receiveDate > projectMap[key].latestDate) { projectMap[key].latestDate = t.receiveDate; }
+            });
+
+            const tableData = Object.values(projectMap).map(p => {
+                const typesArray = Array.from(p.taskTypes).sort((a,b) => a.localeCompare(b, 'th'));
+                return { ...p, displayType: typesArray.length > 0 ? typesArray.join(', ') : 'ไม่ระบุ' };
+            }).sort((a, b) => {
+                if (a.latestDate !== b.latestDate) return (b.latestDate || '').localeCompare(a.latestDate || '');
+                return b.taskCount - a.taskCount;
+            });
+            
+            currentTasktypeFilteredData = tableData;
+
+            let namedCount = 0; let unnamedCount = 0;
+            tableData.forEach(row => { if (row.projectName === 'ไม่ได้ระบุโครงการ' || row.projectName.trim() === '') unnamedCount++; else namedCount++; });
+
+            const projectCountContainer = document.getElementById('tasktype-project-count-container');
+            if (projectCountContainer) {
+                projectCountContainer.innerHTML = `
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-pink-600 text-xl px-1">${namedCount}</span> โครงการ</h3>
+                    ${unnamedCount > 0 ? `<span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">(มีงานที่ไม่ได้ระบุโครงการอีก ${unnamedCount} รายการ)</span>` : ''}
+                `;
+            }
+
+            const totalTablePages = Math.ceil(tableData.length / itemsPerPage) || 1;
+            if (tasktypeCurrentPage > totalTablePages) tasktypeCurrentPage = totalTablePages;
+            const startTableIndex = (tasktypeCurrentPage - 1) * itemsPerPage;
+            const endTableIndex = startTableIndex + itemsPerPage;
+            const paginatedTableData = tableData.slice(startTableIndex, endTableIndex);
+
+            const paginationContainer = document.getElementById('tasktype-summary-pagination');
+            tbody.innerHTML = '';
+            if (paginatedTableData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลโครงการตามเงื่อนไขที่เลือก</td></tr>`;
+                if(paginationContainer) paginationContainer.innerHTML = '';
+            } else {
+                paginatedTableData.forEach((row, index) => {
+                    const globalIndex = startTableIndex + index + 1;
+                    const isNoProject = row.projectName === 'ไม่ได้ระบุโครงการ';
+                    const projectNameHtml = isNoProject ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-pink-600 hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
+                    
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td>
+                            <td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td>
+                            <td class="px-6 py-3">${projectNameHtml}</td>
+                            <td class="px-6 py-3 font-medium text-pink-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td>
+                            <td class="px-4 py-3 text-center font-semibold text-gray-800">${row.taskCount}</td>
+                        </tr>
+                    `;
+                });
+
+                if (paginationContainer && tableData.length > itemsPerPage) {
+                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-pink-600">${startTableIndex + 1}</span> ถึง <span class="font-bold text-pink-600">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-pink-600">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-pink-600">หน้า ${tasktypeCurrentPage} / ${totalTablePages}</div><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                } else if(paginationContainer) { paginationContainer.innerHTML = ''; }
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('tasktype-search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value, dateInput = document.getElementById('tasktype-search-date'), monthInput = document.getElementById('tasktype-search-month'), yearInput = document.getElementById('tasktype-search-year');
+            if(dateInput) { if(type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+            if(monthInput) { if(type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+            if(yearInput) { if(type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+            if (dateInput) dateInput.value = ''; if (monthInput) monthInput.value = ''; if (yearInput) yearInput.value = ''; 
+            tasktypeCurrentPage = 1; tasktypeCardCurrentPage = 1; renderTasktypeSummary();
+        });
+
+        document.getElementById('tasktype-search-input')?.addEventListener('input', () => { tasktypeCurrentPage = 1; tasktypeCardCurrentPage = 1; renderTasktypeSummary(); });
+        document.getElementById('tasktype-search-date')?.addEventListener('change', () => { tasktypeCurrentPage = 1; tasktypeCardCurrentPage = 1; renderTasktypeSummary(); });
+        document.getElementById('tasktype-search-month')?.addEventListener('change', () => { tasktypeCurrentPage = 1; tasktypeCardCurrentPage = 1; renderTasktypeSummary(); });
+        document.getElementById('tasktype-search-year')?.addEventListener('change', () => { tasktypeCurrentPage = 1; tasktypeCardCurrentPage = 1; renderTasktypeSummary(); });
+
+        document.getElementById('btn-tasktype-reset-search')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('tasktype-search-input'), timeType = document.getElementById('tasktype-search-time-type');
+            if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); }
+            currentTasktypeFilter = 'all'; tasktypeCurrentPage = 1; tasktypeCardCurrentPage = 1; renderTasktypeSummary();
+        });
+
+        document.getElementById('btn-tasktype-export-excel')?.addEventListener('click', () => {
+            if (currentTasktypeFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const exportData = currentTasktypeFilteredData.map((r, idx) => ({ 'ลำดับ': idx + 1, 'วันที่รับงานล่าสุด': r.latestDate ? formatDate(r.latestDate) : '-', 'ชื่อโครงการ': r.projectName, 'ประเภทงาน': r.displayType, 'จำนวนงาน (งาน)': r.taskCount }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "TaskType Summary"); XLSX.writeFile(workbook, `TaskType_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
+        });
+
+        document.getElementById('btn-tasktype-export-pdf')?.addEventListener('click', () => {
+            if (currentTasktypeFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('tasktype-summary-table');
+            html2pdf().set({ margin: 0.4, filename: `TaskType_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+        });
+        
         // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
         let currentRespFilteredData = [];
         let currentRespFilter = 'all';
