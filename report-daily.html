@@ -661,7 +661,7 @@
             return `${thaiDate.getFullYear()}-${String(thaiDate.getMonth() + 1).padStart(2, '0')}-${String(thaiDate.getDate()).padStart(2, '0')}`;
         }
 
-        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = []; 
+        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [];
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         
         let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
@@ -896,6 +896,14 @@ function switchTab(activeTabId) {
                 allTaskTypes = []; snapshot.forEach(doc => allTaskTypes.push({id: doc.id, ...doc.data()}));
                 allTaskTypes.sort((a,b) => a.name.localeCompare(b.name, 'th'));
             });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_systems'), (snapshot) => {
+                allSystemsData = []; snapshot.forEach(doc => allSystemsData.push({id: doc.id, ...doc.data()}));
+                allSystemsData.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_brands'), (snapshot) => {
+                allBrandsData = []; snapshot.forEach(doc => allBrandsData.push({id: doc.id, ...doc.data()}));
+                allBrandsData.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+            });
         }
 
         function loadTasks() {
@@ -1014,7 +1022,11 @@ function switchTab(activeTabId) {
 
         window.deleteOptionData = async (collectionName, docId) => {
             if(!currentUser || currentUserRole === 'monitor') return;
-            let itemToRestore = collectionName === 'daily_projects' ? allProjects.find(p => p.id === docId) : allTaskTypes.find(t => t.id === docId);
+            let itemToRestore = null;
+            if(collectionName === 'daily_projects') itemToRestore = allProjects.find(p => p.id === docId);
+            else if (collectionName === 'daily_task_types') itemToRestore = allTaskTypes.find(t => t.id === docId);
+            else if (collectionName === 'daily_systems') itemToRestore = allSystemsData.find(t => t.id === docId);
+            else if (collectionName === 'daily_brands') itemToRestore = allBrandsData.find(t => t.id === docId);
             if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
             try {
@@ -1033,6 +1045,14 @@ function switchTab(activeTabId) {
             if (projWrapper && !projWrapper.contains(e.target)) projList?.classList.add('hidden');
             if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) taskTypeList?.classList.add('hidden');
             if (dashProjWrapper && !dashProjWrapper.contains(e.target)) dashProjList?.classList.add('hidden');
+            
+            // ปิด Dropdown ระบบงาน และ ยี่ห้อ เมื่อคลิกที่อื่น
+            if (!e.target.closest('[id^="sys-wrapper-"]')) {
+                document.querySelectorAll('[id^="sys-list-"]').forEach(el => el.classList.add('hidden'));
+            }
+            if (!e.target.closest('[id^="brand-wrapper-"]')) {
+                document.querySelectorAll('[id^="brand-list-"]').forEach(el => el.classList.add('hidden'));
+            }
         });
 
         let currentSummaryFilter = 'all', finalDisplayProjectData = [];
@@ -1934,14 +1954,25 @@ function switchTab(activeTabId) {
                         <input type="checkbox" class="w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]" ${sys.checked ? 'checked' : ''} onchange="updateSystemCheck('${sys.id}', this.checked)">
                         <span class="text-sm font-semibold text-gray-700">เพิ่มระบบงานที่ ${index + 1}</span>
                     </label>
-                    <div class="${sys.checked ? 'block animate-fade-in' : 'hidden'} space-y-2 mt-3 pt-3 border-t border-gray-100">
-                        <div>
+                    <div class="${sys.checked ? 'block animate-fade-in' : 'hidden'} space-y-3 mt-3 pt-3 border-t border-gray-100">
+                        <!-- Dropdown ระบบงาน -->
+                        <div class="relative w-full" id="sys-wrapper-${sys.id}">
                             <label class="block text-[10px] text-gray-500 font-medium mb-1">ระบบงาน</label>
-                            <input type="text" placeholder="เช่น CCTV, Access Control" value="${sys.system}" oninput="updateSystemField('${sys.id}', 'system', this.value)" class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]">
+                            <div class="flex items-center w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
+                                <input type="text" id="sys-input-${sys.id}" placeholder="พิมพ์เพื่อค้นหา/เพิ่ม..." value="${sys.system}" onfocus="renderSysDropdown('${sys.id}', this.value)" oninput="updateSystemField('${sys.id}', 'system', this.value); renderSysDropdown('${sys.id}', this.value)" class="flex-1 bg-transparent outline-none w-full" autocomplete="off">
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-indigo-600" onclick="document.getElementById('sys-input-${sys.id}').focus(); renderSysDropdown('${sys.id}', '')"></i>
+                            </div>
+                            <div id="sys-list-${sys.id}" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-40 overflow-y-auto py-1 text-sm" id="sys-ul-${sys.id}"></ul></div>
                         </div>
-                        <div>
+
+                        <!-- Dropdown ยี่ห้ออุปกรณ์ -->
+                        <div class="relative w-full" id="brand-wrapper-${sys.id}">
                             <label class="block text-[10px] text-gray-500 font-medium mb-1">ยี่ห้ออุปกรณ์</label>
-                            <input type="text" placeholder="เช่น Hikvision, Dahua" value="${sys.brand}" oninput="updateSystemField('${sys.id}', 'brand', this.value)" class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]">
+                            <div class="flex items-center w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
+                                <input type="text" id="brand-input-${sys.id}" placeholder="พิมพ์เพื่อค้นหา/เพิ่ม..." value="${sys.brand}" onfocus="renderBrandDropdown('${sys.id}', this.value)" oninput="updateSystemField('${sys.id}', 'brand', this.value); renderBrandDropdown('${sys.id}', this.value)" class="flex-1 bg-transparent outline-none w-full" autocomplete="off">
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-indigo-600" onclick="document.getElementById('brand-input-${sys.id}').focus(); renderBrandDropdown('${sys.id}', '')"></i>
+                            </div>
+                            <div id="brand-list-${sys.id}" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-40 overflow-y-auto py-1 text-sm" id="brand-ul-${sys.id}"></ul></div>
                         </div>
                     </div>
                     ${currentSystems.length > 1 ? `<button type="button" onclick="removeSystemRow('${sys.id}')" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 opacity-0 group-hover/sys:opacity-100 transition-opacity"><i data-lucide="x" class="w-4 h-4"></i></button>` : ''}
@@ -1955,6 +1986,67 @@ function switchTab(activeTabId) {
         window.updateSystemField = (id, field, val) => { const s = currentSystems.find(x => x.id === id); if(s) s[field] = val; };
         window.addSystemBrandRow = () => { currentSystems.push({ id: 'sys_' + Date.now(), checked: true, system: '', brand: '' }); renderSystems(); };
         window.removeSystemRow = (id) => { currentSystems = currentSystems.filter(x => x.id !== id); if(currentSystems.length === 0) currentSystems.push({ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }); renderSystems(); };
+        // -- Logic Dropdown ระบบงาน --
+        window.renderSysDropdown = (rowId, query = '') => {
+            const ul = document.getElementById(`sys-ul-${rowId}`), list = document.getElementById(`sys-list-${rowId}`);
+            if(!ul || !list) return; ul.innerHTML = ''; const q = query.toLowerCase().trim();
+            const filtered = allSystemsData.filter(p => p.name.toLowerCase().includes(q));
+            if (q && !allSystemsData.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
+                ul.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectSys('${rowId}', '${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            }
+            if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อเพิ่มรายการใหม่...</li>`;
+            else filtered.forEach(p => {
+                const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_systems', '${p.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                ul.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" onmousedown="selectSys('${rowId}', '${p.name.replace(/'/g, "\\'")}')">${p.name}</span>${delBtn}</li>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons(); list.classList.remove('hidden');
+        };
+
+        window.selectSys = (rowId, name) => {
+            const input = document.getElementById(`sys-input-${rowId}`);
+            if(input) { input.value = name; updateSystemField(rowId, 'system', name); }
+            document.getElementById(`sys-list-${rowId}`)?.classList.add('hidden');
+        };
+
+        window.addAndSelectSys = async (rowId, name) => {
+            if(!currentUser || currentUserRole === 'monitor') return;
+            try {
+                document.getElementById(`sys-input-${rowId}`).value = 'กำลังเพิ่ม...';
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_systems'), { name: name, createdAt: Date.now() });
+                selectSys(rowId, name); showNotification(`เพิ่มระบบงาน "${name}" แล้ว`);
+            } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่ม", "error"); selectSys(rowId, ''); }
+        };
+
+        // -- Logic Dropdown ยี่ห้ออุปกรณ์ --
+        window.renderBrandDropdown = (rowId, query = '') => {
+            const ul = document.getElementById(`brand-ul-${rowId}`), list = document.getElementById(`brand-list-${rowId}`);
+            if(!ul || !list) return; ul.innerHTML = ''; const q = query.toLowerCase().trim();
+            const filtered = allBrandsData.filter(p => p.name.toLowerCase().includes(q));
+            if (q && !allBrandsData.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
+                ul.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectBrand('${rowId}', '${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            }
+            if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อเพิ่มรายการใหม่...</li>`;
+            else filtered.forEach(p => {
+                const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_brands', '${p.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                ul.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" onmousedown="selectBrand('${rowId}', '${p.name.replace(/'/g, "\\'")}')">${p.name}</span>${delBtn}</li>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons(); list.classList.remove('hidden');
+        };
+
+        window.selectBrand = (rowId, name) => {
+            const input = document.getElementById(`brand-input-${rowId}`);
+            if(input) { input.value = name; updateSystemField(rowId, 'brand', name); }
+            document.getElementById(`brand-list-${rowId}`)?.classList.add('hidden');
+        };
+
+        window.addAndSelectBrand = async (rowId, name) => {
+            if(!currentUser || currentUserRole === 'monitor') return;
+            try {
+                document.getElementById(`brand-input-${rowId}`).value = 'กำลังเพิ่ม...';
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_brands'), { name: name, createdAt: Date.now() });
+                selectBrand(rowId, name); showNotification(`เพิ่มยี่ห้ออุปกรณ์ "${name}" แล้ว`);
+            } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่ม", "error"); selectBrand(rowId, ''); }
+        };
         function calculateUsedLeaves(yearStr) {
             const hols = getHolidaysByFilter().filter(h => h.holidayDate && h.holidayDate.startsWith(yearStr));
             let used = { vacation: 0, personal: 0, sick: 0 };
