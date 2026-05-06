@@ -2547,6 +2547,27 @@ function switchTab(activeTabId) {
             content.innerHTML = '';
             if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
             else {
+                // ดึงข้อมูลระบบงานและยี่ห้อทั้งหมดในโครงการนี้มารวมกัน
+                let projectSystems = new Set(), projectBrands = new Set();
+                projectTasks.forEach(task => {
+                    if (Array.isArray(task.systems)) {
+                        task.systems.forEach(s => {
+                            if (s.system && s.system.trim() !== '') projectSystems.add(s.system.trim());
+                            if (s.brand && s.brand.trim() !== '') projectBrands.add(s.brand.trim());
+                        });
+                    }
+                });
+                let sysArray = Array.from(projectSystems).sort((a,b) => a.localeCompare(b, 'th'));
+                let brandArray = Array.from(projectBrands).sort((a,b) => a.localeCompare(b, 'th'));
+                
+                // นำมาแสดงผลด้านบนสุดของ Pop-up
+                if (sysArray.length > 0 || brandArray.length > 0) {
+                    content.innerHTML += `<div class="mb-4 bg-indigo-50/70 border border-indigo-100 rounded-lg p-3 text-sm flex flex-col gap-2">
+                        ${sysArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="server" class="w-4 h-4"></i> ระบบงาน :</span> <span class="text-gray-800 leading-relaxed">${sysArray.join(', ')}</span></div>` : ''}
+                        ${brandArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="cpu" class="w-4 h-4"></i> ยี่ห้ออุปกรณ์ :</span> <span class="text-gray-800 leading-relaxed">${brandArray.join(', ')}</span></div>` : ''}
+                    </div>`;
+                }
+
                 projectTasks.sort((a, b) => (b.receiveDate || '').localeCompare(a.receiveDate || ''));
                 let tasksGridHtml = '<div class="grid grid-cols-1 gap-4">';
                 projectTasks.forEach((task) => {
