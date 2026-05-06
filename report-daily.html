@@ -87,6 +87,10 @@
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
                         <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
+                        <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
+                            <i data-lucide="tag" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปประเภทงาน</span>
+                        </button>
                         <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span>
@@ -716,50 +720,53 @@
         btnToggleMenu?.addEventListener('click', toggleMobileMenu);
         sidebarBackdrop?.addEventListener('click', toggleMobileMenu);
 
-        function switchTab(activeTabId) {
-            const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
-            if (isLeavingManage) resetFormToAddMode();
+function switchTab(activeTabId) {
+            const isLeavingManage = typeof viewManage !== 'undefined' && viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
+            if (isLeavingManage && typeof resetFormToAddMode === 'function') resetFormToAddMode();
             
-            // 1. บังคับซ่อนทุกหน้าจอที่มีอยู่ (แก้ปัญหาการมีโค้ด HTML ซ้ำซ้อน)
+            // ซ่อนทุกหน้าจอ
             document.querySelectorAll('[id^="view-"]').forEach(v => {
                 v.classList.add('hidden');
                 v.classList.remove('block');
             });
             
-            // 2. รีเซ็ตสีปุ่มเมนูทุกปุ่ม
+            // รีเซ็ตสีปุ่มเมนูทั้งหมด
             document.querySelectorAll('[id^="tab-"]').forEach(el => {
                 el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
                 el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
             });
 
-            // 3. แสดงเฉพาะหน้าที่เลือก
+            // แสดงหน้าจอที่เลือก (ครอบคลุมทุกจุดที่ซ้ำกัน)
             document.querySelectorAll('#view-' + activeTabId).forEach(targetView => {
                 targetView.classList.remove('hidden');
                 targetView.classList.add('block');
             });
 
-            // 4. ไฮไลท์สีปุ่มเมนูที่เลือก
+            // ไฮไลท์ปุ่มเมนูที่เลือก (ครอบคลุมทุกจุดที่ซ้ำกัน)
             document.querySelectorAll('#tab-' + activeTabId).forEach(targetTab => {
                 targetTab.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
                 targetTab.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
             });
 
-            // 5. รันฟังก์ชันดึงข้อมูลตามหน้าที่กด
-            if (activeTabId === 'dashboard') renderDashboard(); 
-            else if (activeTabId === 'calendar') renderCalendar(); 
-            else if (activeTabId === 'list') filterAndRenderTasks(); 
-            else if (activeTabId === 'project-summary') renderProjectSummary(); 
-            else if (activeTabId === 'tasktype-summary') renderTasktypeSummary(); 
-            else if (activeTabId === 'responsible-summary') renderResponsibleSummary(); 
-            else if (activeTabId === 'customer-summary') renderCustomerSummary(); 
+            // เรียกการทำงานดึงข้อมูล
+            if (activeTabId === 'dashboard' && typeof renderDashboard === 'function') renderDashboard(); 
+            else if (activeTabId === 'calendar' && typeof renderCalendar === 'function') renderCalendar(); 
+            else if (activeTabId === 'list' && typeof filterAndRenderTasks === 'function') filterAndRenderTasks(); 
+            else if (activeTabId === 'project-summary' && typeof renderProjectSummary === 'function') renderProjectSummary(); 
+            else if (activeTabId === 'tasktype-summary' && typeof renderTasktypeSummary === 'function') renderTasktypeSummary(); 
+            else if (activeTabId === 'responsible-summary' && typeof renderResponsibleSummary === 'function') renderResponsibleSummary(); 
+            else if (activeTabId === 'customer-summary' && typeof renderCustomerSummary === 'function') renderCustomerSummary(); 
             else if (activeTabId === 'manage') { 
-                document.querySelectorAll('#form-title').forEach(t => t.innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"); 
+                document.querySelectorAll('#form-title').forEach(t => t.innerText = typeof currentEditTaskId !== 'undefined' && currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"); 
             }
             
-            if (window.innerWidth < 1024 && sidebarMenu && !sidebarMenu.classList.contains('-translate-x-full')) {
-                toggleMobileMenu();
+            if (window.innerWidth < 1024 && typeof toggleMobileMenu === 'function') {
+                const sidebar = document.getElementById('sidebar-menu');
+                if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                    toggleMobileMenu();
+                }
             }
-            lucide.createIcons();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
