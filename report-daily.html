@@ -610,18 +610,24 @@
                             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6 mt-2"><i data-lucide="user" class="w-6 h-6 text-red-500"></i> บริหารจัดการผู้ใช้งาน (User Management)</h2>
                             <div class="bg-gray-50 border border-gray-200 rounded-lg p-5 mb-8">
                                 <h3 class="font-bold text-gray-700 mb-4 flex items-center gap-2"><i data-lucide="user-plus" class="w-4 h-4 text-gray-500"></i> เพิ่ม / แก้ไขสิทธิ์ผู้ใช้</h3>
-                                <form id="user-role-form" class="flex flex-col md:flex-row gap-4 items-end">
-                                    <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">อีเมลผู้ใช้งาน</label><input type="email" id="manageUserEmail" required placeholder="เช่น newuser@jescqtec.com" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"></div>
-                                    <div class="w-full md:w-1/3">
-                                        <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">ระดับสิทธิ์ (Role)</label>
-                                        <select id="manageUserRole" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"><option value="user">User (จัดการงานตัวเอง)</option><option value="monitor">Monitor (ดูได้อย่างเดียว)</option><option value="admin">Admin (จัดการได้ทั้งหมด)</option><option value="unauthorized">ระงับการใช้งาน (Unauthorized)</option></select>
+                                <form id="user-role-form" class="flex flex-col gap-4">
+                                    <div class="flex flex-col md:flex-row gap-4 items-start">
+                                        <div class="w-full md:w-1/2"><label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">อีเมลผู้ใช้งาน</label><input type="email" id="manageUserEmail" required placeholder="เช่น newuser@jescqtec.com" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"></div>
+                                        <div class="w-full md:w-1/2">
+                                            <label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider">ระดับสิทธิ์ (Role)</label>
+                                            <select id="manageUserRole" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"><option value="user">User (จัดการงานตัวเอง)</option><option value="monitor">Monitor (ดูได้อย่างเดียว)</option><option value="admin">Admin (จัดการได้ทั้งหมด)</option><option value="unauthorized">ระงับการใช้งาน (Unauthorized)</option></select>
+                                        </div>
                                     </div>
-                                    <div class="w-full md:w-auto"><button type="submit" id="btn-save-user" class="w-full md:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md flex items-center justify-center gap-2 text-sm h-[38px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกสิทธิ์</button></div>
+                                    <div class="flex flex-col md:flex-row gap-4 items-end border-t border-gray-100 pt-4 mt-2">
+                                        <div class="w-full md:w-1/3"><label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider"><i data-lucide="calendar" class="w-3 h-3 inline"></i> เริ่มต้น (Start Date)</label><input type="date" id="manageUserStartDate" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm text-gray-600" title="ไม่ต้องระบุหากต้องการให้ดูได้ทั้งหมด"></div>
+                                        <div class="w-full md:w-1/3"><label class="block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wider"><i data-lucide="calendar" class="w-3 h-3 inline"></i> สิ้นสุด (End Date)</label><input type="date" id="manageUserEndDate" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm text-gray-600" title="ไม่ต้องระบุหากต้องการให้ดูได้ทั้งหมด"></div>
+                                        <div class="w-full md:w-1/3 flex justify-end"><button type="submit" id="btn-save-user" class="w-full md:w-auto px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-md flex items-center justify-center gap-2 text-sm h-[38px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกสิทธิ์</button></div>
+                                    </div>
                                 </form>
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="users-table-admin">
-                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">อีเมล (Email)</th><th class="px-6 py-4 font-semibold">ระดับสิทธิ์ (Role)</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-right">จัดการ</th></tr></thead>
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">อีเมล (Email)</th><th class="px-6 py-4 font-semibold">ระดับสิทธิ์ (Role)</th><th class="px-6 py-4 font-semibold">สิทธิ์ดูข้อมูล (ช่วงเวลา)</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-right">จัดการ</th></tr></thead>
                                     <tbody id="users-table-body-admin" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
@@ -931,8 +937,21 @@ function switchTab(activeTabId) {
         }
 
         function filterDataByRole(dataList) {
-            if (currentUserRole === 'admin' || currentUserRole === 'monitor') return dataList; 
-            return dataList.filter(item => item.ownerId === currentUser.uid);
+            let filtered = dataList;
+            if (currentUserRole !== 'admin' && currentUserRole !== 'monitor') {
+                filtered = filtered.filter(item => item.ownerId === currentUser.uid);
+            }
+            // กรองข้อมูลตามสิทธิ์ช่วงเวลาที่กำหนดจากแอดมิน (ถ้ามีการตั้งค่าไว้)
+            if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
+                filtered = filtered.filter(item => {
+                    let itemDate = item.receiveDate || item.holidayDate || (item.createdAt ? new Date(item.createdAt).toISOString().split('T')[0] : null);
+                    if (!itemDate) return true; // ถ้าไม่มีข้อมูลเวลา ปล่อยผ่าน
+                    if (currentUserData.viewStartDate && itemDate < currentUserData.viewStartDate) return false;
+                    if (currentUserData.viewEndDate && itemDate > currentUserData.viewEndDate) return false;
+                    return true;
+                });
+            }
+            return filtered;
         }
 
         function populateEmailDropdowns() {
@@ -2933,9 +2952,11 @@ function switchTab(activeTabId) {
             const tbody = document.getElementById('users-table-body-admin'); if (!tbody) return; tbody.innerHTML = '';
             allUsers.forEach(u => {
                 let roleBadge = u.role === 'admin' ? '<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200">Admin</span>' : u.role === 'monitor' ? '<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold border border-blue-200">Monitor</span>' : u.role === 'unauthorized' ? '<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold border border-gray-200">ถูกระงับ (Unauthorized)</span>' : '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">User</span>';
+                let dateRangeHtml = '<span class="text-gray-400 text-xs">- ไม่มีกำหนด -</span>';
+                if (u.viewStartDate || u.viewEndDate) dateRangeHtml = `<span class="text-xs text-indigo-600 font-medium px-2 py-1 bg-indigo-50 rounded border border-indigo-100">${u.viewStartDate ? formatDate(u.viewStartDate) : 'เริ่มต้น'} ถึง ${u.viewEndDate ? formatDate(u.viewEndDate) : 'ปัจจุบัน'}</span>`;
                 const isSuperAdmin = u.email === 'dukender7188@gmail.com', disableDelete = isSuperAdmin ? 'disabled opacity-30 cursor-not-allowed' : '';
                 const isOnline = u.isOnline && (Date.now() - (u.lastActive || 0) < 5 * 60 * 1000), onlineStatusHtml = isOnline ? `<div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_4px_rgba(34,197,94,0.6)]"></div><span class="text-xs font-medium text-gray-600">ออนไลน์</span></div>` : `<div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-full bg-red-500"></div><span class="text-xs font-medium text-gray-400">ไม่ออนไลน์</span></div>`;
-                tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-6 py-4 font-medium text-gray-800">${u.email}</td><td class="px-6 py-4">${roleBadge}</td><td class="px-6 py-4">${onlineStatusHtml}</td><td class="px-6 py-4 text-right"><button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-6 py-4 font-medium text-gray-800">${u.email}</td><td class="px-6 py-4">${roleBadge}</td><td class="px-6 py-4">${dateRangeHtml}</td><td class="px-6 py-4">${onlineStatusHtml}</td><td class="px-6 py-4 text-right"><button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}', '${u.viewStartDate || ''}', '${u.viewEndDate || ''}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
             });
             lucide.createIcons();
         }
@@ -2945,19 +2966,31 @@ function switchTab(activeTabId) {
             if (currentUserRole !== 'admin') return showNotification("คุณไม่มีสิทธิ์จัดการผู้ใช้งาน", "error");
             const emailInput = document.getElementById('manageUserEmail').value.toLowerCase().trim();
             const roleInput = document.getElementById('manageUserRole').value;
+            const startDateInput = document.getElementById('manageUserStartDate').value;
+            const endDateInput = document.getElementById('manageUserEndDate').value;
             const btn = document.getElementById('btn-save-user');
-            if (emailInput === 'dukender7188@gmail.com' && roleInput !== 'admin') return showNotification("ไม่สามารถลดสิทธิ์ผู้ดูแลระบบสูงสุดได้", "error");
             
+            if (emailInput === 'dukender7188@gmail.com' && roleInput !== 'admin') return showNotification("ไม่สามารถลดสิทธิ์ผู้ดูแลระบบสูงสุดได้", "error");
+            if (startDateInput && endDateInput && startDateInput > endDateInput) return showNotification("วันที่เริ่มต้นต้องไม่มากกว่าวันที่สิ้นสุด", "error");
+
             btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; btn.disabled = true;
             try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailInput), { email: emailInput, role: roleInput, updatedAt: Date.now() }, { merge: true });
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailInput), { email: emailInput, role: roleInput, viewStartDate: startDateInput || null, viewEndDate: endDateInput || null, updatedAt: Date.now() }, { merge: true });
                 showNotification(`บันทึกสิทธิ์สำหรับ ${emailInput} สำเร็จ`);
                 document.getElementById('user-role-form').reset();
             } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } 
             finally { btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกสิทธิ์`; btn.disabled = false; lucide.createIcons(); }
         });
 
-        window.editUserRole = (email, role) => { if (email === 'dukender7188@gmail.com') return; document.getElementById('manageUserEmail').value = email; document.getElementById('manageUserRole').value = role; document.getElementById('manageUserEmail').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+        window.editUserRole = (email, role, startDate, endDate) => { 
+            if (email === 'dukender7188@gmail.com') return; 
+            document.getElementById('manageUserEmail').value = email; 
+            document.getElementById('manageUserRole').value = role; 
+            document.getElementById('manageUserStartDate').value = startDate || '';
+            document.getElementById('manageUserEndDate').value = endDate || '';
+            document.getElementById('manageUserEmail').focus(); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        };
         window.deleteUserRole = async (email) => {
             if (currentUserRole !== 'admin' || email === 'dukender7188@gmail.com') return;
             const userToRestore = allUsers.find(u => u.email === email); if (!userToRestore) return;
