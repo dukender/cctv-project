@@ -225,9 +225,9 @@
                         <!-- Sidebar ซ้าย: ประเภทงาน -->
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
                             <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
-                                <i data-lucide="tag" class="w-5 h-5 text-pink-500"></i> สรุปประเภทงาน
+                                <i data-lucide="tag" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปประเภทงาน
                             </h2>
-                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="tasktype-display-count" class="font-bold text-pink-600">0</span> ประเภท</p>
+                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="tasktype-display-count" class="font-bold text-[#5b5fc7]">0</span> ประเภท</p>
                             
                             <div id="tasktype-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
 
@@ -245,14 +245,14 @@
                                 <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
                                     <div class="relative w-full sm:flex-1 min-w-[150px]">
                                         <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                        <input type="text" id="tasktype-search-input" placeholder="ค้นหาประเภทงาน..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow">
+                                        <input type="text" id="tasktype-search-input" placeholder="ค้นหาประเภทงาน..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow">
                                     </div>
-                                    <select id="tasktype-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
+                                    <select id="tasktype-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
                                         <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
                                     </select>
-                                    <input type="date" id="tasktype-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 block">
-                                    <input type="month" id="tasktype-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 hidden">
-                                    <select id="tasktype-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-pink-500 transition-shadow text-gray-600 hidden min-w-[120px]">
+                                    <input type="date" id="tasktype-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                    <input type="month" id="tasktype-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                    <select id="tasktype-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]">
                                         <option value="">ทุกปีทั้งหมด</option>
                                     </select>
                                     <button id="btn-tasktype-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
@@ -1212,10 +1212,10 @@ function switchTab(activeTabId) {
             } else {
                 paginatedTypeData.forEach(r => {
                     const isSelected = currentTasktypeFilter === r.name;
-                    const ringClass = isSelected ? 'ring-2 ring-pink-500 ring-offset-1 scale-[1.01] shadow-md border-pink-500/50' : 'border-pink-100 hover:shadow-sm hover:border-pink-300/40';
+                    const ringClass = isSelected ? 'ring-2 ring-[#5b5fc7] ring-offset-1 scale-[1.01] shadow-md border-[#5b5fc7]/50' : 'border-indigo-100 hover:shadow-sm hover:border-[#5b5fc7]/40';
                     container.innerHTML += `
-                        <div onclick="setTasktypeFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-pink-50/30 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
-                            <p class="text-sm font-bold text-pink-600 truncate w-full leading-relaxed group-hover:text-pink-800 transition-colors" title="${r.name}">${r.name}</p>
+                        <div onclick="setTasktypeFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-indigo-50/50 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
+                            <p class="text-sm font-bold text-[#5b5fc7] truncate w-full leading-relaxed group-hover:text-indigo-800 transition-colors" title="${r.name}">${r.name}</p>
                             <div class="flex items-baseline justify-center gap-1.5 mt-0.5">
                                 <span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span>
                                 <span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) งาน</span>
@@ -1271,7 +1271,7 @@ function switchTab(activeTabId) {
             const projectCountContainer = document.getElementById('tasktype-project-count-container');
             if (projectCountContainer) {
                 projectCountContainer.innerHTML = `
-                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-pink-600 text-xl px-1">${namedCount}</span> โครงการ</h3>
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">${namedCount}</span> โครงการ</h3>
                     ${unnamedCount > 0 ? `<span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">(มีงานที่ไม่ได้ระบุโครงการอีก ${unnamedCount} รายการ)</span>` : ''}
                 `;
             }
@@ -1291,21 +1291,21 @@ function switchTab(activeTabId) {
                 paginatedTableData.forEach((row, index) => {
                     const globalIndex = startTableIndex + index + 1;
                     const isNoProject = row.projectName === 'ไม่ได้ระบุโครงการ';
-                    const projectNameHtml = isNoProject ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-pink-600 hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
+                    const projectNameHtml = isNoProject ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td>
                             <td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td>
                             <td class="px-6 py-3">${projectNameHtml}</td>
-                            <td class="px-6 py-3 font-medium text-pink-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td>
+                            <td class="px-6 py-3 font-medium text-indigo-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">${row.taskCount}</td>
                         </tr>
                     `;
                 });
 
                 if (paginationContainer && tableData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-pink-600">${startTableIndex + 1}</span> ถึง <span class="font-bold text-pink-600">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-pink-600">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-pink-600">หน้า ${tasktypeCurrentPage} / ${totalTablePages}</div><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${tasktypeCurrentPage} / ${totalTablePages}</div><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
                 } else if(paginationContainer) { paginationContainer.innerHTML = ''; }
             }
             lucide.createIcons();
