@@ -91,6 +91,14 @@
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="tag" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปประเภทงาน</span>
                         </button>
+                        <button id="tab-system-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
+                            <i data-lucide="server" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุประบบงาน</span>
+                        </button>
+                        <button id="tab-brandsum-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
+                            <i data-lucide="cpu" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปยี่ห้ออุปกรณ์</span>
+                        </button>
                         <button id="tab-responsible-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="users-round" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปผู้รับผิดชอบ</span>
@@ -295,7 +303,90 @@
                         </div>
                     </div>
                 </div>
-                    
+                <!-- หน้าสรุประบบงาน -->
+                <div id="view-system-summary" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="server" class="w-5 h-5 text-[#5b5fc7]"></i> สรุประบบงาน</h2>
+                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="system-display-count" class="font-bold text-[#5b5fc7]">0</span> ระบบ</p>
+                            <div id="system-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                            <div id="system-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                <button onclick="changeSystemCardPage(-1)" id="btn-system-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <span id="system-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                <button onclick="changeSystemCardPage(1)" id="btn-system-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="system-project-count-container"></div>
+                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="system-search-input" placeholder="ค้นหาระบบงาน..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]"></div>
+                                    <select id="system-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] bg-white"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                    <input type="date" id="system-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block">
+                                    <input type="month" id="system-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden">
+                                    <select id="system-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                    <button id="btn-system-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-system-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-system-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto min-h-[200px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="system-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ระบบงาน</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th></tr>
+                                    </thead>
+                                    <tbody id="system-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="system-summary-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- หน้าสรุปยี่ห้ออุปกรณ์ -->
+                <div id="view-brandsum-summary" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2"><i data-lucide="cpu" class="w-5 h-5 text-[#5b5fc7]"></i> สรุปยี่ห้ออุปกรณ์</h2>
+                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="brandsum-display-count" class="font-bold text-[#5b5fc7]">0</span> ยี่ห้อ</p>
+                            <div id="brandsum-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                            <div id="brandsum-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                <button onclick="changeBrandsumCardPage(-1)" id="btn-brandsum-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <span id="brandsum-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                <button onclick="changeBrandsumCardPage(1)" id="btn-brandsum-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3" id="brandsum-project-count-container"></div>
+                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="brandsum-search-input" placeholder="ค้นหายี่ห้อ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7]"></div>
+                                    <select id="brandsum-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] bg-white"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                    <input type="date" id="brandsum-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block">
+                                    <input type="month" id="brandsum-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden">
+                                    <select id="brandsum-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                    <button id="btn-brandsum-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-brandsum-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-brandsum-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto min-h-[200px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="brandsum-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงานล่าสุด</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ยี่ห้ออุปกรณ์</th><th class="px-4 py-4 font-semibold text-center w-32">จำนวนงาน (งาน)</th></tr>
+                                    </thead>
+                                    <tbody id="brandsum-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="brandsum-summary-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+
                 <!-- หน้าสรุปผู้รับผิดชอบ -->
                 <div id="view-responsible-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
@@ -781,6 +872,8 @@ function switchTab(activeTabId) {
             else if (activeTabId === 'list' && typeof filterAndRenderTasks === 'function') filterAndRenderTasks(); 
             else if (activeTabId === 'project-summary' && typeof renderProjectSummary === 'function') renderProjectSummary(); 
             else if (activeTabId === 'tasktype-summary' && typeof renderTasktypeSummary === 'function') renderTasktypeSummary(); 
+            else if (activeTabId === 'system-summary' && typeof renderSystemSummary === 'function') renderSystemSummary(); 
+            else if (activeTabId === 'brandsum-summary' && typeof renderBrandsumSummary === 'function') renderBrandsumSummary(); 
             else if (activeTabId === 'responsible-summary' && typeof renderResponsibleSummary === 'function') renderResponsibleSummary(); 
             else if (activeTabId === 'customer-summary' && typeof renderCustomerSummary === 'function') renderCustomerSummary(); 
             else if (activeTabId === 'manage') { 
@@ -802,6 +895,8 @@ function switchTab(activeTabId) {
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
         document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
         document.getElementById('tab-tasktype-summary')?.addEventListener('click', () => switchTab('tasktype-summary'));
+        document.getElementById('tab-system-summary')?.addEventListener('click', () => switchTab('system-summary'));
+        document.getElementById('tab-brandsum-summary')?.addEventListener('click', () => switchTab('brandsum-summary'));
         document.getElementById('tab-responsible-summary')?.addEventListener('click', () => switchTab('responsible-summary'));
         document.getElementById('tab-customer-summary')?.addEventListener('click', () => switchTab('customer-summary'));
         document.getElementById('tab-manage')?.addEventListener('click', () => { currentEditTaskId = null; resetFormToAddMode(); switchTab('manage'); });
@@ -862,6 +957,8 @@ function switchTab(activeTabId) {
             if (viewList && !viewList.classList.contains('hidden')) filterAndRenderTasks();
             if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
             if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
+            const viewSystem = document.getElementById('view-system-summary'); if (viewSystem && !viewSystem.classList.contains('hidden')) renderSystemSummary();
+            const viewBrandsum = document.getElementById('view-brandsum-summary'); if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
             if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
             if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
         });
@@ -950,6 +1047,8 @@ function switchTab(activeTabId) {
                 if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard(); 
                 if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
                 if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
+                const viewSystem = document.getElementById('view-system-summary'); if (viewSystem && !viewSystem.classList.contains('hidden')) renderSystemSummary();
+                const viewBrandsum = document.getElementById('view-brandsum-summary'); if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
                 if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
                 if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
             }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล'; statusEl.className = 'text-red-500 font-bold'; });
@@ -1390,6 +1489,182 @@ function switchTab(activeTabId) {
             showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('tasktype-summary-table');
             html2pdf().set({ margin: 0.4, filename: `TaskType_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
+        
+        // --- Logic สำหรับหน้า สรุประบบงาน (System Summary) ---
+        let currentSystemFilteredData = [], currentSystemFilter = 'all', systemCurrentPage = 1, systemCardCurrentPage = 1; 
+        window.setSystemFilter = (name) => { currentSystemFilter = currentSystemFilter === name ? 'all' : name; systemCurrentPage = 1; renderSystemSummary(); };
+        window.goToSystemSummaryPage = (page) => { systemCurrentPage = page; renderSystemSummary(); };
+        window.changeSystemCardPage = (dir) => { systemCardCurrentPage += dir; renderSystemSummary(); };
+
+        function renderSystemSummary() {
+            const container = document.getElementById('system-cards-container'), tbody = document.getElementById('system-summary-body');
+            if (!container || !tbody) return;
+            let tasksToUse = getTasksByFilter();
+            const searchInput = document.getElementById('system-search-input')?.value.toLowerCase() || '';
+            const timeType = document.getElementById('system-search-time-type')?.value || 'day';
+            const searchDate = document.getElementById('system-search-date')?.value, searchMonth = document.getElementById('system-search-month')?.value, searchYear = document.getElementById('system-search-year')?.value;
+
+            const filteredTasks = tasksToUse.filter(t => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = t.receiveDate === searchDate;
+                else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
+                else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
+                let sysNames = (t.systems || []).map(s => s.system).join(' ');
+                const searchString = [t.taskName || '', t.projectName || '', sysNames].join(' ').toLowerCase();
+                return matchTime && (searchInput ? searchString.includes(searchInput) : true);
+            });
+
+            const typeCounts = {}; let totalTasksCount = filteredTasks.length;
+            filteredTasks.forEach(t => {
+                let sysArray = Array.isArray(t.systems) && t.systems.length > 0 ? t.systems : [{system: 'ไม่ระบุ'}];
+                let uniqueSys = new Set(sysArray.map(s => (s.system && s.system.trim() !== '') ? s.system.trim() : 'ไม่ระบุ'));
+                uniqueSys.forEach(sys => { typeCounts[sys] = (typeCounts[sys] || 0) + 1; });
+            });
+
+            const typeData = Object.keys(typeCounts).map(name => ({ name: name, count: typeCounts[name], percent: totalTasksCount > 0 ? Math.round((typeCounts[name] / totalTasksCount) * 100) : 0 })).sort((a, b) => b.count - a.count);
+            document.getElementById('system-display-count').textContent = typeData.length;
+
+            const totalCardPages = Math.ceil(typeData.length / tasktypeCardsPerPage) || 1;
+            if (systemCardCurrentPage > totalCardPages) systemCardCurrentPage = totalCardPages;
+            const startCardIndex = (systemCardCurrentPage - 1) * tasktypeCardsPerPage, paginatedTypeData = typeData.slice(startCardIndex, startCardIndex + tasktypeCardsPerPage);
+
+            container.innerHTML = ''; const paginationEl = document.getElementById('system-cards-pagination');
+            if (typeData.length === 0) { container.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-50 rounded-lg text-sm">ไม่พบข้อมูลระบบงาน</div>`; paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); } 
+            else {
+                paginatedTypeData.forEach(r => {
+                    const isSelected = currentSystemFilter === r.name, ringClass = isSelected ? 'ring-2 ring-[#5b5fc7] scale-[1.01] shadow-md border-[#5b5fc7]/50' : 'border-indigo-100 hover:shadow-sm hover:border-[#5b5fc7]/40';
+                    container.innerHTML += `<div onclick="setSystemFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-indigo-50/50 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0"><p class="text-sm font-bold text-[#5b5fc7] truncate group-hover:text-indigo-800 transition-colors" title="${r.name}">${r.name}</p><div class="flex items-baseline justify-center gap-1.5 mt-0.5"><span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span><span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) งาน</span></div></div>`;
+                });
+                if (typeData.length > tasktypeCardsPerPage) { paginationEl.classList.remove('hidden'); paginationEl.classList.add('flex'); document.getElementById('system-cards-page-text').textContent = `หน้า ${systemCardCurrentPage} / ${totalCardPages}`; document.getElementById('btn-system-card-prev').disabled = systemCardCurrentPage === 1; document.getElementById('btn-system-card-next').disabled = systemCardCurrentPage === totalCardPages; } else { paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); }
+            }
+
+            let tableTasks = filteredTasks;
+            if (currentSystemFilter !== 'all') { tableTasks = filteredTasks.filter(t => { let sysArray = Array.isArray(t.systems) && t.systems.length > 0 ? t.systems : [{system: 'ไม่ระบุ'}]; let sysNames = sysArray.map(s => (s.system && s.system.trim() !== '') ? s.system.trim() : 'ไม่ระบุ'); return sysNames.includes(currentSystemFilter); }); }
+
+            const projectMap = {};
+            tableTasks.forEach(t => {
+                const pName = t.projectName || 'ไม่ได้ระบุโครงการ';
+                if (!projectMap[pName]) { projectMap[pName] = { projectName: pName, itemTypes: new Set(), taskCount: 0, latestDate: t.receiveDate || '' }; }
+                let sysArray = Array.isArray(t.systems) && t.systems.length > 0 ? t.systems : [{system: 'ไม่ระบุ'}];
+                sysArray.forEach(s => { let sName = (s.system && s.system.trim() !== '') ? s.system.trim() : 'ไม่ระบุ'; if (sName !== 'ไม่ระบุ') projectMap[pName].itemTypes.add(sName); });
+                projectMap[pName].taskCount++;
+                if (t.receiveDate && t.receiveDate > projectMap[pName].latestDate) projectMap[pName].latestDate = t.receiveDate;
+            });
+
+            const tableData = Object.values(projectMap).map(p => ({ ...p, displayType: Array.from(p.itemTypes).sort((a,b) => a.localeCompare(b, 'th')).join(', ') || 'ไม่ระบุ' })).sort((a, b) => { if (a.latestDate !== b.latestDate) return (b.latestDate || '').localeCompare(a.latestDate || ''); return b.taskCount - a.taskCount; });
+            currentSystemFilteredData = tableData;
+            
+            let namedCount = 0, unnamedCount = 0; tableData.forEach(row => { if (row.projectName === 'ไม่ได้ระบุโครงการ' || row.projectName.trim() === '') unnamedCount++; else namedCount++; });
+            document.getElementById('system-project-count-container').innerHTML = `<h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">${namedCount}</span> โครงการ</h3>${unnamedCount > 0 ? `<span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">(มีงานที่ไม่ได้ระบุโครงการอีก ${unnamedCount} รายการ)</span>` : ''}`;
+
+            const totalTablePages = Math.ceil(tableData.length / itemsPerPage) || 1; if (systemCurrentPage > totalTablePages) systemCurrentPage = totalTablePages;
+            const startTableIndex = (systemCurrentPage - 1) * itemsPerPage, paginatedTableData = tableData.slice(startTableIndex, startTableIndex + itemsPerPage);
+            const paginationContainer = document.getElementById('system-summary-pagination'); tbody.innerHTML = '';
+
+            if (paginatedTableData.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตามเงื่อนไข</td></tr>`; if(paginationContainer) paginationContainer.innerHTML = ''; } 
+            else {
+                paginatedTableData.forEach((row, index) => {
+                    const globalIndex = startTableIndex + index + 1, projectNameHtml = row.projectName === 'ไม่ได้ระบุโครงการ' ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
+                    tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td><td class="px-6 py-3">${projectNameHtml}</td><td class="px-6 py-3 font-medium text-indigo-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td><td class="px-4 py-3 text-center font-semibold text-gray-800">${row.taskCount}</td></tr>`;
+                });
+                if (paginationContainer && tableData.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(startTableIndex + itemsPerPage, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToSystemSummaryPage(${systemCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${systemCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${systemCurrentPage} / ${totalTablePages}</div><button onclick="goToSystemSummaryPage(${systemCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${systemCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`; else if(paginationContainer) paginationContainer.innerHTML = '';
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('system-search-time-type')?.addEventListener('change', (e) => { const type = e.target.value, dateInput = document.getElementById('system-search-date'), monthInput = document.getElementById('system-search-month'), yearInput = document.getElementById('system-search-year'); if(dateInput) { dateInput.className = type === 'day' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block" : "hidden"; dateInput.value = ''; } if(monthInput) { monthInput.className = type === 'month' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block" : "hidden"; monthInput.value = ''; } if(yearInput) { yearInput.className = type === 'year' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block" : "hidden"; yearInput.value = ''; } systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); });
+        document.getElementById('system-search-input')?.addEventListener('input', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); }); document.getElementById('system-search-date')?.addEventListener('change', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); }); document.getElementById('system-search-month')?.addEventListener('change', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); }); document.getElementById('system-search-year')?.addEventListener('change', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); });
+        document.getElementById('btn-system-reset-search')?.addEventListener('click', () => { const searchInput = document.getElementById('system-search-input'), timeType = document.getElementById('system-search-time-type'); if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } currentSystemFilter = 'all'; systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); });
+        document.getElementById('btn-system-export-excel')?.addEventListener('click', () => { if (currentSystemFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); const exportData = currentSystemFilteredData.map((r, idx) => ({ 'ลำดับ': idx + 1, 'วันที่รับงานล่าสุด': r.latestDate ? formatDate(r.latestDate) : '-', 'ชื่อโครงการ': r.projectName, 'ระบบงาน': r.displayType, 'จำนวนงาน (งาน)': r.taskCount })); const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "System Summary"); XLSX.writeFile(workbook, `System_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ"); });
+        document.getElementById('btn-system-export-pdf')?.addEventListener('click', () => { if (currentSystemFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('system-summary-table'); html2pdf().set({ margin: 0.4, filename: `System_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ")); });
+
+        // --- Logic สำหรับหน้า สรุปยี่ห้ออุปกรณ์ (Brand Summary) ---
+        let currentBrandsumFilteredData = [], currentBrandsumFilter = 'all', brandsumCurrentPage = 1, brandsumCardCurrentPage = 1; 
+        window.setBrandsumFilter = (name) => { currentBrandsumFilter = currentBrandsumFilter === name ? 'all' : name; brandsumCurrentPage = 1; renderBrandsumSummary(); };
+        window.goToBrandsumSummaryPage = (page) => { brandsumCurrentPage = page; renderBrandsumSummary(); };
+        window.changeBrandsumCardPage = (dir) => { brandsumCardCurrentPage += dir; renderBrandsumSummary(); };
+
+        function renderBrandsumSummary() {
+            const container = document.getElementById('brandsum-cards-container'), tbody = document.getElementById('brandsum-summary-body');
+            if (!container || !tbody) return;
+            let tasksToUse = getTasksByFilter();
+            const searchInput = document.getElementById('brandsum-search-input')?.value.toLowerCase() || '';
+            const timeType = document.getElementById('brandsum-search-time-type')?.value || 'day';
+            const searchDate = document.getElementById('brandsum-search-date')?.value, searchMonth = document.getElementById('brandsum-search-month')?.value, searchYear = document.getElementById('brandsum-search-year')?.value;
+
+            const filteredTasks = tasksToUse.filter(t => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = t.receiveDate === searchDate;
+                else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
+                else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
+                let brandNames = (t.systems || []).map(s => s.brand).join(' ');
+                const searchString = [t.taskName || '', t.projectName || '', brandNames].join(' ').toLowerCase();
+                return matchTime && (searchInput ? searchString.includes(searchInput) : true);
+            });
+
+            const typeCounts = {}; let totalTasksCount = filteredTasks.length;
+            filteredTasks.forEach(t => {
+                let sysArray = Array.isArray(t.systems) && t.systems.length > 0 ? t.systems : [{brand: 'ไม่ระบุ'}];
+                let uniqueBrand = new Set(sysArray.map(s => (s.brand && s.brand.trim() !== '') ? s.brand.trim() : 'ไม่ระบุ'));
+                uniqueBrand.forEach(b => { typeCounts[b] = (typeCounts[b] || 0) + 1; });
+            });
+
+            const typeData = Object.keys(typeCounts).map(name => ({ name: name, count: typeCounts[name], percent: totalTasksCount > 0 ? Math.round((typeCounts[name] / totalTasksCount) * 100) : 0 })).sort((a, b) => b.count - a.count);
+            document.getElementById('brandsum-display-count').textContent = typeData.length;
+
+            const totalCardPages = Math.ceil(typeData.length / tasktypeCardsPerPage) || 1;
+            if (brandsumCardCurrentPage > totalCardPages) brandsumCardCurrentPage = totalCardPages;
+            const startCardIndex = (brandsumCardCurrentPage - 1) * tasktypeCardsPerPage, paginatedTypeData = typeData.slice(startCardIndex, startCardIndex + tasktypeCardsPerPage);
+
+            container.innerHTML = ''; const paginationEl = document.getElementById('brandsum-cards-pagination');
+            if (typeData.length === 0) { container.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-50 rounded-lg text-sm">ไม่พบข้อมูลยี่ห้ออุปกรณ์</div>`; paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); } 
+            else {
+                paginatedTypeData.forEach(r => {
+                    const isSelected = currentBrandsumFilter === r.name, ringClass = isSelected ? 'ring-2 ring-[#5b5fc7] scale-[1.01] shadow-md border-[#5b5fc7]/50' : 'border-indigo-100 hover:shadow-sm hover:border-[#5b5fc7]/40';
+                    container.innerHTML += `<div onclick="setBrandsumFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-indigo-50/50 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0"><p class="text-sm font-bold text-[#5b5fc7] truncate group-hover:text-indigo-800 transition-colors" title="${r.name}">${r.name}</p><div class="flex items-baseline justify-center gap-1.5 mt-0.5"><span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span><span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) งาน</span></div></div>`;
+                });
+                if (typeData.length > tasktypeCardsPerPage) { paginationEl.classList.remove('hidden'); paginationEl.classList.add('flex'); document.getElementById('brandsum-cards-page-text').textContent = `หน้า ${brandsumCardCurrentPage} / ${totalCardPages}`; document.getElementById('btn-brandsum-card-prev').disabled = brandsumCardCurrentPage === 1; document.getElementById('btn-brandsum-card-next').disabled = brandsumCardCurrentPage === totalCardPages; } else { paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); }
+            }
+
+            let tableTasks = filteredTasks;
+            if (currentBrandsumFilter !== 'all') { tableTasks = filteredTasks.filter(t => { let sysArray = Array.isArray(t.systems) && t.systems.length > 0 ? t.systems : [{brand: 'ไม่ระบุ'}]; let bNames = sysArray.map(s => (s.brand && s.brand.trim() !== '') ? s.brand.trim() : 'ไม่ระบุ'); return bNames.includes(currentBrandsumFilter); }); }
+
+            const projectMap = {};
+            tableTasks.forEach(t => {
+                const pName = t.projectName || 'ไม่ได้ระบุโครงการ';
+                if (!projectMap[pName]) { projectMap[pName] = { projectName: pName, itemTypes: new Set(), taskCount: 0, latestDate: t.receiveDate || '' }; }
+                let sysArray = Array.isArray(t.systems) && t.systems.length > 0 ? t.systems : [{brand: 'ไม่ระบุ'}];
+                sysArray.forEach(s => { let bName = (s.brand && s.brand.trim() !== '') ? s.brand.trim() : 'ไม่ระบุ'; if (bName !== 'ไม่ระบุ') projectMap[pName].itemTypes.add(bName); });
+                projectMap[pName].taskCount++;
+                if (t.receiveDate && t.receiveDate > projectMap[pName].latestDate) projectMap[pName].latestDate = t.receiveDate;
+            });
+
+            const tableData = Object.values(projectMap).map(p => ({ ...p, displayType: Array.from(p.itemTypes).sort((a,b) => a.localeCompare(b, 'th')).join(', ') || 'ไม่ระบุ' })).sort((a, b) => { if (a.latestDate !== b.latestDate) return (b.latestDate || '').localeCompare(a.latestDate || ''); return b.taskCount - a.taskCount; });
+            currentBrandsumFilteredData = tableData;
+            
+            let namedCount = 0, unnamedCount = 0; tableData.forEach(row => { if (row.projectName === 'ไม่ได้ระบุโครงการ' || row.projectName.trim() === '') unnamedCount++; else namedCount++; });
+            document.getElementById('brandsum-project-count-container').innerHTML = `<h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">จำนวนโครงการ: <span class="text-[#5b5fc7] text-xl px-1">${namedCount}</span> โครงการ</h3>${unnamedCount > 0 ? `<span class="bg-orange-50 text-orange-700 px-2.5 py-1.5 rounded-md border border-orange-200 text-sm font-medium">(มีงานที่ไม่ได้ระบุโครงการอีก ${unnamedCount} รายการ)</span>` : ''}`;
+
+            const totalTablePages = Math.ceil(tableData.length / itemsPerPage) || 1; if (brandsumCurrentPage > totalTablePages) brandsumCurrentPage = totalTablePages;
+            const startTableIndex = (brandsumCurrentPage - 1) * itemsPerPage, paginatedTableData = tableData.slice(startTableIndex, startTableIndex + itemsPerPage);
+            const paginationContainer = document.getElementById('brandsum-summary-pagination'); tbody.innerHTML = '';
+
+            if (paginatedTableData.length === 0) { tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตามเงื่อนไข</td></tr>`; if(paginationContainer) paginationContainer.innerHTML = ''; } 
+            else {
+                paginatedTableData.forEach((row, index) => {
+                    const globalIndex = startTableIndex + index + 1, projectNameHtml = row.projectName === 'ไม่ได้ระบุโครงการ' ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
+                    tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td><td class="px-6 py-3">${projectNameHtml}</td><td class="px-6 py-3 font-medium text-indigo-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td><td class="px-4 py-3 text-center font-semibold text-gray-800">${row.taskCount}</td></tr>`;
+                });
+                if (paginationContainer && tableData.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(startTableIndex + itemsPerPage, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToBrandsumSummaryPage(${brandsumCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${brandsumCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${brandsumCurrentPage} / ${totalTablePages}</div><button onclick="goToBrandsumSummaryPage(${brandsumCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${brandsumCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`; else if(paginationContainer) paginationContainer.innerHTML = '';
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('brandsum-search-time-type')?.addEventListener('change', (e) => { const type = e.target.value, dateInput = document.getElementById('brandsum-search-date'), monthInput = document.getElementById('brandsum-search-month'), yearInput = document.getElementById('brandsum-search-year'); if(dateInput) { dateInput.className = type === 'day' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block" : "hidden"; dateInput.value = ''; } if(monthInput) { monthInput.className = type === 'month' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block" : "hidden"; monthInput.value = ''; } if(yearInput) { yearInput.className = type === 'year' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] block" : "hidden"; yearInput.value = ''; } brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); });
+        document.getElementById('brandsum-search-input')?.addEventListener('input', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); }); document.getElementById('brandsum-search-date')?.addEventListener('change', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); }); document.getElementById('brandsum-search-month')?.addEventListener('change', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); }); document.getElementById('brandsum-search-year')?.addEventListener('change', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); });
+        document.getElementById('btn-brandsum-reset-search')?.addEventListener('click', () => { const searchInput = document.getElementById('brandsum-search-input'), timeType = document.getElementById('brandsum-search-time-type'); if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } currentBrandsumFilter = 'all'; brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); });
+        document.getElementById('btn-brandsum-export-excel')?.addEventListener('click', () => { if (currentBrandsumFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); const exportData = currentBrandsumFilteredData.map((r, idx) => ({ 'ลำดับ': idx + 1, 'วันที่รับงานล่าสุด': r.latestDate ? formatDate(r.latestDate) : '-', 'ชื่อโครงการ': r.projectName, 'ยี่ห้ออุปกรณ์': r.displayType, 'จำนวนงาน (งาน)': r.taskCount })); const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Brand Summary"); XLSX.writeFile(workbook, `Brand_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ"); });
+        document.getElementById('btn-brandsum-export-pdf')?.addEventListener('click', () => { if (currentBrandsumFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('brandsum-summary-table'); html2pdf().set({ margin: 0.4, filename: `Brand_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ")); });
         
         // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
         let currentRespFilteredData = [];
