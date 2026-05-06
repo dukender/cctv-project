@@ -1862,7 +1862,7 @@ function switchTab(activeTabId) {
                     const isNoProject = row.projectName === 'ไม่ได้ระบุโครงการ';
                     const projectNameHtml = isNoProject ? 
                         `<span class="text-gray-500 italic">${row.projectName}</span>` : 
-                        `<span class="font-bold text-gray-800">${row.projectName}</span>`;
+                        `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-50 transition-colors">
@@ -2123,7 +2123,7 @@ function switchTab(activeTabId) {
                     const isNoProject = row.projectName === 'ไม่ได้ระบุโครงการ';
                     const projectNameHtml = isNoProject ? 
                         `<span class="text-gray-500 italic">${row.projectName}</span>` : 
-                        `<span class="font-bold text-gray-800">${row.projectName}</span>`;
+                        `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
                     
                     tbody.innerHTML += `
                         <tr class="hover:bg-gray-50 transition-colors">
@@ -2487,6 +2487,21 @@ function switchTab(activeTabId) {
         document.getElementById('btn-open-holiday-modal')?.addEventListener('click', () => { if (holidayForm) holidayForm.reset(); const dateInput = document.getElementById('holidayDate'); if (dateInput) dateInput.value = getThaiDateString(); holidayModal?.classList.remove('hidden'); });
         document.getElementById('close-holiday-modal')?.addEventListener('click', () => holidayModal?.classList.add('hidden'));
         document.getElementById('close-day-modal')?.addEventListener('click', () => { document.getElementById('day-detail-modal')?.classList.add('hidden'); document.getElementById('day-detail-modal')?.classList.remove('flex'); });
+
+        // --- ฟังก์ชันกดปุ่ม Esc เพื่อปิด Pop-up ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const hModal = document.getElementById('holiday-form-modal');
+                if (hModal && !hModal.classList.contains('hidden')) {
+                    hModal.classList.add('hidden');
+                }
+                const dModal = document.getElementById('day-detail-modal');
+                if (dModal && !dModal.classList.contains('hidden')) {
+                    dModal.classList.add('hidden');
+                    dModal.classList.remove('flex');
+                }
+            }
+        });
 
         holidayForm?.addEventListener('submit', async (e) => {
             e.preventDefault(); if (!currentUser || currentUserRole === 'monitor') return;
