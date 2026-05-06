@@ -719,33 +719,37 @@
         function switchTab(activeTabId) {
             const isLeavingManage = viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage) resetFormToAddMode();
-            [viewDashboard, viewCalendar, viewList, viewProjectSummary, viewTasktypeSummary, viewResponsibleSummary, viewCustomerSummary, viewManage, viewUsers].forEach(v => { v?.classList.add('hidden'); v?.classList.remove('block'); });
             
-            ['tab-dashboard', 'tab-calendar', 'tab-list', 'tab-project-summary', 'tab-responsible-summary', 'tab-customer-summary', 'tab-manage', 'tab-users'].forEach(t => {
-                const el = document.getElementById(t);
-                if(el) {
-                    el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
-                    el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
-                }
+            document.querySelectorAll('[id^="view-"]').forEach(v => {
+                v.classList.add('hidden');
+                v.classList.remove('block');
+            });
+            
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
+                el.classList.add('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
             });
 
-            const activateTabBtn = (tabId) => {
-                const el = document.getElementById('tab-' + tabId);
-                if(el) {
-                    el.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
-                    el.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
-                }
-            };
+            document.querySelectorAll('#view-' + activeTabId).forEach(targetView => {
+                targetView.classList.remove('hidden');
+                targetView.classList.add('block');
+            });
 
-            if (activeTabId === 'dashboard') { viewDashboard?.classList.remove('hidden'); viewDashboard?.classList.add('block'); activateTabBtn('dashboard'); renderDashboard(); }
-            else if (activeTabId === 'calendar') { viewCalendar?.classList.remove('hidden'); viewCalendar?.classList.add('block'); activateTabBtn('calendar'); renderCalendar(); }
-            else if (activeTabId === 'list') { viewList?.classList.remove('hidden'); viewList?.classList.add('block'); activateTabBtn('list'); filterAndRenderTasks(); }
-            else if (activeTabId === 'project-summary') { viewProjectSummary?.classList.remove('hidden'); viewProjectSummary?.classList.add('block'); activateTabBtn('project-summary'); renderProjectSummary(); }
-            else if (activeTabId === 'tasktype-summary') { viewTasktypeSummary?.classList.remove('hidden'); viewTasktypeSummary?.classList.add('block'); activateTabBtn('tasktype-summary'); renderTasktypeSummary(); }
-            else if (activeTabId === 'responsible-summary') { viewResponsibleSummary?.classList.remove('hidden'); viewResponsibleSummary?.classList.add('block'); activateTabBtn('responsible-summary'); renderResponsibleSummary(); }
-            else if (activeTabId === 'customer-summary') { viewCustomerSummary?.classList.remove('hidden'); viewCustomerSummary?.classList.add('block'); activateTabBtn('customer-summary'); renderCustomerSummary(); }
-            else if (activeTabId === 'manage') { viewManage?.classList.remove('hidden'); viewManage?.classList.add('block'); activateTabBtn('manage'); document.getElementById('form-title').innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"; }
-            else if (activeTabId === 'users') { viewUsers?.classList.remove('hidden'); viewUsers?.classList.add('block'); activateTabBtn('users'); }
+            document.querySelectorAll('#tab-' + activeTabId).forEach(targetTab => {
+                targetTab.classList.add('bg-indigo-50', 'text-[#5b5fc7]', 'ring-1', 'ring-[#5b5fc7]/20');
+                targetTab.classList.remove('text-gray-500', 'hover:bg-gray-100', 'hover:text-gray-800');
+            });
+
+            if (activeTabId === 'dashboard') renderDashboard(); 
+            else if (activeTabId === 'calendar') renderCalendar(); 
+            else if (activeTabId === 'list') filterAndRenderTasks(); 
+            else if (activeTabId === 'project-summary') renderProjectSummary(); 
+            else if (activeTabId === 'tasktype-summary') renderTasktypeSummary(); 
+            else if (activeTabId === 'responsible-summary') renderResponsibleSummary(); 
+            else if (activeTabId === 'customer-summary') renderCustomerSummary(); 
+            else if (activeTabId === 'manage') { 
+                document.querySelectorAll('#form-title').forEach(t => t.innerText = currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"); 
+            }
             
             if (window.innerWidth < 1024 && sidebarMenu && !sidebarMenu.classList.contains('-translate-x-full')) {
                 toggleMobileMenu();
