@@ -1184,22 +1184,30 @@
             tableTasks.forEach(t => {
                 const pName = t.projectName || 'ไม่ได้ระบุโครงการ';
                 const rName = t.responsibleName || 'ไม่ระบุ';
-                const key = pName + '|' + rName;
+                const key = pName; // จัดกลุ่มด้วยชื่อโครงการเท่านั้น
                 if (!projectMap[key]) {
                     projectMap[key] = {
                         projectName: pName,
-                        responsibleName: rName,
+                        responsibleNames: new Set(), // ใช้ Set เพื่อเก็บชื่อไม่ให้ซ้ำกัน
                         taskCount: 0,
                         latestDate: t.receiveDate || ''
                     };
                 }
+                if (rName !== 'ไม่ระบุ') projectMap[key].responsibleNames.add(rName);
                 projectMap[key].taskCount++;
                 if (t.receiveDate && t.receiveDate > projectMap[key].latestDate) {
                     projectMap[key].latestDate = t.receiveDate;
                 }
             });
 
-            const tableData = Object.values(projectMap).sort((a, b) => {
+            const tableData = Object.values(projectMap).map(p => {
+                const namesArray = Array.from(p.responsibleNames);
+                return {
+                    ...p,
+                    // รวมชื่อด้วยเครื่องหมายลูกน้ำ
+                    responsibleName: namesArray.length > 0 ? namesArray.join(', ') : 'ไม่ระบุ'
+                };
+            }).sort((a, b) => {
                 if (a.latestDate !== b.latestDate) {
                     return (b.latestDate || '').localeCompare(a.latestDate || '');
                 }
@@ -1437,22 +1445,30 @@
             tableTasks.forEach(t => {
                 const pName = t.projectName || 'ไม่ได้ระบุโครงการ';
                 const cName = t.customerName || 'ไม่ระบุ';
-                const key = pName + '|' + cName;
+                const key = pName; // จัดกลุ่มด้วยชื่อโครงการเท่านั้น
                 if (!projectMap[key]) {
                     projectMap[key] = {
                         projectName: pName,
-                        customerName: cName,
+                        customerNames: new Set(), // ใช้ Set เพื่อเก็บชื่อลูกค้าไม่ให้ซ้ำ
                         taskCount: 0,
                         latestDate: t.receiveDate || ''
                     };
                 }
+                if (cName !== 'ไม่ระบุ') projectMap[key].customerNames.add(cName);
                 projectMap[key].taskCount++;
                 if (t.receiveDate && t.receiveDate > projectMap[key].latestDate) {
                     projectMap[key].latestDate = t.receiveDate;
                 }
             });
 
-            const tableData = Object.values(projectMap).sort((a, b) => {
+            const tableData = Object.values(projectMap).map(p => {
+                const namesArray = Array.from(p.customerNames);
+                return {
+                    ...p,
+                    // รวมชื่อด้วยเครื่องหมายลูกน้ำ
+                    customerName: namesArray.length > 0 ? namesArray.join(', ') : 'ไม่ระบุ'
+                };
+            }).sort((a, b) => {
                 if (a.latestDate !== b.latestDate) {
                     return (b.latestDate || '').localeCompare(a.latestDate || '');
                 }
