@@ -2012,7 +2012,17 @@
                 destroyChart('project');
                 const allProjKeys = Object.keys(projectCounts).sort((a,b) => projectCounts[b] - projectCounts[a]);
                 let finalProjKeys = [], finalProjValues = [];
-                if (allProjKeys.length > 10) { finalProjKeys = allProjKeys.slice(0, 9); finalProjValues = finalProjKeys.map(k => projectCounts[k]); finalProjKeys.push('โครงการอื่นๆ'); finalProjValues.push(allProjKeys.slice(9).reduce((sum, key) => sum + projectCounts[key], 0)); } else { finalProjKeys = allProjKeys; finalProjValues = finalProjKeys.map(k => projectCounts[k]); }
+                if (allProjKeys.length > 10) { 
+                    finalProjKeys = allProjKeys.slice(0, 9); 
+                    finalProjValues = finalProjKeys.map(k => projectCounts[k]); 
+                    finalProjKeys.push('โครงการอื่นๆ (เฉลี่ย)'); 
+                    const remain = allProjKeys.slice(9);
+                    const avg = Math.round(remain.reduce((sum, key) => sum + projectCounts[key], 0) / remain.length);
+                    finalProjValues.push(avg); 
+                } else { 
+                    finalProjKeys = allProjKeys; 
+                    finalProjValues = finalProjKeys.map(k => projectCounts[k]); 
+                }
                 const maxProjVal = finalProjValues.length > 0 ? Math.max(...finalProjValues) : 0, projXAxisMax = Math.max(10, Math.ceil(maxProjVal / 10) * 10);
                 chartInstances['project'] = new Chart(projCanvas.getContext('2d'), { type: 'bar', data: { labels: finalProjKeys, datasets: [{ label: 'จำนวนงาน', data: finalProjValues, backgroundColor: '#14b8a6', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', layout: { padding: { right: 40 } }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, max: projXAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'hBarLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#0f766e'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(value, datapoint.x + 8, datapoint.y); } }); ctx.restore(); } }] });
             }
