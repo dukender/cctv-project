@@ -214,8 +214,8 @@
                         </div>
                     </div>
                 </div>
-                    
-<!-- หน้าสรุปประเภทงาน -->
+
+                <!-- หน้าสรุปประเภทงาน -->
                 <div id="view-tasktype-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
                         <!-- Sidebar ซ้าย: ประเภทงาน -->
@@ -694,6 +694,7 @@
         window.addEventListener('offline', updateNetworkStatus);
 
         const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewTasktypeSummary = document.getElementById('view-tasktype-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewCustomerSummary = document.getElementById('view-customer-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
+
         const btnToggleMenu = document.getElementById('btn-toggle-menu');
         const sidebarMenu = document.getElementById('sidebar-menu');
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
@@ -1126,7 +1127,7 @@
             summaryCurrentPage = 1;
             renderProjectSummary();
         });
-        
+
 // --- Logic สำหรับหน้า สรุปประเภทงาน (Task Type Summary) ---
         let currentTasktypeFilteredData = [];
         let currentTasktypeFilter = 'all';
