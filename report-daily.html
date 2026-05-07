@@ -18,7 +18,11 @@
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
     </script>
     <style>
-        body { background-color: #f8f9fc; }
+        body { 
+            background-color: #f4f6f9; 
+            background-image: radial-gradient(#cbd5e1 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -115,7 +119,7 @@
                 </div>
             </aside>
 
-            <main class="flex-1 overflow-y-auto w-full bg-[#f8f9fc]">
+            <main class="flex-1 overflow-y-auto w-full bg-transparent">
                 <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
                     <div class="fixed bottom-6 right-6 z-[100] role-restricted-action">
                         <button id="btn-add-task-top" onclick="document.getElementById('tab-manage').click()" class="px-5 py-3 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white text-base font-semibold rounded-full transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:-translate-y-1 whitespace-nowrap">
