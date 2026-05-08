@@ -163,6 +163,19 @@
                             </div>
                         </div>
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <div class="md:w-1/4 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 pr-0 md:pr-4">
+                                    <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="coins" class="w-5 h-5 text-emerald-500"></i> สรุปมูลค่างาน <span class="text-xs font-normal text-gray-500">(<span id="dash-value-label">รายเดือน</span>)</span></h3>
+                                    <div class="flex-1 flex flex-col justify-center gap-4">
+                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">มูลค่าโครงการทั้งหมด</p><p class="text-2xl font-bold text-[#5b5fc7]" id="dash-val-total">0</p></div>
+                                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100"><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p><p class="text-2xl font-bold text-blue-600" id="dash-val-prog">0</p></div>
+                                        <div class="bg-green-50 p-4 rounded-lg border border-green-100"><p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p><p class="text-2xl font-bold text-green-600" id="dash-val-won">0</p></div>
+                                    </div>
+                                </div>
+                                <div class="md:w-3/4 flex flex-col min-h-[250px]"><div class="relative flex-1 w-full"><canvas id="chart-value"></canvas></div></div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:col-span-2">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
                                 <h3 class="font-bold text-gray-800 flex items-center gap-2"><i data-lucide="folder-kanban" class="w-5 h-5 text-teal-500"></i> จำนวนงานแยกตามชื่อโครงการ (Top 10)</h3>
                                 <div class="relative min-w-[240px] w-full sm:w-auto z-20" id="dash-project-dropdown-wrapper">
@@ -235,7 +248,7 @@
                         <div class="overflow-x-auto min-h-[300px]">
                             <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="projects-summary-table">
                                 <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
-                                    <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-4 py-4 font-semibold text-center w-32">กำลังดำเนินการ</th><th class="px-4 py-4 font-semibold text-center w-32">ได้งาน</th><th class="px-4 py-4 font-semibold text-center w-32">ไม่ได้งาน</th></tr>
+                                    <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-4 py-4 font-semibold text-center w-28">วันที่รับงาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-4 py-4 font-semibold text-right w-40">มูลค่างาน (บาท)</th><th class="px-4 py-4 font-semibold text-center w-32">กำลังดำเนินการ</th><th class="px-4 py-4 font-semibold text-center w-32">ได้งาน</th><th class="px-4 py-4 font-semibold text-center w-32">ไม่ได้งาน</th></tr>
                                 </thead>
                                 <tbody id="projects-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
                             </table>
@@ -820,7 +833,7 @@
 
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
-        let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
+        let chartInstances = { time: null, value: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         
         // สร้างหรือดึง Session ID ของเครื่อง/แท็บปัจจุบัน
         let localSessionId = sessionStorage.getItem('myDailyTaskSessionId');
@@ -1485,7 +1498,8 @@ function switchTab(activeTabId) {
                         else if (type === 'lost') { colorClass = 'accent-red-500 text-red-500 focus:ring-red-500'; hoverRing = 'hover:ring-red-500/30'; }
                         return `<input type="checkbox" ${st === type ? 'checked' : ''} class="cursor-pointer hover:ring-2 hover:ring-offset-1 ${hoverRing} w-5 h-5 ${colorClass} border-gray-300 rounded shadow-sm" onchange="updateProjectStatus('${p.id}', '${type}', this.checked)">`;
                     };
-                    tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-4 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td><td class="px-6 py-4 font-bold text-[#5b5fc7] cursor-pointer hover:underline" onclick="openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">${p.name}</td><td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td><td class="px-4 py-4 text-center">${checkboxHTML('won')}</td><td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td></tr>`;
+                    const valInputHTML = `<input type="number" class="w-full text-right px-2 py-1.5 border border-gray-200 rounded text-sm focus:ring-1 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none transition-shadow font-medium text-gray-700 bg-gray-50 hover:bg-white" value="${p.value || ''}" placeholder="0" onchange="updateProjectValue('${p.id}', this.value)" ${currentUserRole === 'monitor' ? 'disabled' : ''}>`;
+                    tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-4 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td><td class="px-6 py-4 font-bold text-[#5b5fc7] cursor-pointer hover:underline" onclick="openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">${p.name}</td><td class="px-4 py-4 pr-6">${valInputHTML}</td><td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td><td class="px-4 py-4 text-center">${checkboxHTML('won')}</td><td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td></tr>`;
                 });
                 if (paginationContainer && finalDisplayProjectData.length > itemsPerPage) {
                     paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, finalDisplayProjectData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${finalDisplayProjectData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToSummaryPage(${summaryCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${summaryCurrentPage} / ${totalPages}</div><button onclick="goToSummaryPage(${summaryCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
@@ -1498,6 +1512,11 @@ function switchTab(activeTabId) {
         window.updateProjectStatus = async (projectId, statusType, isChecked) => {
             const newStatus = isChecked ? statusType : ''; 
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { status: newStatus }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตสถานะ", "error"); renderProjectSummary(); }
+        };
+        window.updateProjectValue = async (projectId, val) => {
+            const numVal = parseFloat(val) || 0;
+            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectId), { value: numVal }); if(viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard(); } 
+            catch (e) { showNotification("เกิดข้อผิดพลาดในการอัปเดตมูลค่า", "error"); renderProjectSummary(); }
         };
 
         // --- เพิ่ม Event Listeners สำหรับหน้าสรุปโครงการ (Project Summary) ---
@@ -3055,13 +3074,44 @@ function switchTab(activeTabId) {
             const totalProjEl = document.getElementById('dash-total-projects'), noProjEl = document.getElementById('dash-no-project'), filteredProjEl = document.getElementById('dash-filtered-projects');
             if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size; if (noProjEl) noProjEl.textContent = noProjectCount; if (filteredProjEl) filteredProjEl.textContent = filteredProjectsSet.size;
 
-            const timeData = { counts: {} }, projectCounts = {};
+            const timeData = { counts: {} }, timeValueData = { counts: {} }, projectCounts = {};
+            const projectToTimeKey = {};
+            
             fullyFilteredTasks.forEach(t => {
                 if (!t.receiveDate) return; const [yearStr, monthStr, dayStr] = t.receiveDate.split('-'); const d = new Date(parseInt(yearStr, 10), parseInt(monthStr, 10) - 1, parseInt(dayStr, 10));
-                if (dashTimeView === 'month') { const monthKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`; timeData.counts[monthKey] = (timeData.counts[monthKey] || 0) + 1; }
-                else { const firstDayOfMonth = new Date(d.getFullYear(), d.getMonth(), 1).getDay(), weekOfMonth = Math.ceil((d.getDate() + firstDayOfMonth) / 7), weekKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-W${weekOfMonth}`; timeData.counts[weekKey] = (timeData.counts[weekKey] || 0) + 1; }
-                const proj = t.projectName || 'ไม่ได้ระบุโครงการ'; projectCounts[proj] = (projectCounts[proj] || 0) + 1;
+                let timeKey = '';
+                if (dashTimeView === 'month') { timeKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`; timeData.counts[timeKey] = (timeData.counts[timeKey] || 0) + 1; }
+                else { const firstDayOfMonth = new Date(d.getFullYear(), d.getMonth(), 1).getDay(), weekOfMonth = Math.ceil((d.getDate() + firstDayOfMonth) / 7); timeKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-W${weekOfMonth}`; timeData.counts[timeKey] = (timeData.counts[timeKey] || 0) + 1; }
+                
+                const proj = t.projectName || 'ไม่ได้ระบุโครงการ'; 
+                projectCounts[proj] = (projectCounts[proj] || 0) + 1;
+                
+                if(!projectToTimeKey[proj] || t.receiveDate < projectToTimeKey[proj].fullDate) {
+                    projectToTimeKey[proj] = { timeKey: timeKey, fullDate: t.receiveDate };
+                }
             });
+
+            let valTotal = 0, valProg = 0, valWon = 0;
+            let dashProjObjs = [];
+            filteredProjectsSet.forEach(pName => {
+                const pObj = allProjects.find(p => p.name === pName);
+                if(pObj) {
+                    dashProjObjs.push(pObj);
+                    const v = pObj.value || 0;
+                    valTotal += v;
+                    if (pObj.status === 'in_progress') valProg += v;
+                    if (pObj.status === 'won') valWon += v;
+                    
+                    if(projectToTimeKey[pObj.name]) {
+                        const tKey = projectToTimeKey[pObj.name].timeKey;
+                        timeValueData.counts[tKey] = (timeValueData.counts[tKey] || 0) + v;
+                    }
+                }
+            });
+            
+            const totalValEl = document.getElementById('dash-val-total'); if(totalValEl) totalValEl.textContent = valTotal.toLocaleString('th-TH');
+            const progValEl = document.getElementById('dash-val-prog'); if(progValEl) progValEl.textContent = valProg.toLocaleString('th-TH');
+            const wonValEl = document.getElementById('dash-val-won'); if(wonValEl) wonValEl.textContent = valWon.toLocaleString('th-TH');
 
             const counts = { responsible: {}, customer: {}, assignment: {}, taskType: {}, system: {}, brand: {} };
             getFilteredTasksFor('responsible').forEach(t => { const resp = t.responsibleName || 'ไม่ระบุ'; counts.responsible[resp] = (counts.responsible[resp] || 0) + 1; });
@@ -3106,6 +3156,20 @@ function switchTab(activeTabId) {
                 const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0, timeYAxisMax = Math.max(10, Math.ceil(maxTimeVal / 10) * 10);
                 chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์'})`, data: timeDataValues, backgroundColor: '#6366f1', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'barLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#4f46e5'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value, datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
                 const timeLabel = document.getElementById('dash-time-label'); if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
+            }
+
+            const valueCanvas = document.getElementById('chart-value');
+            if (valueCanvas) {
+                destroyChart('value');
+                const sortedTimeKeys = Object.keys(timeValueData.counts).sort(), timeValueValues = sortedTimeKeys.map(k => timeValueData.counts[k]), thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+                const displayTimeLabels = sortedTimeKeys.map(k => {
+                    if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
+                    else if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
+                    return k; 
+                });
+                
+                chartInstances['value'] = new Chart(valueCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `มูลค่างาน (${dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์'})`, data: timeValueValues, backgroundColor: '#10b981', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, ticks: { callback: function(value) { return value.toLocaleString('th-TH'); } } } } }, plugins: [{ id: 'barLabelsVal', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 12px Sarabun, sans-serif'; ctx.fillStyle = '#047857'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value.toLocaleString('th-TH'), datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
+                const valueLabel = document.getElementById('dash-value-label'); if(valueLabel) valueLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
             }
 
             const projCanvas = document.getElementById('chart-project');
@@ -3387,6 +3451,7 @@ function switchTab(activeTabId) {
                 'ลำดับ': idx + 1, 
                 'วันที่เริ่มรับงาน': p.earliestDate ? formatDate(p.earliestDate) : '-', 
                 'ชื่อโครงการ': p.name, 
+                'มูลค่างาน (บาท)': p.value || 0,
                 'สถานะโครงการ': p.status === 'won' ? 'ได้งาน' : p.status === 'lost' ? 'ไม่ได้งาน' : 'กำลังดำเนินการ' 
             }));
             const worksheet = XLSX.utils.json_to_sheet(exportData);
