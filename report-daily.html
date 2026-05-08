@@ -935,11 +935,17 @@ function switchTab(activeTabId) {
             try {
                 const userSnap = await getDoc(userRef);
                 if (userSnap.exists()) {
+                    currentUserData = userSnap.data(); // เก็บข้อมูลสิทธิ์ทันทีก่อนเริ่มดึงงาน
                     let currentRole = userSnap.data().role || 'unauthorized';
                     if (userEmail === 'dukender7188@gmail.com' && currentRole !== 'admin') { currentRole = 'admin'; await updateDoc(userRef, { role: 'admin' }); }
                     return currentRole;
                 } else {
-                    if (userEmail === 'dukender7188@gmail.com') { await setDoc(userRef, { email: userEmail, role: 'admin', createdAt: Date.now() }); return 'admin'; }
+                    if (userEmail === 'dukender7188@gmail.com') { 
+                        let newData = { email: userEmail, role: 'admin', createdAt: Date.now() };
+                        await setDoc(userRef, newData); 
+                        currentUserData = newData;
+                        return 'admin'; 
+                    }
                     return 'unauthorized';
                 }
             } catch(e) { return userEmail === 'dukender7188@gmail.com' ? 'admin' : 'unauthorized'; }
@@ -953,8 +959,22 @@ function switchTab(activeTabId) {
         }
 
         function filterDataByRole(dataList) {
-            if (currentUserRole === 'admin' || currentUserRole === 'monitor') return dataList; 
-            return dataList.filter(item => item.ownerId === currentUser.uid);
+            let filtered = dataList;
+            if (currentUserRole !== 'admin' && currentUserRole !== 'monitor') {
+                filtered = filtered.filter(item => item.ownerId === currentUser.uid);
+            }
+            
+            // ล็อกการดูข้อมูลให้อยู่แค่ใน "ช่วงเวลา" ที่กำหนดไว้เท่านั้น
+            if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
+                filtered = filtered.filter(item => {
+                    let itemDate = item.receiveDate || item.holidayDate || (item.createdAt ? new Date(item.createdAt).toISOString().split('T')[0] : null);
+                    if (!itemDate) return false; // เข้มงวดสุด: ไม่มีวันที่ ไม่ให้ดู
+                    if (currentUserData.viewStartDate && itemDate < currentUserData.viewStartDate) return false;
+                    if (currentUserData.viewEndDate && itemDate > currentUserData.viewEndDate) return false;
+                    return true;
+                });
+            }
+            return filtered;
         }
 
         function populateEmailDropdowns() {
@@ -998,7 +1018,22 @@ function switchTab(activeTabId) {
                 currentUser = user;
                 mySessionStartTime = Date.now(); // เริ่มจับเวลา Session ของผู้ใช้
                 unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => {
-                    currentUserData = docSnap.exists() ? docSnap.data() : null;
+                    const newData = docSnap.exists() ? docSnap.data() : null;
+                    const oldStartDate = currentUserData?.viewStartDate;
+                    const oldEndDate = currentUserData?.viewEndDate;
+                    const newStartDate = newData?.viewStartDate;
+                    const newEndDate = newData?.viewEndDate;
+                    
+                    currentUserData = newData;
+                    
+                    // ถ้าระยะเวลาสิทธิ์ดูข้อมูลถูกเปลี่ยน ให้โหลดและกรองข้อมูลงานใหม่ทันที
+                    if (oldStartDate !== newStartDate || oldEndDate !== newEndDate) {
+                        if (unsubscribeTasks) unsubscribeTasks();
+                        if (unsubscribeHolidays) unsubscribeHolidays();
+                        loadTasks();
+                        loadHolidays();
+                    }
+                    
                     if (viewCalendar && !viewCalendar.classList.contains('hidden')) renderCalendar();
                 });
                 document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ';
