@@ -632,7 +632,7 @@
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="users-table-admin">
-                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">อีเมล (Email)</th><th class="px-6 py-4 font-semibold">ระดับสิทธิ์ (Role)</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-right">จัดการ</th></tr></thead>
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">อีเมล (Email)</th><th class="px-6 py-4 font-semibold">ระดับสิทธิ์ (Role)</th><th class="px-6 py-4 font-semibold">สิทธิ์ดูข้อมูล (ช่วงเวลา)</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-center">เข้าใช้งานล่าสุด</th><th class="px-6 py-4 font-semibold text-center">ระยะเวลาเข้าใช้งาน</th><th class="px-6 py-4 font-semibold text-right">จัดการ</th></tr></thead>
                                     <tbody id="users-table-body-admin" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
@@ -778,6 +778,7 @@
         }
 
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [];
+        let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         
         let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
@@ -915,7 +916,11 @@ function switchTab(activeTabId) {
 
         async function updatePresence(isOnlineStatus) {
             if (!currentUser || !currentUser.email) return;
-            try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { isOnline: isOnlineStatus, lastActive: Date.now() }, { merge: true }); } catch (e) { console.error(e); }
+            try { 
+                let updateData = { isOnline: isOnlineStatus, lastActive: Date.now() };
+                if (isOnlineStatus && mySessionStartTime) updateData.sessionStartedAt = mySessionStartTime;
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), updateData, { merge: true }); 
+            } catch (e) { console.error(e); }
         }
 
         async function fetchUserRole(user) {
@@ -985,6 +990,7 @@ function switchTab(activeTabId) {
                 currentUserRole = await fetchUserRole(user);
                 if (currentUserRole === 'unauthorized') { signOut(auth); showNotification("อีเมลนี้ไม่ได้รับอนุญาตให้เข้าใช้งานระบบ", "error"); return; }
                 currentUser = user;
+                mySessionStartTime = Date.now(); // เริ่มจับเวลา Session ของผู้ใช้
                 unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => {
                     currentUserData = docSnap.exists() ? docSnap.data() : null;
                     if (viewCalendar && !viewCalendar.classList.contains('hidden')) renderCalendar();
@@ -2979,11 +2985,51 @@ function switchTab(activeTabId) {
             const tbody = document.getElementById('users-table-body-admin'); if (!tbody) return; tbody.innerHTML = '';
             allUsers.forEach(u => {
                 let roleBadge = u.role === 'admin' ? '<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold border border-red-200">Admin</span>' : u.role === 'monitor' ? '<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold border border-blue-200">Monitor</span>' : u.role === 'unauthorized' ? '<span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold border border-gray-200">ถูกระงับ (Unauthorized)</span>' : '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold border border-green-200">User</span>';
+                let dateRangeHtml = '<span class="text-gray-400 text-xs">- ไม่มีกำหนด -</span>';
+                if (u.viewStartDate || u.viewEndDate) dateRangeHtml = `<span class="text-xs text-indigo-600 font-medium px-2 py-1 bg-indigo-50 rounded border border-indigo-100">${u.viewStartDate ? formatDate(u.viewStartDate) : 'เริ่มต้น'} ถึง ${u.viewEndDate ? formatDate(u.viewEndDate) : 'ปัจจุบัน'}</span>`;
                 const isSuperAdmin = u.email === 'dukender7188@gmail.com', disableDelete = isSuperAdmin ? 'disabled opacity-30 cursor-not-allowed' : '';
-                const isOnline = u.isOnline && (Date.now() - (u.lastActive || 0) < 5 * 60 * 1000), onlineStatusHtml = isOnline ? `<div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_4px_rgba(34,197,94,0.6)]"></div><span class="text-xs font-medium text-gray-600">ออนไลน์</span></div>` : `<div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-full bg-red-500"></div><span class="text-xs font-medium text-gray-400">ไม่ออนไลน์</span></div>`;
-                tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-6 py-4 font-medium text-gray-800">${u.email}</td><td class="px-6 py-4">${roleBadge}</td><td class="px-6 py-4">${onlineStatusHtml}</td><td class="px-6 py-4 text-right"><button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
+                const isOnline = u.isOnline && (Date.now() - (u.lastActive || 0) < 5 * 60 * 1000);
+                const onlineStatusHtml = isOnline ? `<div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_4px_rgba(34,197,94,0.6)]"></div><span class="text-xs font-medium text-green-600">ออนไลน์</span></div>` : `<div class="flex items-center gap-1.5"><div class="w-2.5 h-2.5 rounded-full bg-red-500"></div><span class="text-xs font-medium text-gray-400">ไม่ออนไลน์</span></div>`;
+                
+                // จัดรูปแบบ วันที่/เวลา เข้าใช้งานล่าสุด
+                let lastActiveStr = '<span class="text-gray-400 text-xs">-</span>';
+                if (u.lastActive) {
+                    const d = new Date(u.lastActive);
+                    const day = String(d.getDate()).padStart(2, '0');
+                    const month = String(d.getMonth() + 1).padStart(2, '0');
+                    const year = d.getFullYear() + 543; // แปลงเป็น พ.ศ.
+                    const hours = String(d.getHours()).padStart(2, '0');
+                    const mins = String(d.getMinutes()).padStart(2, '0');
+                    lastActiveStr = `${day}/${month}/${year} ${hours}:${mins} น.`;
+                }
+
+                // สร้างแท็กสำหรับแสดงเวลาแบบ Real-time
+                const sessionStart = u.sessionStartedAt || u.lastActive || Date.now();
+                const sessionDisplay = isOnline ? `<span class="user-session-timer text-indigo-600 font-mono text-sm bg-indigo-50 px-2 py-1 rounded border border-indigo-100 font-semibold shadow-inner" data-start="${sessionStart}">00:00:00</span>` : '<span class="text-gray-400 text-sm font-semibold">-</span>';
+
+                tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-6 py-4 font-medium text-gray-800">${u.email}</td><td class="px-6 py-4">${roleBadge}</td><td class="px-6 py-4">${dateRangeHtml}</td><td class="px-6 py-4">${onlineStatusHtml}</td><td class="px-6 py-4 text-center text-sm text-gray-600 font-medium">${lastActiveStr}</td><td class="px-6 py-4 text-center">${sessionDisplay}</td><td class="px-6 py-4 text-right"><button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}', '${u.viewStartDate || ''}', '${u.viewEndDate || ''}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button></td></tr>`;
             });
             lucide.createIcons();
+            startSessionTimers(); // สั่งให้เริ่มจับเวลา
+        }
+
+        // ฟังก์ชันช่วยรันเวลาแบบ Real-time ให้เดินทุกๆ 1 วินาที
+        function startSessionTimers() {
+            if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+            const updateTimers = () => {
+                document.querySelectorAll('.user-session-timer').forEach(el => {
+                    const start = parseInt(el.getAttribute('data-start'));
+                    if (!start) return;
+                    const diff = Math.floor((Date.now() - start) / 1000); // วินาที
+                    if (diff < 0) return;
+                    const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+                    const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                    const s = String(diff % 60).padStart(2, '0');
+                    el.textContent = `${h}:${m}:${s}`;
+                });
+            };
+            updateTimers(); // โชว์ทันที
+            sessionTimerInterval = setInterval(updateTimers, 1000); // อัปเดตทุก 1 วินาที
         }
 
         document.getElementById('user-role-form')?.addEventListener('submit', async (e) => {
