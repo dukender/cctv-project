@@ -723,6 +723,22 @@
         <button id="toast-undo-btn" class="hidden ml-4 px-3 py-1 bg-white/20 hover:bg-white/30 text-white text-xs font-bold rounded transition-colors whitespace-nowrap">ย้อนกลับ</button>
     </div>
 
+    <div id="duplicate-login-modal" class="fixed inset-0 bg-black/60 hidden z-[250] flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 flex flex-col overflow-hidden transform transition-all scale-100 border border-gray-100">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
+                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">บัญชีนี้กำลังใช้งานอยู่</h3>
+                <p class="text-sm text-gray-500 mb-6 leading-relaxed">ตรวจพบการเข้าสู่ระบบจากอุปกรณ์หรือเบราว์เซอร์อื่น คุณต้องการออกจากระบบในอุปกรณ์เดิม และ <span class="font-bold text-red-600">เข้าใช้งานต่อ</span> ที่นี่หรือไม่?</p>
+                <div class="flex gap-3">
+                    <button id="btn-cancel-login" class="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium text-sm shadow-sm">ยกเลิก</button>
+                    <button id="btn-force-login" class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium text-sm shadow-sm flex justify-center items-center gap-1.5"><i data-lucide="log-in" class="w-4 h-4"></i> ใช้งานต่อ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="holiday-form-modal" class="fixed inset-0 bg-black/50 hidden z-[110] flex items-center justify-center backdrop-blur-sm transition-opacity">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 flex flex-col overflow-hidden transform transition-all">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-red-50">
@@ -786,6 +802,13 @@
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
+        
+        // สร้างหรือดึง Session ID ของเครื่อง/แท็บปัจจุบัน
+        let localSessionId = sessionStorage.getItem('myDailyTaskSessionId');
+        if (!localSessionId) {
+            localSessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2);
+            sessionStorage.setItem('myDailyTaskSessionId', localSessionId);
+        }
         
         let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
         let dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null };
@@ -925,6 +948,7 @@ function switchTab(activeTabId) {
             try { 
                 let updateData = { isOnline: isOnlineStatus, lastActive: Date.now() };
                 if (isOnlineStatus && mySessionStartTime) updateData.sessionStartedAt = mySessionStartTime;
+                if (isOnlineStatus) updateData.sessionId = localSessionId; // แปะรหัสเครื่องขึ้นไป
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), updateData, { merge: true }); 
             } catch (e) { console.error(e); }
         }
@@ -1010,44 +1034,93 @@ function switchTab(activeTabId) {
         document.getElementById('btn-logout')?.addEventListener('click', async () => { await updatePresence(false); signOut(auth); });
         window.addEventListener('beforeunload', () => { if (currentUser) updatePresence(false); });
 
+        async function initializeUserApp(user) {
+            currentUserRole = await fetchUserRole(user);
+            if (currentUserRole === 'unauthorized') { signOut(auth); showNotification("อีเมลนี้ไม่ได้รับอนุญาตให้เข้าใช้งานระบบ", "error"); return; }
+            currentUser = user;
+            mySessionStartTime = Date.now(); // เริ่มจับเวลา Session
+            
+            // อัปเดต sessionId และสถานะออนไลน์ล่าสุดให้เป็นของเครื่องนี้
+            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), { sessionId: localSessionId, isOnline: true, lastActive: Date.now() }, { merge: true });
+
+            unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => {
+                const newData = docSnap.exists() ? docSnap.data() : null;
+                
+                // --- ตรวจสอบว่าโดนเตะออกจากระบบหรือไม่ ---
+                if (newData && newData.sessionId && newData.sessionId !== localSessionId) {
+                    alert("เซสชันถูกยกเลิก: บัญชีของคุณมีการเข้าสู่ระบบจากอุปกรณ์อื่น");
+                    signOut(auth);
+                    window.location.reload();
+                    return;
+                }
+
+                const oldStartDate = currentUserData?.viewStartDate;
+                const oldEndDate = currentUserData?.viewEndDate;
+                const newStartDate = newData?.viewStartDate;
+                const newEndDate = newData?.viewEndDate;
+                
+                currentUserData = newData;
+                
+                // ถ้าระยะเวลาสิทธิ์ดูข้อมูลถูกเปลี่ยน ให้โหลดและกรองข้อมูลงานใหม่ทันที
+                if (oldStartDate !== newStartDate || oldEndDate !== newEndDate) {
+                    if (unsubscribeTasks) unsubscribeTasks();
+                    if (unsubscribeHolidays) unsubscribeHolidays();
+                    loadTasks();
+                    loadHolidays();
+                }
+                if (viewCalendar && !viewCalendar.classList.contains('hidden')) renderCalendar();
+            });
+            
+            document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ';
+            document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
+            document.getElementById('view-login').classList.add('hidden'); 
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            updateNetworkStatus();
+            const recDate = document.getElementById('receiveDate');
+            if (recDate) recDate.value = getThaiDateString();
+            
+            applyRoleUI(); loadTasks(); loadHolidays(); loadOptions();
+            if (currentUserRole === 'admin' || currentUserRole === 'monitor') loadUsersList();
+            
+            updatePresence(true);
+            if (presenceInterval) clearInterval(presenceInterval);
+            presenceInterval = setInterval(() => updatePresence(true), 60000); 
+            switchTab('list');
+        }
+
         onAuthStateChanged(auth, async (user) => {
             const loginView = document.getElementById('view-login'), mainApp = document.getElementById('main-app');
             if (user) {
-                currentUserRole = await fetchUserRole(user);
-                if (currentUserRole === 'unauthorized') { signOut(auth); showNotification("อีเมลนี้ไม่ได้รับอนุญาตให้เข้าใช้งานระบบ", "error"); return; }
-                currentUser = user;
-                mySessionStartTime = Date.now(); // เริ่มจับเวลา Session ของผู้ใช้
-                unsubscribeUser = onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'users', currentUser.email.toLowerCase()), (docSnap) => {
-                    const newData = docSnap.exists() ? docSnap.data() : null;
-                    const oldStartDate = currentUserData?.viewStartDate;
-                    const oldEndDate = currentUserData?.viewEndDate;
-                    const newStartDate = newData?.viewStartDate;
-                    const newEndDate = newData?.viewEndDate;
-                    
-                    currentUserData = newData;
-                    
-                    // ถ้าระยะเวลาสิทธิ์ดูข้อมูลถูกเปลี่ยน ให้โหลดและกรองข้อมูลงานใหม่ทันที
-                    if (oldStartDate !== newStartDate || oldEndDate !== newEndDate) {
-                        if (unsubscribeTasks) unsubscribeTasks();
-                        if (unsubscribeHolidays) unsubscribeHolidays();
-                        loadTasks();
-                        loadHolidays();
+                // ก่อนโหลดเข้าแอป เช็คว่ามีใครใช้งานอยู่หรือไม่
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.email.toLowerCase());
+                const userSnap = await getDoc(userRef);
+                
+                let isDuplicate = false;
+                if (userSnap.exists()) {
+                    const uData = userSnap.data();
+                    // ถ้าออนไลน์, มี session id ไม่ตรงกับเครื่องนี้, และ active ล่าสุดไม่เกิน 2 นาที แปลว่ามีคนใช้งานอยู่จริงๆ
+                    if (uData.isOnline && uData.sessionId && uData.sessionId !== localSessionId && (Date.now() - (uData.lastActive || 0) < 120000)) {
+                        isDuplicate = true;
                     }
+                }
+
+                if (isDuplicate) {
+                    const dupModal = document.getElementById('duplicate-login-modal');
+                    dupModal.classList.remove('hidden');
                     
-                    if (viewCalendar && !viewCalendar.classList.contains('hidden')) renderCalendar();
-                });
-                document.getElementById('display-user-email').textContent = user.email || 'ผู้ใช้ไม่ระบุชื่อ';
-                document.getElementById('display-user-role').textContent = `[${currentUserRole.toUpperCase()}]`;
-                loginView.classList.add('hidden'); mainApp.classList.remove('hidden');
-                updateNetworkStatus();
-                const recDate = document.getElementById('receiveDate');
-                if (recDate) recDate.value = getThaiDateString();
-                applyRoleUI(); loadTasks(); loadHolidays(); loadOptions();
-                if (currentUserRole === 'admin' || currentUserRole === 'monitor') loadUsersList();
-                updatePresence(true);
-                if (presenceInterval) clearInterval(presenceInterval);
-                presenceInterval = setInterval(() => updatePresence(true), 60000); 
-                switchTab('list');
+                    document.getElementById('btn-cancel-login').onclick = () => {
+                        dupModal.classList.add('hidden');
+                        signOut(auth);
+                    };
+                    
+                    document.getElementById('btn-force-login').onclick = () => {
+                        dupModal.classList.add('hidden');
+                        initializeUserApp(user); // บังคับเข้าใช้งาน (จะไปเตะเครื่องเก่าที่ onSnapshot ของเครื่องนั้น)
+                    };
+                } else {
+                    initializeUserApp(user); // ใช้งานปกติ
+                }
             } else {
                 currentUser = null; currentUserRole = 'user'; loginView.classList.remove('hidden'); mainApp.classList.add('hidden');
                 if (presenceInterval) clearInterval(presenceInterval);
