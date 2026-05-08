@@ -3067,8 +3067,9 @@ function switchTab(activeTabId) {
                 });
             }
 
-            const baseFullyFilteredTasks = getFilteredTasksFor('none', false);
-            const fullyFilteredTasks = getFilteredTasksFor('none', true);
+            const baseFullyFilteredTasks = getFilteredTasksFor('none', false); 
+            const fullyFilteredTasks = getFilteredTasksFor('none', true); 
+
             const totalProjectsSet = new Set();
             tasksToUse.forEach(t => { if(t.projectName) totalProjectsSet.add(t.projectName); });
             if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
@@ -3084,11 +3085,14 @@ function switchTab(activeTabId) {
                 filterDataByRole(allProjects).forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
             }
 
-            const filteredProjectsSet = new Set(); let noProjectCount = 0;
-            baseFullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') filteredProjectsSet.add(t.projectName); else noProjectCount++; });
+            const displayFilteredProjectsSet = new Set(); let displayNoProjectCount = 0;
+            fullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') displayFilteredProjectsSet.add(t.projectName); else displayNoProjectCount++; });
 
             const totalProjEl = document.getElementById('dash-total-projects'), noProjEl = document.getElementById('dash-no-project'), filteredProjEl = document.getElementById('dash-filtered-projects');
-            if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size; if (noProjEl) noProjEl.textContent = noProjectCount; if (filteredProjEl) filteredProjEl.textContent = filteredProjectsSet.size;
+            if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size; if (noProjEl) noProjEl.textContent = displayNoProjectCount; if (filteredProjEl) filteredProjEl.textContent = displayFilteredProjectsSet.size;
+
+            const baseFilteredProjectsSet = new Set(); 
+            baseFullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') baseFilteredProjectsSet.add(t.projectName); });
 
             const timeData = { counts: {} }, timeValueData = { counts: {} }, projectCounts = {};
             const projectToTimeKey = {};
@@ -3108,13 +3112,11 @@ function switchTab(activeTabId) {
             });
 
             let valTotal = 0, valProg = 0, valWon = 0, valLost = 0;
-            let dashProjObjs = [];
             timeValueData.prog = {}; timeValueData.won = {}; timeValueData.lost = {};
             
-            filteredProjectsSet.forEach(pName => {
+            baseFilteredProjectsSet.forEach(pName => {
                 const pObj = allProjects.find(p => p.name === pName);
                 if(pObj) {
-                    dashProjObjs.push(pObj);
                     const v = pObj.value || 0;
                     const st = pObj.status || 'in_progress';
                     valTotal += v;
