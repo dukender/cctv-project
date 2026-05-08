@@ -1126,8 +1126,15 @@ function switchTab(activeTabId) {
             if(!projUl) return;
             projUl.innerHTML = '';
             const q = query.toLowerCase().trim();
-            const filtered = allProjects.filter(p => p.name.toLowerCase().includes(q));
-            if (q && !allProjects.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') projUl.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectProject('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            let allowedProjects = allProjects;
+            if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
+                const tasksToUse = getTasksByFilter();
+                const activeProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
+                const dateFilteredProjectNames = new Set(filterDataByRole(allProjects).map(p => p.name));
+                allowedProjects = allProjects.filter(p => activeProjectNames.has(p.name) || dateFilteredProjectNames.has(p.name));
+            }
+            const filtered = allowedProjects.filter(p => p.name.toLowerCase().includes(q));
+            if (q && !allowedProjects.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') projUl.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectProject('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
             if (filtered.length === 0 && !q) projUl.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อเพิ่มรายการใหม่...</li>`;
             else filtered.forEach(p => {
                 const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_projects', '${p.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
@@ -1234,17 +1241,20 @@ function switchTab(activeTabId) {
             const tbody = document.getElementById('projects-summary-body'), paginationContainer = document.getElementById('summary-pagination');
             if (!tbody) return;
             const tasksToUse = getTasksByFilter();
+            const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
             let visibleProjects = [];
             if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
                 if (globalEmailFilter === 'all') visibleProjects = [...allProjects];
                 else {
-                    const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
                     const targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
                     visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name));
                 }
             } else {
-                const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
                 visibleProjects = allProjects.filter(p => p.ownerId === currentUser.uid || userProjectNames.has(p.name));
+            }
+            if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
+                const dateFilteredProjectNames = new Set(filterDataByRole(visibleProjects).map(p => p.name));
+                visibleProjects = visibleProjects.filter(p => userProjectNames.has(p.name) || dateFilteredProjectNames.has(p.name));
             }
 
             const projectData = visibleProjects.map(p => {
@@ -2851,6 +2861,11 @@ function switchTab(activeTabId) {
                     const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean)), targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
                     allProjects.filter(p => p.ownerId === targetUid || userProjectNames.has(p.name)).forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
                 }
+            }
+            if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
+                totalProjectsSet.clear();
+                tasksToUse.forEach(t => { if(t.projectName) totalProjectsSet.add(t.projectName); });
+                filterDataByRole(allProjects).forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
             }
 
             const filteredProjectsSet = new Set(); let noProjectCount = 0;
