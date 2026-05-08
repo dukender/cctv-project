@@ -1061,14 +1061,6 @@ function switchTab(activeTabId) {
             emailFilterSelect.innerHTML = optionsHtml;
             if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; }
         }
-            const currentVal = globalEmailFilter;
-            const emailsSet = new Set();
-            allUsers.forEach(u => { if(u.email && u.role === 'user') emailsSet.add(u.email); });
-            let optionsHtml = '<option value="all">ดูข้อมูลทุกผู้ใช้งาน</option>';
-            Array.from(emailsSet).sort().forEach(email => { optionsHtml += `<option value="${email}">${email}</option>`; });
-            emailFilterSelect.innerHTML = optionsHtml;
-            if (emailsSet.has(currentVal)) emailFilterSelect.value = currentVal; else { globalEmailFilter = 'all'; emailFilterSelect.value = 'all'; }
-        }
 
         function getTasksByFilter() { return globalEmailFilter === 'all' ? allTasks : allTasks.filter(t => t.ownerEmail === globalEmailFilter); }
         function getHolidaysByFilter() { return globalEmailFilter === 'all' ? allHolidays : allHolidays.filter(h => h.ownerEmail === globalEmailFilter); }
