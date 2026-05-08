@@ -3037,13 +3037,16 @@ function switchTab(activeTabId) {
                 dashProjInput.value = dashCurrentProject === 'all' ? '' : dashCurrentProject; dashProjInput.placeholder = dashCurrentProject === 'all' ? 'ทุกโครงการทั้งหมด' : dashCurrentProject;
             }
 
-            let dashTasks = tasksToUse;
-            if (dashCurrentYear !== 'all') dashTasks = dashTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
-            if (dashCurrentMonth !== 'all') dashTasks = dashTasks.filter(t => t.receiveDate && t.receiveDate.substring(5, 7) === dashCurrentMonth);
-            if (dashCurrentProject !== 'all') dashTasks = dashTasks.filter(t => (t.projectName || 'ไม่ได้ระบุโครงการ') === dashCurrentProject);
+            let baseDashTasks = tasksToUse;
+            if (dashCurrentYear !== 'all') baseDashTasks = baseDashTasks.filter(t => t.receiveDate && t.receiveDate.startsWith(dashCurrentYear));
+            if (dashCurrentMonth !== 'all') baseDashTasks = baseDashTasks.filter(t => t.receiveDate && t.receiveDate.substring(5, 7) === dashCurrentMonth);
+            if (dashCurrentProject !== 'all') baseDashTasks = baseDashTasks.filter(t => (t.projectName || 'ไม่ได้ระบุโครงการ') === dashCurrentProject);
 
-            function getFilteredTasksFor(excludeKey) {
-                return dashTasks.filter(t => {
+            const projStatusMap = {};
+            allProjects.forEach(p => projStatusMap[p.name] = p.status || 'in_progress');
+
+            function getFilteredTasksFor(excludeKey, applyValueFilter = true) {
+                return baseDashTasks.filter(t => {
                     let match = true;
                     if (excludeKey !== 'responsible' && dashCrossFilters.responsible && (t.responsibleName || 'ไม่ระบุ') !== dashCrossFilters.responsible) match = false;
                     if (excludeKey !== 'customer' && dashCrossFilters.customer && (t.customerName || 'ไม่ระบุ') !== dashCrossFilters.customer) match = false;
@@ -3053,11 +3056,20 @@ function switchTab(activeTabId) {
                     let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : []);
                     if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
                     if (excludeKey !== 'tasktype' && dashCrossFilters.tasktype && !tTypes.includes(dashCrossFilters.tasktype)) match = false;
+                    
+                    if (applyValueFilter && dashValueFilter !== 'all') {
+                        const pName = t.projectName || 'ไม่ได้ระบุโครงการ';
+                        const pStatus = projStatusMap[pName] || 'in_progress';
+                        if (pStatus !== dashValueFilter) match = false;
+                    }
+                    
                     return match;
                 });
             }
 
-            const fullyFilteredTasks = getFilteredTasksFor('none'), totalProjectsSet = new Set();
+            const baseFullyFilteredTasks = getFilteredTasksFor('none', false);
+            const fullyFilteredTasks = getFilteredTasksFor('none', true);
+            const totalProjectsSet = new Set();
             tasksToUse.forEach(t => { if(t.projectName) totalProjectsSet.add(t.projectName); });
             if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
                 if (globalEmailFilter === 'all') allProjects.forEach(p => { if(p.name) totalProjectsSet.add(p.name); });
@@ -3073,7 +3085,7 @@ function switchTab(activeTabId) {
             }
 
             const filteredProjectsSet = new Set(); let noProjectCount = 0;
-            fullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') filteredProjectsSet.add(t.projectName); else noProjectCount++; });
+            baseFullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') filteredProjectsSet.add(t.projectName); else noProjectCount++; });
 
             const totalProjEl = document.getElementById('dash-total-projects'), noProjEl = document.getElementById('dash-no-project'), filteredProjEl = document.getElementById('dash-filtered-projects');
             if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size; if (noProjEl) noProjEl.textContent = noProjectCount; if (filteredProjEl) filteredProjEl.textContent = filteredProjectsSet.size;
@@ -3319,7 +3331,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-reset-dash-filter')?.addEventListener('click', () => {
             if (document.getElementById('dash-year-select')) document.getElementById('dash-year-select').value = 'all'; if (document.getElementById('dash-month-select')) document.getElementById('dash-month-select').value = 'all';
             dashCurrentProject = 'all'; if (dashProjInput) { dashProjInput.value = ''; dashProjInput.placeholder = 'ทุกโครงการทั้งหมด'; }
-            dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null }; dashCurrentYear = 'all'; dashCurrentMonth = 'all'; renderDashboard();
+            dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null }; dashCurrentYear = 'all'; dashCurrentMonth = 'all'; dashValueFilter = 'all'; renderDashboard();
         });
         document.getElementById('btn-view-month')?.addEventListener('click', () => { dashTimeView = 'month'; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
         document.getElementById('btn-view-week')?.addEventListener('click', () => { dashTimeView = 'week'; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
