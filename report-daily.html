@@ -682,7 +682,16 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-6 pl-0 sm:pl-9">
                                     <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="calendar" class="w-4 h-4"></i> วันรับงาน</label><input type="date" id="receiveDate" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
                                     <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบงาน</label><input type="text" id="responsibleName" required placeholder="ชื่อผู้รับผิดชอบ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
-                                    <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="arrow-right-left" class="w-4 h-4"></i> การมอบหมาย</label><input type="text" id="assignment" placeholder="มอบหมายให้ใครต่อ / สถานะ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
+                                    <div>
+                                        <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="arrow-right-left" class="w-4 h-4"></i> การมอบหมาย</label>
+                                        <div class="relative w-full" id="assignment-dropdown-wrapper">
+                                            <div class="flex flex-wrap items-center gap-1.5 w-full px-2 py-1.5 min-h-[38px] bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text" id="assignment-input-area">
+                                                <div id="assignment-chips-container" class="flex flex-wrap gap-1.5"></div>
+                                                <input type="text" id="assignmentInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="พิมพ์เพื่อค้นหา หรือเพิ่มใหม่..." autocomplete="off">
+                                            </div>
+                                            <div id="assignment-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="assignment-options-ul"></ul></div>
+                                        </div>
+                                    </div>
                                     <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="map-pin" class="w-4 h-4"></i> สถานที่ปฏิบัติงาน</label><input type="text" id="workLocation" placeholder="ระบุสถานที่" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
                                 </div>
                                 <div class="pl-0 sm:pl-9 mt-4">
@@ -809,7 +818,7 @@
             return `${thaiDate.getFullYear()}-${String(thaiDate.getMonth() + 1).padStart(2, '0')}-${String(thaiDate.getDate()).padStart(2, '0')}`;
         }
 
-        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [];
+        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let chartInstances = { time: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         
@@ -1196,6 +1205,10 @@ function switchTab(activeTabId) {
                 allBrandsData = []; snapshot.forEach(doc => allBrandsData.push({id: doc.id, ...doc.data()}));
                 allBrandsData.sort((a,b) => a.name.localeCompare(b.name, 'th'));
             });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_assignments'), (snapshot) => {
+                allAssignments = []; snapshot.forEach(doc => allAssignments.push({id: doc.id, ...doc.data()}));
+                allAssignments.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+            });
         }
 
         function loadTasks() {
@@ -1320,7 +1333,40 @@ function switchTab(activeTabId) {
             try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), { name: name, createdAt: Date.now() }); selectTaskType(name); showNotification(`เพิ่มประเภทงาน "${name}" แล้ว`); } 
             catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มประเภทงาน", "error"); }
         };
-
+        const assignmentInputArea = document.getElementById('assignment-input-area'), assignmentInput = document.getElementById('assignmentInput'), assignmentList = document.getElementById('assignment-dropdown-list'), assignmentUl = document.getElementById('assignment-options-ul'), assignmentWrapper = document.getElementById('assignment-dropdown-wrapper'), assignmentChipsContainer = document.getElementById('assignment-chips-container');
+        function renderAssignmentChips() {
+            if(!assignmentChipsContainer) return; assignmentChipsContainer.innerHTML = '';
+            selectedAssignments.forEach(tag => {
+                assignmentChipsContainer.innerHTML += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-rose-50 text-rose-600 border border-rose-200 text-sm font-medium">${tag}<button type="button" onclick="removeAssignment('${tag}')" class="text-rose-500 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></span>`;
+            });
+            lucide.createIcons();
+        }
+        window.removeAssignment = (tag) => { selectedAssignments = selectedAssignments.filter(t => t !== tag); renderAssignmentChips(); };
+        function renderAssignmentDropdown(query = '') {
+            if(!assignmentUl) return; assignmentUl.innerHTML = ''; const q = query.toLowerCase().trim();
+            const availableAssigns = allAssignments.filter(t => !selectedAssignments.includes(t.name));
+            const filtered = availableAssigns.filter(t => t.name.toLowerCase().includes(q));
+            if (q && !allAssignments.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') assignmentUl.innerHTML += `<li class="px-4 py-2 hover:bg-rose-50 text-rose-600 cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectAssignment('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            if (filtered.length === 0 && !q) assignmentUl.innerHTML += availableAssigns.length === 0 ? `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว... (พิมพ์เพื่อเพิ่มใหม่)</li>` : `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+            else filtered.forEach(t => {
+                const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_assignments', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                assignmentUl.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" onmousedown="selectAssignment('${t.name}')">${t.name}</span>${delBtn}</li>`;
+            });
+            lucide.createIcons(); assignmentList.classList.remove('hidden');
+        }
+        assignmentInputArea?.addEventListener('click', () => assignmentInput?.focus());
+        assignmentInput?.addEventListener('focus', () => renderAssignmentDropdown(assignmentInput.value));
+        assignmentInput?.addEventListener('input', (e) => renderAssignmentDropdown(e.target.value));
+        window.selectAssignment = (name) => {
+            if (!selectedAssignments.includes(name)) { selectedAssignments.push(name); selectedAssignments.sort((a, b) => a.localeCompare(b, 'th')); renderAssignmentChips(); }
+            if(assignmentInput) assignmentInput.value = ''; renderAssignmentDropdown(''); assignmentInput?.focus(); 
+        };
+        window.addAndSelectAssignment = async (name) => {
+            if(!currentUser || currentUserRole === 'monitor' || !name) return;
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_assignments'), { name: name, createdAt: Date.now() }); selectAssignment(name); showNotification(`เพิ่มการมอบหมาย "${name}" แล้ว`); } 
+            catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มการมอบหมาย", "error"); }
+        };
+        
         window.deleteOptionData = async (collectionName, docId) => {
             if(!currentUser || currentUserRole === 'monitor') return;
             let itemToRestore = null;
@@ -1328,6 +1374,7 @@ function switchTab(activeTabId) {
             else if (collectionName === 'daily_task_types') itemToRestore = allTaskTypes.find(t => t.id === docId);
             else if (collectionName === 'daily_systems') itemToRestore = allSystemsData.find(t => t.id === docId);
             else if (collectionName === 'daily_brands') itemToRestore = allBrandsData.find(t => t.id === docId);
+            else if (collectionName === 'daily_assignments') itemToRestore = allAssignments.find(t => t.id === docId);
             if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
             try {
@@ -1337,7 +1384,9 @@ function switchTab(activeTabId) {
                     if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
                     } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); }
                 });
-                if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
+                if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); 
+                if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
+                if (collectionName === 'daily_assignments') renderAssignmentDropdown(assignmentInput?.value || '');
             } catch(e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
 
@@ -1345,6 +1394,7 @@ function switchTab(activeTabId) {
         document.addEventListener('mousedown', (e) => {
             if (projWrapper && !projWrapper.contains(e.target)) projList?.classList.add('hidden');
             if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) taskTypeList?.classList.add('hidden');
+            if (assignmentWrapper && !assignmentWrapper.contains(e.target)) assignmentList?.classList.add('hidden');
             if (dashProjWrapper && !dashProjWrapper.contains(e.target)) dashProjList?.classList.add('hidden');
             
             // ปิด Dropdown ระบบงาน และ ยี่ห้อ เมื่อคลิกที่อื่น
@@ -2858,7 +2908,10 @@ function switchTab(activeTabId) {
             filteredTasks = getTasksByFilter().filter(task => {
                 let matchTime = true;
                 if (timeType === 'day' && searchDate) matchTime = task.receiveDate === searchDate; else if (timeType === 'month' && searchMonth) matchTime = task.receiveDate && task.receiveDate.startsWith(searchMonth); else if (timeType === 'year' && searchYear) matchTime = task.receiveDate && task.receiveDate.startsWith(searchYear);
-                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || ''), searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, task.assignment, typeStr].join(' ').toLowerCase(), notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
+                const typeStr = Array.isArray(task.taskType) ? task.taskType.join(' ') : (task.taskType || '');
+                const assignStr = Array.isArray(task.assignment) ? task.assignment.join(' ') : (task.assignment || '');
+                const searchString = [task.taskName, task.projectName, task.responsibleName, task.customerName, task.customerPhone, task.workLocation, assignStr, typeStr].join(' ').toLowerCase();
+                const notesString = (task.notes || []).map(n => n.text).join(' ').toLowerCase();
                 return matchTime && (searchText ? `${searchString} ${notesString}`.includes(searchText) : true);
             });
             renderTasks(filteredTasks);
@@ -2880,7 +2933,9 @@ function switchTab(activeTabId) {
 
         function resetFormToAddMode() {
             if (taskForm) taskForm.reset(); currentEditTaskId = null; const projInputEl = document.getElementById('projectNameInput'); if(projInputEl) projInputEl.value = '';
-            selectedTaskTypes = []; renderTaskTypeChips(); const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
+            selectedTaskTypes = []; renderTaskTypeChips(); 
+            selectedAssignments = []; renderAssignmentChips();
+            const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
             currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }]; renderNotes();
             currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }]; renderSystems();
             document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่"; document.getElementById('submit-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; lucide.createIcons();
@@ -2891,7 +2946,7 @@ function switchTab(activeTabId) {
             const submitBtn = document.getElementById('submit-btn'); submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
             const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
             const systemsToSave = currentSystems.filter(s => s.checked && (s.system.trim() !== '' || s.brand.trim() !== '')).map(s => ({ system: s.system.trim(), brand: s.brand.trim() }));
-            const taskData = { taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', taskType: selectedTaskTypes, receiveDate: document.getElementById('receiveDate')?.value || '', responsibleName: document.getElementById('responsibleName')?.value || '', assignment: document.getElementById('assignment')?.value || '', customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, systems: systemsToSave, updatedAt: Date.now() };
+            const taskData = { taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', taskType: selectedTaskTypes, receiveDate: document.getElementById('receiveDate')?.value || '', responsibleName: document.getElementById('responsibleName')?.value || '', assignment: selectedAssignments, customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, systems: systemsToSave, updatedAt: Date.now() };
             try {
                 if (currentEditTaskId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); showNotification("อัปเดตงานเรียบร้อยแล้ว"); }
                 else { taskData.createdAt = Date.now(); taskData.ownerId = currentUser.uid; taskData.ownerEmail = currentUser.email; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); }
@@ -2903,10 +2958,12 @@ function switchTab(activeTabId) {
             if (currentUserRole === 'monitor') return; const task = allTasks.find(t => t.id === taskId); if(!task) return;
             if (currentUserRole === 'user' && task.ownerId !== currentUser.uid) return showNotification("คุณแก้ไขได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
             document.getElementById('day-detail-modal')?.classList.add('hidden');
-            ['taskName', 'receiveDate', 'responsibleName', 'assignment', 'customerName', 'customerPhone', 'workLocation'].forEach(field => { const el = document.getElementById(field); if (el) el.value = task[field] || ''; });
+            ['taskName', 'receiveDate', 'responsibleName', 'customerName', 'customerPhone', 'workLocation'].forEach(field => { const el = document.getElementById(field); if (el) el.value = task[field] || ''; });
             const projInputEl = document.getElementById('projectNameInput'); if (projInputEl) projInputEl.value = task.projectName || '';
             if (Array.isArray(task.taskType)) { selectedTaskTypes = [...task.taskType]; selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); } else if (task.taskType && typeof task.taskType === 'string') selectedTaskTypes = [task.taskType]; else selectedTaskTypes = [];
             renderTaskTypeChips();
+            if (Array.isArray(task.assignment)) { selectedAssignments = [...task.assignment]; selectedAssignments.sort((a, b) => a.localeCompare(b, 'th')); } else if (task.assignment && typeof task.assignment === 'string') selectedAssignments = [task.assignment]; else selectedAssignments = [];
+            renderAssignmentChips();
             if (task.notes && task.notes.length > 0) { currentNotes = JSON.parse(JSON.stringify(task.notes)); const lastNote = currentNotes[currentNotes.length - 1]; if (lastNote && lastNote.completed) currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }); } else currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
             renderNotes(); 
             if (task.systems && task.systems.length > 0) { currentSystems = task.systems.map((s, i) => ({ id: 'sys_edit_' + Date.now() + '_' + i, checked: true, system: s.system || '', brand: s.brand || '' })); } else { currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }]; }
@@ -2967,7 +3024,9 @@ function switchTab(activeTabId) {
                     let match = true;
                     if (excludeKey !== 'responsible' && dashCrossFilters.responsible && (t.responsibleName || 'ไม่ระบุ') !== dashCrossFilters.responsible) match = false;
                     if (excludeKey !== 'customer' && dashCrossFilters.customer && (t.customerName || 'ไม่ระบุ') !== dashCrossFilters.customer) match = false;
-                    if (excludeKey !== 'assignment' && dashCrossFilters.assignment && (t.assignment || 'ไม่ระบุ') !== dashCrossFilters.assignment) match = false;
+                    let tAssigns = Array.isArray(t.assignment) ? t.assignment : (t.assignment && typeof t.assignment === 'string' ? [t.assignment] : []);
+                    if (tAssigns.length === 0) tAssigns = ['ไม่ระบุ'];
+                    if (excludeKey !== 'assignment' && dashCrossFilters.assignment && !tAssigns.includes(dashCrossFilters.assignment)) match = false;
                     let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : []);
                     if (tTypes.length === 0) tTypes = ['ไม่ระบุ'];
                     if (excludeKey !== 'tasktype' && dashCrossFilters.tasktype && !tTypes.includes(dashCrossFilters.tasktype)) match = false;
@@ -3007,7 +3066,11 @@ function switchTab(activeTabId) {
             const counts = { responsible: {}, customer: {}, assignment: {}, taskType: {}, system: {}, brand: {} };
             getFilteredTasksFor('responsible').forEach(t => { const resp = t.responsibleName || 'ไม่ระบุ'; counts.responsible[resp] = (counts.responsible[resp] || 0) + 1; });
             getFilteredTasksFor('customer').forEach(t => { const cust = t.customerName || 'ไม่ระบุ'; counts.customer[cust] = (counts.customer[cust] || 0) + 1; });
-            getFilteredTasksFor('assignment').forEach(t => { const assign = t.assignment || 'ไม่ระบุ'; counts.assignment[assign] = (counts.assignment[assign] || 0) + 1; });
+            getFilteredTasksFor('assignment').forEach(t => { 
+                let assigns = Array.isArray(t.assignment) ? t.assignment : (t.assignment && typeof t.assignment === 'string' ? [t.assignment] : []); 
+                if (assigns.length === 0) assigns = ['ไม่ระบุ']; 
+                assigns.forEach(a => { counts.assignment[a] = (counts.assignment[a] || 0) + 1; }); 
+            });
             
             getFilteredTasksFor('tasktype').forEach(t => { 
                 let tTypes = Array.isArray(t.taskType) ? t.taskType : (t.taskType && typeof t.taskType === 'string' ? [t.taskType] : []); 
@@ -3134,7 +3197,12 @@ function switchTab(activeTabId) {
 
         document.getElementById('btn-export-excel')?.addEventListener('click', () => {
             if (filteredTasks.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
-            const exportData = filteredTasks.map(t => { let notesStr = t.notes ? t.notes.map(n => n.text).filter(text => text.trim() !== '').join(' | ') : ''; let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || '-'); return { 'วันรับงาน': formatDate(t.receiveDate), 'ชื่องาน': t.taskName || '-', 'ชื่อโครงการ': t.projectName || '-', 'ประเภทงาน': typeStr, 'ผู้รับผิดชอบ': t.responsibleName || '-', 'การมอบหมาย': t.assignment || '-', 'ชื่อลูกค้า': t.customerName || '-', 'เบอร์ลูกค้า': t.customerPhone || '-', 'สถานที่': t.workLocation || '-', 'บันทึกย่อ': notesStr }; });
+            const exportData = filteredTasks.map(t => { 
+                let notesStr = t.notes ? t.notes.map(n => n.text).filter(text => text.trim() !== '').join(' | ') : ''; 
+                let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || '-'); 
+                let assignStr = Array.isArray(t.assignment) ? t.assignment.join(', ') : (t.assignment || '-'); 
+                return { 'วันรับงาน': formatDate(t.receiveDate), 'ชื่องาน': t.taskName || '-', 'ชื่อโครงการ': t.projectName || '-', 'ประเภทงาน': typeStr, 'ผู้รับผิดชอบ': t.responsibleName || '-', 'การมอบหมาย': assignStr, 'ชื่อลูกค้า': t.customerName || '-', 'เบอร์ลูกค้า': t.customerPhone || '-', 'สถานที่': t.workLocation || '-', 'บันทึกย่อ': notesStr }; 
+            });
             const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Daily Tasks"); XLSX.writeFile(workbook, `Daily_Tasks_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ");
         });
 
