@@ -564,8 +564,16 @@
                                         <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option><option value="8">กันยายน</option>
                                         <option value="9">ตุลาคม</option><option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
                                     </select>
-                                    <select id="calendar-year-select" class="bg-white border border-gray-200 text-gray-800 text-lg sm:text-xl font-bold rounded-md px-2 py-1 focus:ring-2 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none cursor-pointer shadow-sm hover:border-[#5b5fc7] transition-colors appearance-none pr-8 relative bg-no-repeat bg-[right_0.5rem_center] bg-[length:1em_1em]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
-                                    </select>
+                                    <div class="relative" id="custom-year-wrapper">
+                                        <div id="custom-year-btn" class="bg-white border border-gray-200 text-gray-800 text-lg sm:text-xl font-bold rounded-md px-3 py-1 cursor-pointer shadow-sm hover:border-[#5b5fc7] transition-colors flex items-center gap-2">
+                                            <span id="custom-year-display"></span>
+                                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500"></i>
+                                        </div>
+                                        <div id="custom-year-menu" class="absolute left-0 mt-1 w-full min-w-[130px] bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden overflow-hidden">
+                                            <ul id="custom-year-list" class="max-h-[190px] overflow-y-auto text-base">
+                                                </ul>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end">
                                     <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-0 sm:mr-2 flex-1 sm:flex-none justify-center"><i data-lucide="calendar-off" class="w-4 h-4"></i> เพิ่มวันหยุด/ลา</button>
@@ -1434,6 +1442,12 @@ function switchTab(activeTabId) {
             if (assignmentWrapper && !assignmentWrapper.contains(e.target)) assignmentList?.classList.add('hidden');
             if (dashProjWrapper && !dashProjWrapper.contains(e.target)) dashProjList?.classList.add('hidden');
             
+            // ปิด Dropdown ปีปฏิทิน เมื่อคลิกที่อื่น
+            const yearWrapper = document.getElementById('custom-year-wrapper');
+            if (yearWrapper && !yearWrapper.contains(e.target)) {
+                document.getElementById('custom-year-menu')?.classList.add('hidden');
+            }
+
             // ปิด Dropdown ระบบงาน และ ยี่ห้อ เมื่อคลิกที่อื่น
             if (!e.target.closest('[id^="sys-wrapper-"]')) {
                 document.querySelectorAll('[id^="sys-list-"]').forEach(el => el.classList.add('hidden'));
@@ -2677,22 +2691,28 @@ function switchTab(activeTabId) {
             const year = currentCalendarDate.getFullYear(), month = currentCalendarDate.getMonth(), yearStr = year.toString();
             
             const calMonthSel = document.getElementById('calendar-month-select');
-            const calYearSel = document.getElementById('calendar-year-select');
             if(calMonthSel) calMonthSel.value = month;
-            if(calYearSel) {
-                // สร้างรายการปีให้เลือก (ถอยหลัง 100 ปี และล่วงหน้า 100 ปี เพื่อให้เสมือนไม่จำกัดและเกิด Scrollbar อัตโนมัติ)
-                if(calYearSel.options.length === 0) {
-                    let yearOptions = '';
-                    for(let y = year - 100; y <= year + 100; y++) {
-                        yearOptions += `<option value="${y}">${y + 543} (${y})</option>`;
-                    }
-                    calYearSel.innerHTML = yearOptions;
+            
+            const yearDisplay = document.getElementById('custom-year-display');
+            const yearList = document.getElementById('custom-year-list');
+            if (yearDisplay) yearDisplay.innerHTML = `<span class="text-red-600">${year + 543}</span> <span class="text-gray-500 text-sm font-normal">(${year})</span>`;
+            
+            if (yearList && yearList.children.length === 0) {
+                let listHtml = '';
+                for(let y = year - 100; y <= year + 100; y++) {
+                    listHtml += `<li class="year-option px-3 py-2 hover:bg-red-50 cursor-pointer flex justify-between items-center transition-colors border-b border-gray-100 last:border-0" data-year="${y}"><span class="text-red-600 font-bold">${y + 543}</span> <span class="text-gray-500 text-sm font-normal">(${y})</span></li>`;
                 }
-                // เช็คว่ามีปีปัจจุบันในตัวเลือกไหม ถ้าไม่มีให้ใส่เพิ่มเข้าไป
-                if (!Array.from(calYearSel.options).some(opt => parseInt(opt.value) === year)) {
-                    calYearSel.innerHTML += `<option value="${year}">${year + 543} (${year})</option>`;
-                }
-                calYearSel.value = year;
+                yearList.innerHTML = listHtml;
+                
+                // ผูก Event ให้แต่ละปีที่กดได้
+                yearList.querySelectorAll('.year-option').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        const selectedYear = parseInt(e.currentTarget.getAttribute('data-year'));
+                        currentCalendarDate.setFullYear(selectedYear);
+                        document.getElementById('custom-year-menu').classList.add('hidden');
+                        renderCalendar();
+                    });
+                });
             }
 
             const quotaContainer = document.getElementById('leave-quota-container');
@@ -2825,14 +2845,26 @@ function switchTab(activeTabId) {
         document.getElementById('next-month')?.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); });
         document.getElementById('today-btn')?.addEventListener('click', () => { currentCalendarDate = getThaiDate(); renderCalendar(); });
         
-        // จับ Event ตอนผู้ใช้เลือกเดือนหรือปีจาก Dropdown
+        // จับ Event ตอนผู้ใช้เลือกเดือนจาก Dropdown
         document.getElementById('calendar-month-select')?.addEventListener('change', (e) => { 
             currentCalendarDate.setMonth(parseInt(e.target.value)); 
             renderCalendar(); 
         });
-        document.getElementById('calendar-year-select')?.addEventListener('change', (e) => { 
-            currentCalendarDate.setFullYear(parseInt(e.target.value)); 
-            renderCalendar(); 
+
+        // เปิด/ปิด Custom Dropdown ปี
+        const yearBtn = document.getElementById('custom-year-btn');
+        const yearMenu = document.getElementById('custom-year-menu');
+        yearBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            yearMenu.classList.toggle('hidden');
+            if(!yearMenu.classList.contains('hidden')) {
+                // เลื่อน Scrollbar อัตโนมัติไปที่ปีปัจจุบันที่เลือกอยู่ (ให้อยู่ตรงกลางของกรอบ 5 รายการ)
+                const selectedEl = document.querySelector(`.year-option[data-year="${currentCalendarDate.getFullYear()}"]`);
+                if(selectedEl) {
+                    const ul = yearMenu.querySelector('ul');
+                    ul.scrollTop = selectedEl.offsetTop - (ul.clientHeight / 2) + (selectedEl.clientHeight / 2);
+                }
+            }
         });
 
         const holidayModal = document.getElementById('holiday-form-modal'), holidayForm = document.getElementById('holiday-form');
