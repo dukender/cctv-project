@@ -111,6 +111,10 @@
                             <i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
                         </button>
                         <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
+                        <button id="tab-holiday-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
+                            <i data-lucide="tent" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปวันหยุด / วันลา</span>
+                        </button>
                         <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
                         <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
                         <button id="tab-manage" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน</button>
@@ -613,6 +617,63 @@
                     </div>
                 </div>
 
+                <div id="view-holiday-summary" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 w-full lg:w-[300px] shrink-0 flex flex-col min-h-[500px]">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
+                                <i data-lucide="tent" class="w-5 h-5 text-red-500"></i> สรุปวันหยุด / วันลา
+                            </h2>
+                            <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="hol-display-count" class="font-bold text-red-500">0</span> วัน</p>
+                            <div id="hol-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
+                            <div id="hol-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                <button onclick="changeHolCardPage(-1)" id="btn-hol-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <span id="hol-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                <button onclick="changeHolCardPage(1)" id="btn-hol-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">รายการวันหยุด</h3>
+                                </div>
+                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]">
+                                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="hol-search-input" placeholder="ค้นหารายละเอียด..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 transition-shadow">
+                                    </div>
+                                    <select id="hol-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 transition-shadow text-gray-600 bg-white flex-1 sm:flex-none">
+                                        <option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option>
+                                    </select>
+                                    <input type="date" id="hol-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 transition-shadow text-gray-600 block">
+                                    <input type="month" id="hol-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 transition-shadow text-gray-600 hidden">
+                                    <select id="hol-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 transition-shadow text-gray-600 hidden min-w-[120px]">
+                                        <option value="">ทุกปีทั้งหมด</option>
+                                    </select>
+                                    <button id="btn-hol-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-hol-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-hol-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto min-h-[200px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="hol-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
+                                            <th class="px-6 py-4 font-semibold text-center w-32">วันที่</th>
+                                            <th class="px-6 py-4 font-semibold">รายละเอียด</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="hol-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="hol-summary-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="view-list" class="hidden animate-fade-in pb-10">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <div class="p-6 border-b border-gray-200 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-gray-50/50">
@@ -914,7 +975,7 @@
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
 
-        const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewTasktypeSummary = document.getElementById('view-tasktype-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewCustomerSummary = document.getElementById('view-customer-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
+        const viewDashboard = document.getElementById('view-dashboard'), viewCalendar = document.getElementById('view-calendar'), viewList = document.getElementById('view-list'), viewProjectSummary = document.getElementById('view-project-summary'), viewTasktypeSummary = document.getElementById('view-tasktype-summary'), viewSystemSummary = document.getElementById('view-system-summary'), viewBrandsumSummary = document.getElementById('view-brandsum-summary'), viewResponsibleSummary = document.getElementById('view-responsible-summary'), viewCustomerSummary = document.getElementById('view-customer-summary'), viewHolidaySummary = document.getElementById('view-holiday-summary'), viewManage = document.getElementById('view-manage'), viewUsers = document.getElementById('view-users');
 
         const btnToggleMenu = document.getElementById('btn-toggle-menu');
         const sidebarMenu = document.getElementById('sidebar-menu');
@@ -981,6 +1042,7 @@ function switchTab(activeTabId) {
             else if (activeTabId === 'brandsum-summary' && typeof renderBrandsumSummary === 'function') renderBrandsumSummary(); 
             else if (activeTabId === 'responsible-summary' && typeof renderResponsibleSummary === 'function') renderResponsibleSummary(); 
             else if (activeTabId === 'customer-summary' && typeof renderCustomerSummary === 'function') renderCustomerSummary(); 
+            else if (activeTabId === 'holiday-summary' && typeof renderHolidaySummary === 'function') renderHolidaySummary(); 
             else if (activeTabId === 'manage') { 
                 document.querySelectorAll('#form-title').forEach(t => t.innerText = typeof currentEditTaskId !== 'undefined' && currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"); 
             }
@@ -997,6 +1059,7 @@ function switchTab(activeTabId) {
         
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
+        document.getElementById('tab-holiday-summary')?.addEventListener('click', () => switchTab('holiday-summary'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
         document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
         document.getElementById('tab-tasktype-summary')?.addEventListener('click', () => switchTab('tasktype-summary'));
@@ -1130,6 +1193,7 @@ function switchTab(activeTabId) {
             const viewBrandsum = document.getElementById('view-brandsum-summary'); if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
             if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
             if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
+            if (viewHolidaySummary && !viewHolidaySummary.classList.contains('hidden')) renderHolidaySummary();
         });
 
         document.getElementById('btn-login-google')?.addEventListener('click', async () => { try { await signInWithPopup(auth, googleProvider); } catch (e) { if (e.code !== 'auth/popup-closed-by-user') showNotification("เกิดข้อผิดพลาดในการล็อกอิน: " + e.message, "error"); } });
@@ -1297,6 +1361,7 @@ function switchTab(activeTabId) {
             unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => {
                 let hols = []; snapshot.forEach(doc => { hols.push({ id: doc.id, ...doc.data() }); });
                 allHolidays = filterDataByRole(hols); renderCalendar();
+                if (viewHolidaySummary && !viewHolidaySummary.classList.contains('hidden')) renderHolidaySummary();
             }, (error) => console.error(error));
         }
 
@@ -3674,7 +3739,208 @@ function switchTab(activeTabId) {
                 jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
             }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
+// --- Logic สำหรับหน้า สรุปวันหยุด / วันลา (Holiday Summary) ---
+        let currentHolFilteredData = [];
+        let currentHolFilter = 'all';
+        let holCurrentPage = 1;
+        let holCardCurrentPage = 1; 
+        const holCardsPerPage = 10;  
 
+        window.setHolFilter = (name) => { 
+            currentHolFilter = currentHolFilter === name ? 'all' : name; 
+            holCurrentPage = 1;
+            renderHolidaySummary(); 
+        };
+        
+        window.goToHolSummaryPage = (page) => { holCurrentPage = page; renderHolidaySummary(); };
+        window.changeHolCardPage = (direction) => { holCardCurrentPage += direction; renderHolidaySummary(); };
+
+        function renderHolidaySummary() {
+            const container = document.getElementById('hol-cards-container');
+            const tbody = document.getElementById('hol-summary-body');
+            if (!container || !tbody) return;
+
+            let holsToUse = getHolidaysByFilter();
+
+            const searchInput = document.getElementById('hol-search-input')?.value.toLowerCase() || '';
+            const timeType = document.getElementById('hol-search-time-type')?.value || 'day';
+            const searchDate = document.getElementById('hol-search-date')?.value;
+            const searchMonth = document.getElementById('hol-search-month')?.value;
+            const searchYear = document.getElementById('hol-search-year')?.value;
+
+            // แมพประเภทในระบบเป็นข้อความภาษาไทย
+            const holTypeMapping = {
+                'holiday': 'วันหยุดประจำปี',
+                'vacation_leave': 'วันลาพักร้อน',
+                'personal_leave': 'วันลากิจ',
+                'leave': 'วันลากิจ', // เผื่อมีข้อมูลเก่า
+                'sick_leave': 'วันลาป่วย'
+            };
+
+            const filteredHols = holsToUse.filter(h => {
+                let matchTime = true;
+                if (timeType === 'day' && searchDate) matchTime = h.holidayDate === searchDate;
+                else if (timeType === 'month' && searchMonth) matchTime = h.holidayDate && h.holidayDate.startsWith(searchMonth);
+                else if (timeType === 'year' && searchYear) matchTime = h.holidayDate && h.holidayDate.startsWith(searchYear);
+
+                const typeTh = holTypeMapping[h.holidayType] || 'อื่นๆ';
+                const searchString = [h.holidayName || '', typeTh].join(' ').toLowerCase();
+                const matchText = searchInput ? searchString.includes(searchInput) : true;
+                
+                return matchTime && matchText;
+            });
+
+            // นับจำนวนตามประเภท
+            const typeCounts = {};
+            let totalHolsCount = filteredHols.length;
+            
+            filteredHols.forEach(h => {
+                const typeTh = holTypeMapping[h.holidayType] || 'อื่นๆ';
+                typeCounts[typeTh] = (typeCounts[typeTh] || 0) + 1;
+            });
+
+            const typeData = Object.keys(typeCounts).map(name => ({
+                name: name,
+                count: typeCounts[name],
+                percent: totalHolsCount > 0 ? Math.round((typeCounts[name] / totalHolsCount) * 100) : 0
+            })).sort((a, b) => b.count - a.count);
+
+            const displayCountEl = document.getElementById('hol-display-count');
+            if(displayCountEl) displayCountEl.textContent = totalHolsCount;
+
+            const totalCardPages = Math.ceil(typeData.length / holCardsPerPage) || 1;
+            if (holCardCurrentPage > totalCardPages) holCardCurrentPage = totalCardPages;
+            
+            const startCardIndex = (holCardCurrentPage - 1) * holCardsPerPage;
+            const endCardIndex = startCardIndex + holCardsPerPage;
+            const paginatedTypeData = typeData.slice(startCardIndex, endCardIndex);
+
+            container.innerHTML = '';
+            const paginationEl = document.getElementById('hol-cards-pagination');
+
+            if (typeData.length === 0) {
+                 container.innerHTML = `<div class="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-100 text-sm">ไม่พบข้อมูลวันหยุด</div>`;
+                 if(paginationEl) { paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex'); }
+            } else {
+                paginatedTypeData.forEach(r => {
+                    const isSelected = currentHolFilter === r.name;
+                    const ringClass = isSelected ? 'ring-2 ring-red-500 ring-offset-1 scale-[1.01] shadow-md border-red-500/50' : 'border-red-100 hover:shadow-sm hover:border-red-500/40';
+                    container.innerHTML += `
+                        <div onclick="setHolFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-red-50/50 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
+                            <p class="text-sm font-bold text-red-600 w-full leading-relaxed group-hover:text-red-800 transition-colors">${r.name}</p>
+                            <div class="flex items-baseline justify-center gap-1.5 mt-0.5">
+                                <span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span>
+                                <span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) วัน</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                if(paginationEl) {
+                    if (typeData.length > holCardsPerPage) {
+                        paginationEl.classList.remove('hidden'); paginationEl.classList.add('flex');
+                        document.getElementById('hol-cards-page-text').textContent = `หน้า ${holCardCurrentPage} / ${totalCardPages}`;
+                        document.getElementById('btn-hol-card-prev').disabled = holCardCurrentPage === 1;
+                        document.getElementById('btn-hol-card-next').disabled = holCardCurrentPage === totalCardPages;
+                    } else {
+                        paginationEl.classList.add('hidden'); paginationEl.classList.remove('flex');
+                    }
+                }
+            }
+
+            let tableData = filteredHols;
+            if (currentHolFilter !== 'all') {
+                tableData = filteredHols.filter(h => (holTypeMapping[h.holidayType] || 'อื่นๆ') === currentHolFilter);
+            }
+
+            // เรียงลำดับวันที่ล่าสุดขึ้นก่อน
+            tableData.sort((a, b) => (b.holidayDate || '').localeCompare(a.holidayDate || ''));
+            currentHolFilteredData = tableData;
+
+            const totalTablePages = Math.ceil(tableData.length / itemsPerPage) || 1;
+            if (holCurrentPage > totalTablePages) holCurrentPage = totalTablePages;
+            const startTableIndex = (holCurrentPage - 1) * itemsPerPage;
+            const endTableIndex = startTableIndex + itemsPerPage;
+            const paginatedTableData = tableData.slice(startTableIndex, endTableIndex);
+
+            const paginationContainer = document.getElementById('hol-summary-pagination');
+
+            tbody.innerHTML = '';
+            if (paginatedTableData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
+                if(paginationContainer) paginationContainer.innerHTML = '';
+            } else {
+                paginatedTableData.forEach((row, index) => {
+                    const globalIndex = startTableIndex + index + 1;
+                    const typeTh = holTypeMapping[row.holidayType] || 'อื่นๆ';
+                    
+                    let badgeColor = 'bg-red-100 text-red-700';
+                    if(row.holidayType === 'vacation_leave') badgeColor = 'bg-green-100 text-green-700';
+                    else if(row.holidayType === 'personal_leave' || row.holidayType === 'leave') badgeColor = 'bg-orange-100 text-orange-700';
+                    else if(row.holidayType === 'sick_leave') badgeColor = 'bg-purple-100 text-purple-700';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td>
+                            <td class="px-6 py-3 text-center text-sm font-semibold text-gray-800">${row.holidayDate ? formatDate(row.holidayDate) : '-'}</td>
+                            <td class="px-6 py-3">
+                                <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor} mr-2">${typeTh}</span> 
+                                <span class="text-gray-700">${row.holidayName || '-'}</span>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                if (paginationContainer && tableData.length > itemsPerPage) {
+                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-red-600">${startTableIndex + 1}</span> ถึง <span class="font-bold text-red-600">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-red-600">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToHolSummaryPage(${holCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${holCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-red-600">หน้า ${holCurrentPage} / ${totalTablePages}</div><button onclick="goToHolSummaryPage(${holCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${holCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
+                } else if(paginationContainer) {
+                    paginationContainer.innerHTML = '';
+                }
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('hol-search-time-type')?.addEventListener('change', (e) => {
+            const type = e.target.value, dateInput = document.getElementById('hol-search-date'), monthInput = document.getElementById('hol-search-month'), yearInput = document.getElementById('hol-search-year');
+            if(dateInput) { dateInput.className = type === 'day' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 block" : "hidden"; dateInput.value = ''; }
+            if(monthInput) { monthInput.className = type === 'month' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 block" : "hidden"; monthInput.value = ''; }
+            if(yearInput) { yearInput.className = type === 'year' ? "px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 block" : "hidden"; yearInput.value = ''; }
+            holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary();
+        });
+
+        document.getElementById('hol-search-input')?.addEventListener('input', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
+        document.getElementById('hol-search-date')?.addEventListener('change', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
+        document.getElementById('hol-search-month')?.addEventListener('change', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
+        document.getElementById('hol-search-year')?.addEventListener('change', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
+
+        document.getElementById('btn-hol-reset-search')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('hol-search-input'), timeType = document.getElementById('hol-search-time-type');
+            if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); }
+            currentHolFilter = 'all'; holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary();
+        });
+
+        document.getElementById('btn-hol-export-excel')?.addEventListener('click', () => {
+            if (currentHolFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            const holTypeMapping = { 'holiday': 'วันหยุดประจำปี', 'vacation_leave': 'วันลาพักร้อน', 'personal_leave': 'วันลากิจ', 'leave': 'วันลากิจ', 'sick_leave': 'วันลาป่วย' };
+            const exportData = currentHolFilteredData.map((r, idx) => ({ 
+                'ลำดับ': idx + 1, 
+                'วันที่': r.holidayDate ? formatDate(r.holidayDate) : '-', 
+                'ประเภท': holTypeMapping[r.holidayType] || 'อื่นๆ', 
+                'รายละเอียด': r.holidayName || '-'
+            }));
+            const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); 
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Holiday Summary"); 
+            XLSX.writeFile(workbook, `Holiday_Summary_${getThaiDateString()}.xlsx`); 
+            showNotification("Export Excel สำเร็จ");
+        });
+
+        document.getElementById('btn-hol-export-pdf')?.addEventListener('click', () => {
+            if (currentHolFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
+            showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('hol-summary-table');
+            html2pdf().set({ margin: 0.4, filename: `Holiday_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+        });
+
+        // ----------------------------------------------------
         lucide.createIcons();
     </script>
 </body>
