@@ -623,6 +623,84 @@
                             <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-2">
                                 <i data-lucide="tent" class="w-5 h-5 text-red-500"></i> สรุปวันหยุด / วันลา
                             </h2>
+                            <div id="view-holiday-summary" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <div class="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
+                            
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="font-bold text-gray-800 flex items-center gap-2 text-lg">
+                                        <i data-lucide="calendar" class="w-5 h-5 text-red-500"></i> ปฏิทิน
+                                    </h2>
+                                    <div class="flex items-center gap-1">
+                                        <button id="mini-cal-prev" class="p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 rounded transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                        <span id="mini-cal-month-year" class="text-sm font-bold text-gray-700 min-w-[90px] text-center">ม.ค. 2026</span>
+                                        <button id="mini-cal-next" class="p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 rounded transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-gray-500 mb-2">
+                                    <div class="text-red-500">อา</div><div>จ</div><div>อ</div><div>พ</div><div>พฤ</div><div>ศ</div><div class="text-indigo-500">ส</div>
+                                </div>
+                                <div id="mini-cal-grid" class="grid grid-cols-7 gap-1 text-center text-sm font-medium">
+                                    </div>
+                                <div class="mt-4 flex flex-wrap gap-x-3 gap-y-1.5 justify-center text-[10px] text-gray-500 border-t border-gray-100 pt-3">
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-red-500 block"></span> วันหยุด</div>
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-green-500 block"></span> พักร้อน</div>
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 block"></span> ลากิจ</div>
+                                    <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-purple-500 block"></span> ลาป่วย</div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex flex-col min-h-[300px]">
+                                <h2 class="font-bold text-gray-800 flex items-center gap-2 mb-2 text-lg border-b border-gray-100 pb-3">
+                                    <i data-lucide="bar-chart-2" class="w-5 h-5 text-red-500"></i> สรุปวันหยุด / วันลา
+                                </h2>
+                                <p class="text-xs text-gray-500 mb-3 text-center">รวมข้อมูลตาม <span class="font-bold text-red-500" id="hol-time-filter-label">เดือนที่เลือก</span></p>
+                                
+                                <div id="hol-cards-container" class="flex flex-col gap-2.5 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4">
+                                    </div>
+
+                                <div id="hol-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
+                                    <button onclick="changeHolCardPage(-1)" id="btn-hol-card-prev" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                    <span id="hol-cards-page-text" class="text-xs font-medium text-gray-500">หน้า 1 / 1</span>
+                                    <button onclick="changeHolCardPage(1)" id="btn-hol-card-next" class="p-1.5 rounded-lg bg-white border border-gray-200 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                                <div class="shrink-0 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">รายการ <span id="hol-table-title-label"></span></h3>
+                                </div>
+                                <div class="flex flex-wrap items-center justify-start xl:justify-end gap-2 w-full xl:w-auto">
+                                    <div class="relative w-full sm:flex-1 min-w-[150px]">
+                                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" id="hol-search-input" placeholder="ค้นหารายละเอียด..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-500 transition-shadow">
+                                    </div>
+                                    <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                        <button id="btn-hol-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                        <button id="btn-hol-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto min-h-[200px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="hol-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
+                                            <th class="px-6 py-4 font-semibold text-center w-32">วันที่</th>
+                                            <th class="px-6 py-4 font-semibold text-center w-40">ประเภทวันหยุด</th>
+                                            <th class="px-6 py-4 font-semibold">รายละเอียด</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="hol-summary-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="hol-summary-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                             <p class="text-sm text-gray-500 mb-4 pb-3 border-b border-gray-100">จำนวนทั้งหมด <span id="hol-display-count" class="font-bold text-red-500">0</span> วัน</p>
                             <div id="hol-cards-container" class="flex flex-col gap-3 overflow-y-auto no-scrollbar flex-1 select-none p-1 pb-4"></div>
                             <div id="hol-cards-pagination" class="hidden mt-auto pt-3 border-t border-gray-100 flex items-center justify-between bg-white">
@@ -3746,6 +3824,7 @@ function switchTab(activeTabId) {
         let holCurrentPage = 1;
         let holCardCurrentPage = 1; 
         const holCardsPerPage = 10;  
+        let miniCalDate = getThaiDate(); // เก็บวันที่ของปฏิทินจิ๋ว
 
         window.setHolFilter = (name) => { 
             currentHolFilter = currentHolFilter === name ? 'all' : name; 
@@ -3764,10 +3843,14 @@ function switchTab(activeTabId) {
             let holsToUse = getHolidaysByFilter();
 
             const searchInput = document.getElementById('hol-search-input')?.value.toLowerCase() || '';
-            const timeType = document.getElementById('hol-search-time-type')?.value || 'day';
-            const searchDate = document.getElementById('hol-search-date')?.value;
-            const searchMonth = document.getElementById('hol-search-month')?.value;
-            const searchYear = document.getElementById('hol-search-year')?.value;
+            
+            // ดึงเดือน/ปี จาก Mini Calendar
+            const yearStr = miniCalDate.getFullYear().toString();
+            const monthStr = String(miniCalDate.getMonth() + 1).padStart(2, '0');
+            const targetMonthPrefix = `${yearStr}-${monthStr}`;
+
+            document.getElementById('hol-time-filter-label').textContent = `${miniCalDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}`;
+            document.getElementById('hol-table-title-label').textContent = currentHolFilter === 'all' ? `ทั้งหมด` : `${currentHolFilter}`;
 
             // แมพประเภทในระบบเป็นข้อความภาษาไทย
             const holTypeMapping = {
@@ -3779,10 +3862,7 @@ function switchTab(activeTabId) {
             };
 
             const filteredHols = holsToUse.filter(h => {
-                let matchTime = true;
-                if (timeType === 'day' && searchDate) matchTime = h.holidayDate === searchDate;
-                else if (timeType === 'month' && searchMonth) matchTime = h.holidayDate && h.holidayDate.startsWith(searchMonth);
-                else if (timeType === 'year' && searchYear) matchTime = h.holidayDate && h.holidayDate.startsWith(searchYear);
+                let matchTime = h.holidayDate && h.holidayDate.startsWith(targetMonthPrefix); // กรองตามเดือนที่เลือกในปฏิทินจิ๋ว
 
                 const typeTh = holTypeMapping[h.holidayType] || 'อื่นๆ';
                 const searchString = [h.holidayName || '', typeTh].join(' ').toLowerCase();
@@ -3835,13 +3915,23 @@ function switchTab(activeTabId) {
                     const ringClass = isSelected ? `ring-2 ${cardColor.ring} ring-offset-1 scale-[1.01] shadow-md` : `${cardColor.border} hover:shadow-sm ${cardColor.hoverBorder}`;
                     
                     container.innerHTML += `
-                        <div onclick="setHolFilter('${r.name.replace(/'/g, "\\'")}')" class="${cardColor.bg} py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
-                            <p class="text-sm font-bold ${cardColor.text} w-full leading-relaxed ${cardColor.hoverText} transition-colors">${r.name}</p>
-                            <div class="flex items-baseline justify-center gap-1.5 mt-0.5">
-                                <span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span>
-                                <span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) วัน</span>
+                        let cardColor = { bg: 'bg-gray-50/50', border: 'border-gray-200', hoverBorder: 'hover:border-gray-400/50', text: 'text-gray-600', hoverText: 'group-hover:text-gray-800', ring: 'ring-gray-500 border-gray-500/50' };
+                    if (r.name === 'วันหยุดประจำปี') cardColor = { bg: 'bg-red-50/50', border: 'border-red-100', hoverBorder: 'hover:border-red-400/40', text: 'text-red-600', hoverText: 'group-hover:text-red-800', ring: 'ring-red-500 border-red-500/50' };
+                    else if (r.name === 'วันลาพักร้อน') cardColor = { bg: 'bg-green-50/50', border: 'border-green-100', hoverBorder: 'hover:border-green-400/40', text: 'text-green-600', hoverText: 'group-hover:text-green-800', ring: 'ring-green-500 border-green-500/50' };
+                    else if (r.name === 'วันลากิจ') cardColor = { bg: 'bg-orange-50/50', border: 'border-orange-100', hoverBorder: 'hover:border-orange-400/40', text: 'text-orange-600', hoverText: 'group-hover:text-orange-800', ring: 'ring-orange-500 border-orange-500/50' };
+                    else if (r.name === 'วันลาป่วย') cardColor = { bg: 'bg-purple-50/50', border: 'border-purple-100', hoverBorder: 'hover:border-purple-400/40', text: 'text-purple-600', hoverText: 'group-hover:text-purple-800', ring: 'ring-purple-500 border-purple-500/50' };
+
+                    const ringClass = isSelected ? `ring-2 ${cardColor.ring} ring-offset-1 scale-[1.01] shadow-md` : `${cardColor.border} hover:shadow-sm ${cardColor.hoverBorder}`;
+
+                    container.innerHTML += `
+                        <div onclick="setHolFilter('${r.name.replace(/'/g, "\\'")}')" class="${cardColor.bg} py-2.5 px-3 rounded-lg border flex justify-between items-center transition-all cursor-pointer ${ringClass} group shrink-0">
+                            <span class="text-sm font-bold ${cardColor.text} ${cardColor.hoverText} transition-colors">${r.name}</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xl font-black text-gray-800">${r.count}</span>
+                                <span class="text-xs font-semibold text-gray-500 mt-1">วัน</span>
                             </div>
                         </div>
+                    `;
                     `;
                 });
 
@@ -3919,10 +4009,95 @@ function switchTab(activeTabId) {
             holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary();
         });
 
+        // ฟังก์ชันวาดปฏิทินจิ๋ว
+        function renderMiniCalendar() {
+            const grid = document.getElementById('mini-cal-grid');
+            const monthYearText = document.getElementById('mini-cal-month-year');
+            if (!grid || !monthYearText) return;
+
+            const year = miniCalDate.getFullYear();
+            const month = miniCalDate.getMonth();
+            const yearStr = year.toString();
+            const monthStr = String(month + 1).padStart(2, '0');
+            const targetPrefix = `${yearStr}-${monthStr}`;
+
+            const thaiMonthNames = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            monthYearText.textContent = `${thaiMonthNames[month]} ${year + 543}`;
+
+            const holsToUse = getHolidaysByFilter();
+            const monthlyHolidays = holsToUse.filter(h => h.holidayDate && h.holidayDate.startsWith(targetPrefix));
+
+            grid.innerHTML = '';
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            const today = getThaiDate();
+            
+            // วาดช่องว่างก่อนวันที่ 1
+            for(let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="p-1.5 opacity-0"></div>`;
+            }
+
+            for(let day = 1; day <= daysInMonth; day++) {
+                const dateString = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayHols = monthlyHolidays.filter(h => h.holidayDate === dateString);
+                const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                
+                let dotHtml = '';
+                if (dayHols.length > 0) {
+                    // เลือกสีกลมๆ ตามประเภทอันแรกที่เจอในวันนั้น
+                    const type = dayHols[0].holidayType;
+                    let dotColor = 'bg-red-500';
+                    if (type === 'vacation_leave') dotColor = 'bg-green-500';
+                    else if (type === 'personal_leave' || type === 'leave') dotColor = 'bg-orange-500';
+                    else if (type === 'sick_leave') dotColor = 'bg-purple-500';
+                    dotHtml = `<span class="w-1.5 h-1.5 rounded-full ${dotColor} absolute bottom-0.5 left-1/2 transform -translate-x-1/2"></span>`;
+                }
+
+                let baseClass = 'relative flex items-center justify-center h-8 w-8 mx-auto rounded-full cursor-pointer hover:bg-gray-100 transition-colors text-sm';
+                if (isToday) baseClass = 'relative flex items-center justify-center h-8 w-8 mx-auto rounded-full bg-indigo-50 text-[#5b5fc7] font-bold border border-indigo-200 text-sm';
+
+                grid.innerHTML += `
+                    <div class="${baseClass}" onclick="document.getElementById('hol-search-input').value = ''; renderHolidaySummary();">
+                        ${day}
+                        ${dotHtml}
+                    </div>
+                `;
+            }
+        }
+
+        // ปุ่มเปลี่ยนเดือนปฏิทินจิ๋ว
+        document.getElementById('mini-cal-prev')?.addEventListener('click', () => {
+            miniCalDate.setMonth(miniCalDate.getMonth() - 1);
+            holCurrentPage = 1; holCardCurrentPage = 1; currentHolFilter = 'all'; document.getElementById('hol-search-input').value = '';
+            renderMiniCalendar();
+            renderHolidaySummary();
+        });
+
+        document.getElementById('mini-cal-next')?.addEventListener('click', () => {
+            miniCalDate.setMonth(miniCalDate.getMonth() + 1);
+            holCurrentPage = 1; holCardCurrentPage = 1; currentHolFilter = 'all'; document.getElementById('hol-search-input').value = '';
+            renderMiniCalendar();
+            renderHolidaySummary();
+        });
+
+        // เวลาค้นหา หรือกดรีเซ็ต ให้ทำงานสัมพันธ์กัน
         document.getElementById('hol-search-input')?.addEventListener('input', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
-        document.getElementById('hol-search-date')?.addEventListener('change', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
-        document.getElementById('hol-search-month')?.addEventListener('change', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
-        document.getElementById('hol-search-year')?.addEventListener('change', () => { holCurrentPage = 1; holCardCurrentPage = 1; renderHolidaySummary(); });
+        
+        document.getElementById('btn-hol-reset-search')?.addEventListener('click', () => {
+            const searchInput = document.getElementById('hol-search-input');
+            if (searchInput) searchInput.value = ''; 
+            currentHolFilter = 'all'; holCurrentPage = 1; holCardCurrentPage = 1; 
+            miniCalDate = getThaiDate(); // กลับมาเดือนปัจจุบัน
+            renderMiniCalendar();
+            renderHolidaySummary();
+        });
+
+        // 🌟 เพิ่มคำสั่งเรียกวาดปฏิทินจิ๋วไว้ในฟังก์ชัน renderHolidaySummary ตอนเริ่มต้น 🌟
+        const originalRenderHolidaySummary = renderHolidaySummary;
+        renderHolidaySummary = function() {
+            renderMiniCalendar();
+            originalRenderHolidaySummary();
+        }
 
         document.getElementById('btn-hol-reset-search')?.addEventListener('click', () => {
             const searchInput = document.getElementById('hol-search-input'), timeType = document.getElementById('hol-search-time-type');
