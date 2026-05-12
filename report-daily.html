@@ -2680,10 +2680,10 @@ function switchTab(activeTabId) {
             const calYearSel = document.getElementById('calendar-year-select');
             if(calMonthSel) calMonthSel.value = month;
             if(calYearSel) {
-                // สร้างรายการปีให้เลือก (ถอยหลัง 5 ปี และล่วงหน้า 10 ปี)
+                // สร้างรายการปีให้เลือก (ถอยหลัง 100 ปี และล่วงหน้า 100 ปี เพื่อให้เสมือนไม่จำกัดและเกิด Scrollbar อัตโนมัติ)
                 if(calYearSel.options.length === 0) {
                     let yearOptions = '';
-                    for(let y = year - 5; y <= year + 10; y++) {
+                    for(let y = year - 100; y <= year + 100; y++) {
                         yearOptions += `<option value="${y}">${y + 543} (${y})</option>`;
                     }
                     calYearSel.innerHTML = yearOptions;
