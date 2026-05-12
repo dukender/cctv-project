@@ -739,7 +739,7 @@
                                 </div> <!-- ปิด flex container ซ้าย-ขวา -->
 
                                 <div class="w-full pt-4 flex justify-end gap-3 border-t border-gray-100">
-                                    <button type="button" onclick="switchTab('list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm shadow-sm">ยกเลิก</button>
+                                    <button type="button" onclick="switchTab(window.previousTab || 'list')" class="px-5 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-md transition-colors text-sm shadow-sm">ยกเลิก</button>
                                     <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium rounded-md transition-colors flex items-center justify-center gap-2 shadow-sm text-sm min-w-[140px]"><i data-lucide="save" class="w-4 h-4"></i> บันทึกการแก้ไข</button>
                                 </div>
                             </form>
@@ -834,6 +834,7 @@
 
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
+        window.currentActiveTab = 'list'; window.previousTab = 'list'; // ตัวแปรจำหน้าล่าสุด
         let chartInstances = { time: null, value: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         
         // สร้างหรือดึง Session ID ของเครื่อง/แท็บปัจจุบัน
@@ -918,6 +919,12 @@ function switchTab(activeTabId) {
             const isLeavingManage = typeof viewManage !== 'undefined' && viewManage && !viewManage.classList.contains('hidden') && activeTabId !== 'manage';
             if (isLeavingManage && typeof resetFormToAddMode === 'function') resetFormToAddMode();
             
+            // จดจำหน้าก่อนที่จะเข้ามาหน้าเพิ่ม/แก้ไขงาน
+            if (activeTabId === 'manage' && window.currentActiveTab !== 'manage') {
+                window.previousTab = window.currentActiveTab;
+            }
+            window.currentActiveTab = activeTabId;
+
             // ซ่อนทุกหน้าจอ
             document.querySelectorAll('[id^="view-"]').forEach(v => {
                 v.classList.add('hidden');
@@ -3000,7 +3007,7 @@ function switchTab(activeTabId) {
             try {
                 if (currentEditTaskId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); showNotification("อัปเดตงานเรียบร้อยแล้ว"); }
                 else { taskData.createdAt = Date.now(); taskData.ownerId = currentUser.uid; taskData.ownerEmail = currentUser.email; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); }
-                resetFormToAddMode(); switchTab('list');
+                resetFormToAddMode(); switchTab(window.previousTab || 'list');
             } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } finally { submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; submitBtn.disabled = false; lucide.createIcons(); }
         });
 
