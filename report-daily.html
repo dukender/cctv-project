@@ -2867,16 +2867,21 @@ function switchTab(activeTabId) {
             if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
             else {
                 // ดึงข้อมูลระบบงานและยี่ห้อทั้งหมดในโครงการนี้มารวมกัน พร้อมรวมจำนวนอุปกรณ์
-                let projectSystems = new Set(), projectBrands = new Set(), brandQtyMap = {};
+                let projectSystems = new Set(), projectBrands = new Set(), sysBrandQtyMap = {};
                 projectTasks.forEach(task => {
                     if (Array.isArray(task.systems)) {
                         task.systems.forEach(s => {
-                            if (s.system && s.system.trim() !== '') projectSystems.add(s.system.trim());
-                            if (s.brand && s.brand.trim() !== '') {
-                                let bName = s.brand.trim();
-                                projectBrands.add(bName);
-                                if (!brandQtyMap[bName]) brandQtyMap[bName] = 0;
-                                brandQtyMap[bName] += parseInt(String(s.qty).replace(/,/g, ''), 10) || 0;
+                            let sName = (s.system && s.system.trim() !== '') ? s.system.trim() : 'ไม่ระบุระบบ';
+                            let bName = (s.brand && s.brand.trim() !== '') ? s.brand.trim() : 'ไม่ระบุยี่ห้อ';
+                            let qty = parseInt(String(s.qty).replace(/,/g, ''), 10) || 0;
+                            
+                            if (sName !== 'ไม่ระบุระบบ') projectSystems.add(sName);
+                            if (bName !== 'ไม่ระบุยี่ห้อ') projectBrands.add(bName);
+                            
+                            if (qty > 0) {
+                                let key = `${sName} : ${bName}`;
+                                if (!sysBrandQtyMap[key]) sysBrandQtyMap[key] = 0;
+                                sysBrandQtyMap[key] += qty;
                             }
                         });
                     }
@@ -2884,16 +2889,16 @@ function switchTab(activeTabId) {
                 let sysArray = Array.from(projectSystems).sort((a,b) => a.localeCompare(b, 'th'));
                 let brandArray = Array.from(projectBrands).sort((a,b) => a.localeCompare(b, 'th'));
                 
-                // กรองเฉพาะยี่ห้อที่มีจำนวนมากกว่า 0 เพื่อนำไปแสดงในส่วน "จำนวนอุปกรณ์"
-                let brandsWithQty = brandArray.filter(b => brandQtyMap[b] > 0);
+                // ดึงเฉพาะรายการ (ระบบงาน : ยี่ห้อ) ที่มีจำนวนมากกว่า 0
+                let sysBrandKeys = Object.keys(sysBrandQtyMap).sort((a,b) => a.localeCompare(b, 'th'));
                 
                 // นำมาแสดงผลด้านบนสุดของ Pop-up
                 if (sysArray.length > 0 || brandArray.length > 0) {
-                    let qtyItemsHtml = brandsWithQty.map(b => `<div>${b} ( ${brandQtyMap[b].toLocaleString('th-TH')} )</div>`).join('');
+                    let qtyItemsHtml = sysBrandKeys.map(k => `<div>${k} ( ${sysBrandQtyMap[k].toLocaleString('th-TH')} )</div>`).join('');
                     content.innerHTML += `<div class="mb-4 bg-indigo-50/70 border border-indigo-100 rounded-lg p-3 text-sm flex flex-col gap-2">
                         ${sysArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="server" class="w-4 h-4"></i> ระบบงาน :</span> <span class="text-gray-800 leading-relaxed">${sysArray.join(', ')}</span></div>` : ''}
                         ${brandArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="cpu" class="w-4 h-4"></i> ยี่ห้ออุปกรณ์ :</span> <span class="text-gray-800 leading-relaxed">${brandArray.join(', ')}</span></div>` : ''}
-                        ${brandsWithQty.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="box" class="w-4 h-4"></i> จำนวนอุปกรณ์ :</span> <div class="flex flex-col text-gray-800 leading-relaxed">${qtyItemsHtml}</div></div>` : ''}
+                        ${sysBrandKeys.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="box" class="w-4 h-4"></i> จำนวนอุปกรณ์ :</span> <div class="flex flex-col text-gray-800 leading-relaxed">${qtyItemsHtml}</div></div>` : ''}
                     </div>`;
                 }
 
