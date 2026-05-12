@@ -556,7 +556,17 @@
                     <div class="flex flex-col xl:flex-row gap-6 items-start">
                         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full xl:w-8/12 flex-1">
                             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-                                <div class="flex items-center gap-4"><h2 id="calendar-month-year" class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">เดือน ปี</h2></div>
+                                <div class="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-bold text-gray-800">
+                                    <i data-lucide="calendar" class="w-6 h-6 text-[#5b5fc7] shrink-0"></i>
+                                    <select id="calendar-month-select" class="bg-white border border-gray-200 text-gray-800 text-lg sm:text-xl font-bold rounded-md px-2 py-1 focus:ring-2 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none cursor-pointer shadow-sm hover:border-[#5b5fc7] transition-colors appearance-none pr-8 relative bg-no-repeat bg-[right_0.5rem_center] bg-[length:1em_1em]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
+                                        <option value="0">มกราคม</option><option value="1">กุมภาพันธ์</option><option value="2">มีนาคม</option>
+                                        <option value="3">เมษายน</option><option value="4">พฤษภาคม</option><option value="5">มิถุนายน</option>
+                                        <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option><option value="8">กันยายน</option>
+                                        <option value="9">ตุลาคม</option><option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
+                                    </select>
+                                    <select id="calendar-year-select" class="bg-white border border-gray-200 text-gray-800 text-lg sm:text-xl font-bold rounded-md px-2 py-1 focus:ring-2 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none cursor-pointer shadow-sm hover:border-[#5b5fc7] transition-colors appearance-none pr-8 relative bg-no-repeat bg-[right_0.5rem_center] bg-[length:1em_1em]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
+                                    </select>
+                                </div>
                                 <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end">
                                     <button id="btn-open-holiday-modal" class="role-restricted-action px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-md font-medium text-sm transition-colors flex items-center gap-2 mr-0 sm:mr-2 flex-1 sm:flex-none justify-center"><i data-lucide="calendar-off" class="w-4 h-4"></i> เพิ่มวันหยุด/ลา</button>
                                     <div class="flex gap-2"><button id="prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button><button id="today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button><button id="next-month" class="p-2 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button></div>
@@ -2661,12 +2671,29 @@ function switchTab(activeTabId) {
         };
 
         function renderCalendar() {
-            const grid = document.getElementById('calendar-grid'), monthYearText = document.getElementById('calendar-month-year');
-            if (!grid || !monthYearText) return;
+            const grid = document.getElementById('calendar-grid');
+            if (!grid) return;
             grid.innerHTML = '';
             const year = currentCalendarDate.getFullYear(), month = currentCalendarDate.getMonth(), yearStr = year.toString();
-            const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-            monthYearText.innerHTML = `<i data-lucide="calendar" class="w-6 h-6 text-[#5b5fc7]"></i> ${monthNames[month]} ${year + 543} (${year})`;
+            
+            const calMonthSel = document.getElementById('calendar-month-select');
+            const calYearSel = document.getElementById('calendar-year-select');
+            if(calMonthSel) calMonthSel.value = month;
+            if(calYearSel) {
+                // สร้างรายการปีให้เลือก (ถอยหลัง 5 ปี และล่วงหน้า 10 ปี)
+                if(calYearSel.options.length === 0) {
+                    let yearOptions = '';
+                    for(let y = year - 5; y <= year + 10; y++) {
+                        yearOptions += `<option value="${y}">${y + 543} (${y})</option>`;
+                    }
+                    calYearSel.innerHTML = yearOptions;
+                }
+                // เช็คว่ามีปีปัจจุบันในตัวเลือกไหม ถ้าไม่มีให้ใส่เพิ่มเข้าไป
+                if (!Array.from(calYearSel.options).some(opt => parseInt(opt.value) === year)) {
+                    calYearSel.innerHTML += `<option value="${year}">${year + 543} (${year})</option>`;
+                }
+                calYearSel.value = year;
+            }
 
             const quotaContainer = document.getElementById('leave-quota-container');
             if (quotaContainer) {
@@ -2797,6 +2824,16 @@ function switchTab(activeTabId) {
         document.getElementById('prev-month')?.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1); renderCalendar(); });
         document.getElementById('next-month')?.addEventListener('click', () => { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1); renderCalendar(); });
         document.getElementById('today-btn')?.addEventListener('click', () => { currentCalendarDate = getThaiDate(); renderCalendar(); });
+        
+        // จับ Event ตอนผู้ใช้เลือกเดือนหรือปีจาก Dropdown
+        document.getElementById('calendar-month-select')?.addEventListener('change', (e) => { 
+            currentCalendarDate.setMonth(parseInt(e.target.value)); 
+            renderCalendar(); 
+        });
+        document.getElementById('calendar-year-select')?.addEventListener('change', (e) => { 
+            currentCalendarDate.setFullYear(parseInt(e.target.value)); 
+            renderCalendar(); 
+        });
 
         const holidayModal = document.getElementById('holiday-form-modal'), holidayForm = document.getElementById('holiday-form');
         document.getElementById('btn-open-holiday-modal')?.addEventListener('click', () => { if (holidayForm) holidayForm.reset(); const dateInput = document.getElementById('holidayDate'); if (dateInput) dateInput.value = getThaiDateString(); holidayModal?.classList.remove('hidden'); });
