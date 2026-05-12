@@ -2894,7 +2894,7 @@ function switchTab(activeTabId) {
                 
                 // นำมาแสดงผลด้านบนสุดของ Pop-up
                 if (sysArray.length > 0 || brandArray.length > 0) {
-                    let qtyItemsHtml = sysBrandKeys.map(k => `<div>${k} ( ${sysBrandQtyMap[k].toLocaleString('th-TH')} )</div>`).join('');
+                    let qtyItemsHtml = sysBrandKeys.map(k => `<div>${k} ( <span class="text-red-500 font-bold">${sysBrandQtyMap[k].toLocaleString('th-TH')}</span> )</div>`).join('');
                     content.innerHTML += `
                     <div class="mb-4 bg-indigo-50/70 border border-indigo-100 rounded-lg p-4 text-sm flex flex-col md:flex-row gap-4">
                         <div class="flex flex-col gap-2 flex-1 min-w-0">
