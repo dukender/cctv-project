@@ -2907,7 +2907,8 @@ function switchTab(activeTabId) {
 
         window.openDayModal = (dateString) => {
             const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), dayTasks = getTasksByFilter().filter(t => t.receiveDate === dateString);
-            title.innerHTML = `<i data-lucide="calendar" class="w-5 h-5"></i> ${formatDate(dateString)} ${dayTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${dayTasks.length} งาน )</span>` : ''}`;
+            title.className = "font-bold text-xl text-[#5b5fc7] flex items-start gap-2 sm:gap-3";
+            title.innerHTML = `<i data-lucide="calendar" class="w-6 h-6 shrink-0 mt-0.5"></i> <span class="leading-relaxed break-words">วันที่ <span class="text-gray-800">${formatDate(dateString)}</span> ${dayTasks.length > 0 ? `<span class="text-red-600 font-bold whitespace-nowrap ml-1">( ${dayTasks.length} งาน )</span>` : ''}</span>`;
             content.innerHTML = '';
             const dayHolidays = getHolidaysByFilter().filter(h => h.holidayDate === dateString);
             if (dayHolidays.length > 0) {
@@ -2942,7 +2943,8 @@ function switchTab(activeTabId) {
 
         window.openProjectDetailModal = (projectName) => {
             const modal = document.getElementById('day-detail-modal'), title = document.getElementById('day-detail-title'), content = document.getElementById('day-detail-content'), projectTasks = getTasksByFilter().filter(t => t.projectName === projectName);
-            title.innerHTML = `<i data-lucide="folder-open" class="w-5 h-5"></i> โครงการ: ${projectName} ${projectTasks.length > 0 ? `<span class="text-red-500 ml-2 font-bold">( ${projectTasks.length} งาน )</span>` : ''}`;
+            title.className = "font-bold text-xl text-[#5b5fc7] flex items-start gap-2 sm:gap-3";
+            title.innerHTML = `<i data-lucide="folder-open" class="w-6 h-6 shrink-0 mt-0.5"></i> <span class="leading-relaxed break-words">โครงการ: <span class="text-gray-800">${projectName}</span> ${projectTasks.length > 0 ? `<span class="text-red-600 font-bold whitespace-nowrap ml-1">( ${projectTasks.length} งาน )</span>` : ''}</span>`;
             content.innerHTML = '';
             if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
             else {
