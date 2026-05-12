@@ -2895,10 +2895,16 @@ function switchTab(activeTabId) {
                 // นำมาแสดงผลด้านบนสุดของ Pop-up
                 if (sysArray.length > 0 || brandArray.length > 0) {
                     let qtyItemsHtml = sysBrandKeys.map(k => `<div>${k} ( ${sysBrandQtyMap[k].toLocaleString('th-TH')} )</div>`).join('');
-                    content.innerHTML += `<div class="mb-4 bg-indigo-50/70 border border-indigo-100 rounded-lg p-3 text-sm flex flex-col gap-2">
-                        ${sysArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="server" class="w-4 h-4"></i> ระบบงาน :</span> <span class="text-gray-800 leading-relaxed">${sysArray.join(', ')}</span></div>` : ''}
-                        ${brandArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="cpu" class="w-4 h-4"></i> ยี่ห้ออุปกรณ์ :</span> <span class="text-gray-800 leading-relaxed">${brandArray.join(', ')}</span></div>` : ''}
-                        ${sysBrandKeys.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="box" class="w-4 h-4"></i> จำนวนอุปกรณ์ :</span> <div class="flex flex-col text-gray-800 leading-relaxed">${qtyItemsHtml}</div></div>` : ''}
+                    content.innerHTML += `
+                    <div class="mb-4 bg-indigo-50/70 border border-indigo-100 rounded-lg p-4 text-sm flex flex-col md:flex-row gap-4">
+                        <div class="flex flex-col gap-2 flex-1 min-w-0">
+                            ${sysArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="server" class="w-4 h-4"></i> ระบบงาน :</span> <span class="text-gray-800 leading-relaxed">${sysArray.join(', ')}</span></div>` : ''}
+                            ${brandArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="cpu" class="w-4 h-4"></i> ยี่ห้ออุปกรณ์ :</span> <span class="text-gray-800 leading-relaxed">${brandArray.join(', ')}</span></div>` : ''}
+                        </div>
+                        ${sysBrandKeys.length > 0 ? `
+                        <div class="flex flex-col gap-2 flex-1 min-w-0 md:border-l border-indigo-200/60 md:pl-4">
+                            <div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="box" class="w-4 h-4"></i> จำนวนอุปกรณ์ :</span> <div class="flex flex-col text-gray-800 leading-relaxed">${qtyItemsHtml}</div></div>
+                        </div>` : ''}
                     </div>`;
                 }
 
