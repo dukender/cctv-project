@@ -663,6 +663,7 @@
                                         <tr>
                                             <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
                                             <th class="px-6 py-4 font-semibold text-center w-32">วันที่</th>
+                                            <th class="px-6 py-4 font-semibold text-center w-40">ประเภทวันหยุด</th>
                                             <th class="px-6 py-4 font-semibold">รายละเอียด</th>
                                         </tr>
                                     </thead>
@@ -3824,10 +3825,18 @@ function switchTab(activeTabId) {
             } else {
                 paginatedTypeData.forEach(r => {
                     const isSelected = currentHolFilter === r.name;
-                    const ringClass = isSelected ? 'ring-2 ring-red-500 ring-offset-1 scale-[1.01] shadow-md border-red-500/50' : 'border-red-100 hover:shadow-sm hover:border-red-500/40';
+                    // กำหนดสีการ์ดตามประเภทให้เหมือนป้าย
+                    let cardColor = { bg: 'bg-gray-50/50', border: 'border-gray-200', hoverBorder: 'hover:border-gray-400/50', text: 'text-gray-600', hoverText: 'group-hover:text-gray-800', ring: 'ring-gray-500 border-gray-500/50' };
+                    if (r.name === 'วันหยุดประจำปี') cardColor = { bg: 'bg-red-50/50', border: 'border-red-100', hoverBorder: 'hover:border-red-400/40', text: 'text-red-600', hoverText: 'group-hover:text-red-800', ring: 'ring-red-500 border-red-500/50' };
+                    else if (r.name === 'วันลาพักร้อน') cardColor = { bg: 'bg-green-50/50', border: 'border-green-100', hoverBorder: 'hover:border-green-400/40', text: 'text-green-600', hoverText: 'group-hover:text-green-800', ring: 'ring-green-500 border-green-500/50' };
+                    else if (r.name === 'วันลากิจ') cardColor = { bg: 'bg-orange-50/50', border: 'border-orange-100', hoverBorder: 'hover:border-orange-400/40', text: 'text-orange-600', hoverText: 'group-hover:text-orange-800', ring: 'ring-orange-500 border-orange-500/50' };
+                    else if (r.name === 'วันลาป่วย') cardColor = { bg: 'bg-purple-50/50', border: 'border-purple-100', hoverBorder: 'hover:border-purple-400/40', text: 'text-purple-600', hoverText: 'group-hover:text-purple-800', ring: 'ring-purple-500 border-purple-500/50' };
+
+                    const ringClass = isSelected ? `ring-2 ${cardColor.ring} ring-offset-1 scale-[1.01] shadow-md` : `${cardColor.border} hover:shadow-sm ${cardColor.hoverBorder}`;
+                    
                     container.innerHTML += `
-                        <div onclick="setHolFilter('${r.name.replace(/'/g, "\\'")}')" class="bg-red-50/50 py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
-                            <p class="text-sm font-bold text-red-600 w-full leading-relaxed group-hover:text-red-800 transition-colors">${r.name}</p>
+                        <div onclick="setHolFilter('${r.name.replace(/'/g, "\\'")}')" class="${cardColor.bg} py-3 px-3 rounded-xl border text-center transition-all flex flex-col justify-center cursor-pointer ${ringClass} group shrink-0">
+                            <p class="text-sm font-bold ${cardColor.text} w-full leading-relaxed ${cardColor.hoverText} transition-colors">${r.name}</p>
                             <div class="flex items-baseline justify-center gap-1.5 mt-0.5">
                                 <span class="text-2xl font-black text-gray-800 leading-none">${r.count}</span>
                                 <span class="text-[11px] font-semibold text-gray-500 leading-none">( ${r.percent}% ) วัน</span>
@@ -3867,7 +3876,7 @@ function switchTab(activeTabId) {
 
             tbody.innerHTML = '';
             if (paginatedTableData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</td></tr>`;
                 if(paginationContainer) paginationContainer.innerHTML = '';
             } else {
                 paginatedTableData.forEach((row, index) => {
@@ -3883,8 +3892,10 @@ function switchTab(activeTabId) {
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td>
                             <td class="px-6 py-3 text-center text-sm font-semibold text-gray-800">${row.holidayDate ? formatDate(row.holidayDate) : '-'}</td>
+                            <td class="px-6 py-3 text-center">
+                                <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor}">${typeTh}</span> 
+                            </td>
                             <td class="px-6 py-3">
-                                <span class="px-2 py-1 rounded text-xs font-bold ${badgeColor} mr-2">${typeTh}</span> 
                                 <span class="text-gray-700">${row.holidayName || '-'}</span>
                             </td>
                         </tr>
@@ -3925,7 +3936,7 @@ function switchTab(activeTabId) {
             const exportData = currentHolFilteredData.map((r, idx) => ({ 
                 'ลำดับ': idx + 1, 
                 'วันที่': r.holidayDate ? formatDate(r.holidayDate) : '-', 
-                'ประเภท': holTypeMapping[r.holidayType] || 'อื่นๆ', 
+                'ประเภทวันหยุด': holTypeMapping[r.holidayType] || 'อื่นๆ', 
                 'รายละเอียด': r.holidayName || '-'
             }));
             const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); 
