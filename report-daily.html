@@ -2884,13 +2884,16 @@ function switchTab(activeTabId) {
                 let sysArray = Array.from(projectSystems).sort((a,b) => a.localeCompare(b, 'th'));
                 let brandArray = Array.from(projectBrands).sort((a,b) => a.localeCompare(b, 'th'));
                 
+                // กรองเฉพาะยี่ห้อที่มีจำนวนมากกว่า 0 เพื่อนำไปแสดงในส่วน "จำนวนอุปกรณ์"
+                let brandsWithQty = brandArray.filter(b => brandQtyMap[b] > 0);
+                
                 // นำมาแสดงผลด้านบนสุดของ Pop-up
                 if (sysArray.length > 0 || brandArray.length > 0) {
-                    let qtyItemsHtml = brandArray.map(b => `<div>${b} ( ${brandQtyMap[b] > 0 ? brandQtyMap[b].toLocaleString('th-TH') : '-'} )</div>`).join('');
+                    let qtyItemsHtml = brandsWithQty.map(b => `<div>${b} ( ${brandQtyMap[b].toLocaleString('th-TH')} )</div>`).join('');
                     content.innerHTML += `<div class="mb-4 bg-indigo-50/70 border border-indigo-100 rounded-lg p-3 text-sm flex flex-col gap-2">
                         ${sysArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="server" class="w-4 h-4"></i> ระบบงาน :</span> <span class="text-gray-800 leading-relaxed">${sysArray.join(', ')}</span></div>` : ''}
                         ${brandArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="cpu" class="w-4 h-4"></i> ยี่ห้ออุปกรณ์ :</span> <span class="text-gray-800 leading-relaxed">${brandArray.join(', ')}</span></div>` : ''}
-                        ${brandArray.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="box" class="w-4 h-4"></i> จำนวนอุปกรณ์ :</span> <div class="flex flex-col text-gray-800 leading-relaxed">${qtyItemsHtml}</div></div>` : ''}
+                        ${brandsWithQty.length > 0 ? `<div class="flex items-start gap-2"><span class="font-bold text-[#5b5fc7] shrink-0 flex items-center gap-1"><i data-lucide="box" class="w-4 h-4"></i> จำนวนอุปกรณ์ :</span> <div class="flex flex-col text-gray-800 leading-relaxed">${qtyItemsHtml}</div></div>` : ''}
                     </div>`;
                 }
 
