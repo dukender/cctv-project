@@ -2700,7 +2700,7 @@ function switchTab(activeTabId) {
             if (yearList && yearList.children.length === 0) {
                 let listHtml = '';
                 for(let y = year - 100; y <= year + 100; y++) {
-                    listHtml += `<li class="year-option px-3 py-2 hover:bg-red-50 cursor-pointer flex justify-between items-center transition-colors border-b border-gray-100 last:border-0" data-year="${y}"><span class="text-red-600 font-bold">${y + 543}</span> <span class="text-gray-500 text-sm font-normal">(${y})</span></li>`;
+                    listHtml += `<li class="year-option px-3 py-2 hover:bg-red-50 cursor-pointer flex justify-between items-center transition-colors border-b border-gray-100 last:border-0" data-year="${y}"><span class="text-gray-600 font-bold">${y + 543}</span> <span class="text-gray-500 text-sm font-normal">(${y})</span></li>`;
                 }
                 yearList.innerHTML = listHtml;
                 
