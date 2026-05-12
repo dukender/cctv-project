@@ -2498,7 +2498,7 @@ function switchTab(activeTabId) {
         function renderSystems() {
             const list = document.getElementById('system-brand-list');
             if(!list) return;
-            if (!currentSystems || currentSystems.length === 0) currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }];
+            if (!currentSystems || currentSystems.length === 0) currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '', qty: '' }];
             list.innerHTML = '';
             currentSystems.forEach((sys, index) => {
                 list.innerHTML += `
@@ -2519,13 +2519,19 @@ function switchTab(activeTabId) {
                         </div>
 
                         <!-- Dropdown ยี่ห้ออุปกรณ์ -->
-                        <div class="relative w-full" id="brand-wrapper-${sys.id}">
-                            <label class="block text-[10px] text-gray-500 font-medium mb-1">ยี่ห้ออุปกรณ์</label>
-                            <div class="flex items-center w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
-                                <input type="text" id="brand-input-${sys.id}" placeholder="พิมพ์เพื่อค้นหา/เพิ่ม..." value="${sys.brand}" onfocus="renderBrandDropdown('${sys.id}', this.value)" oninput="updateSystemField('${sys.id}', 'brand', this.value); renderBrandDropdown('${sys.id}', this.value)" class="flex-1 bg-transparent outline-none w-full" autocomplete="off">
-                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-indigo-600" onclick="document.getElementById('brand-input-${sys.id}').focus(); renderBrandDropdown('${sys.id}', '')"></i>
+                        <div class="flex gap-2 w-full">
+                            <div class="relative flex-1 min-w-0" id="brand-wrapper-${sys.id}">
+                                <label class="block text-[10px] text-gray-500 font-medium mb-1">ยี่ห้ออุปกรณ์</label>
+                                <div class="flex items-center w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text">
+                                    <input type="text" id="brand-input-${sys.id}" placeholder="พิมพ์เพื่อค้นหา/เพิ่ม..." value="${sys.brand}" onfocus="renderBrandDropdown('${sys.id}', this.value)" oninput="updateSystemField('${sys.id}', 'brand', this.value); renderBrandDropdown('${sys.id}', this.value)" class="flex-1 bg-transparent outline-none w-full truncate" autocomplete="off">
+                                    <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 cursor-pointer hover:text-indigo-600" onclick="document.getElementById('brand-input-${sys.id}').focus(); renderBrandDropdown('${sys.id}', '')"></i>
+                                </div>
+                                <div id="brand-list-${sys.id}" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-40 overflow-y-auto py-1 text-sm" id="brand-ul-${sys.id}"></ul></div>
                             </div>
-                            <div id="brand-list-${sys.id}" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-40 overflow-y-auto py-1 text-sm" id="brand-ul-${sys.id}"></ul></div>
+                            <div class="w-20 shrink-0">
+                                <label class="block text-[10px] text-gray-500 font-medium mb-1">จำนวน</label>
+                                <input type="text" placeholder="0" value="${sys.qty || ''}" onkeyup="let v=this.value.replace(/[^\\d]/g,''); if(v){this.value=Number(v).toLocaleString('th-TH');}else{this.value='';}" onblur="updateSystemField('${sys.id}', 'qty', this.value)" class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] focus:bg-white transition-colors text-right font-medium text-gray-700">
+                            </div>
                         </div>
                     </div>
                     ${currentSystems.length > 1 ? `<button type="button" onclick="removeSystemRow('${sys.id}')" class="absolute top-2 right-2 text-gray-300 hover:text-red-500 opacity-0 group-hover/sys:opacity-100 transition-opacity"><i data-lucide="x" class="w-4 h-4"></i></button>` : ''}
@@ -2537,7 +2543,7 @@ function switchTab(activeTabId) {
 
         window.updateSystemCheck = (id, checked) => { const s = currentSystems.find(x => x.id === id); if(s) s.checked = checked; renderSystems(); };
         window.updateSystemField = (id, field, val) => { const s = currentSystems.find(x => x.id === id); if(s) s[field] = val; };
-        window.addSystemBrandRow = () => { currentSystems.push({ id: 'sys_' + Date.now(), checked: true, system: '', brand: '' }); renderSystems(); };
+        window.addSystemBrandRow = () => { currentSystems.push({ id: 'sys_' + Date.now(), checked: true, system: '', brand: '', qty: '' }); renderSystems(); };
         window.removeSystemRow = (id) => {
             const index = currentSystems.findIndex(x => x.id === id);
             if (index === -1) return;
@@ -2546,7 +2552,7 @@ function switchTab(activeTabId) {
             
             let isBlankAdded = false;
             if (currentSystems.length === 0) { 
-                currentSystems.push({ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }); 
+                currentSystems.push({ id: 'sys_' + Date.now(), checked: false, system: '', brand: '', qty: '' }); 
                 isBlankAdded = true;
             }
             renderSystems();
@@ -2554,7 +2560,7 @@ function switchTab(activeTabId) {
             // เรียกใช้ Popup แจ้งเตือนพร้อมปุ่ม ย้อนกลับ (Undo)
             showNotification("ลบข้อมูลระบบงานแล้ว", "success", () => {
                 // ตรวจสอบว่าถ้ามีกล่องเปล่าๆ ที่เพิ่งสร้างขึ้นมาแทนที่ตอนลบหมด ให้เอาออกก่อน
-                if (isBlankAdded && currentSystems.length === 1 && currentSystems[0].system === '' && currentSystems[0].brand === '') {
+                if (isBlankAdded && currentSystems.length === 1 && currentSystems[0].system === '' && currentSystems[0].brand === '' && (currentSystems[0].qty === '' || currentSystems[0].qty === undefined)) {
                     currentSystems.pop(); 
                 }
                 // ใส่ข้อมูลเดิมกลับคืนในตำแหน่งเดิม
@@ -2960,7 +2966,7 @@ function switchTab(activeTabId) {
             selectedAssignments = []; renderAssignmentChips();
             const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
             currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }]; renderNotes();
-            currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }]; renderSystems();
+            currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '', qty: '' }]; renderSystems();
             document.getElementById('form-title').innerText = "เพิ่มรายละเอียดงานใหม่"; document.getElementById('submit-btn').innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; lucide.createIcons();
         }
 
@@ -2968,7 +2974,7 @@ function switchTab(activeTabId) {
             e.preventDefault(); if (!currentUser || currentUserRole === 'monitor') return;
             const submitBtn = document.getElementById('submit-btn'); submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
             const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
-            const systemsToSave = currentSystems.filter(s => s.checked && (s.system.trim() !== '' || s.brand.trim() !== '')).map(s => ({ system: s.system.trim(), brand: s.brand.trim() }));
+            const systemsToSave = currentSystems.filter(s => s.checked && (s.system.trim() !== '' || s.brand.trim() !== '')).map(s => ({ system: s.system.trim(), brand: s.brand.trim(), qty: s.qty ? parseInt(String(s.qty).replace(/,/g, ''), 10) || '' : '' }));
             const taskData = { taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', taskType: selectedTaskTypes, receiveDate: document.getElementById('receiveDate')?.value || '', responsibleName: document.getElementById('responsibleName')?.value || '', assignment: selectedAssignments, customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, systems: systemsToSave, updatedAt: Date.now() };
             try {
                 if (currentEditTaskId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); showNotification("อัปเดตงานเรียบร้อยแล้ว"); }
@@ -2989,7 +2995,7 @@ function switchTab(activeTabId) {
             renderAssignmentChips();
             if (task.notes && task.notes.length > 0) { currentNotes = JSON.parse(JSON.stringify(task.notes)); const lastNote = currentNotes[currentNotes.length - 1]; if (lastNote && lastNote.completed) currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }); } else currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
             renderNotes(); 
-            if (task.systems && task.systems.length > 0) { currentSystems = task.systems.map((s, i) => ({ id: 'sys_edit_' + Date.now() + '_' + i, checked: true, system: s.system || '', brand: s.brand || '' })); } else { currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '' }]; }
+            if (task.systems && task.systems.length > 0) { currentSystems = task.systems.map((s, i) => ({ id: 'sys_edit_' + Date.now() + '_' + i, checked: true, system: s.system || '', brand: s.brand || '', qty: s.qty ? Number(s.qty).toLocaleString('th-TH') : '' })); } else { currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '', qty: '' }]; }
             renderSystems();
             currentEditTaskId = taskId; switchTab('manage');
         };
