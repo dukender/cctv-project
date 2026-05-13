@@ -624,6 +624,9 @@
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="font-bold text-gray-800 flex items-center gap-2 text-lg">
                                         <i data-lucide="calendar" class="w-5 h-5 text-red-500"></i> ปฏิทิน
+                                        <button id="btn-mini-cal-reset" class="p-1 text-gray-400 hover:text-gray-800 hover:bg-gray-100 rounded-full transition-colors ml-1" title="กลับไปเดือนปัจจุบันและแสดงทั้งหมด">
+                                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                        </button>
                                     </h2>
                                     <div class="flex items-center gap-1">
                                         <button id="mini-cal-prev" class="p-1 text-gray-400 hover:bg-red-50 hover:text-red-600 rounded transition-colors"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
@@ -3781,12 +3784,11 @@ function switchTab(activeTabId) {
             let holsToUse = getHolidaysByFilter();
             const searchInput = document.getElementById('hol-search-input')?.value.toLowerCase() || '';
             
-            // ดึงเดือน/ปี จาก Mini Calendar
+            // ดึงปี จาก Mini Calendar (เปลี่ยนเป็นดึงข้อมูลทั้งปี)
             const yearStr = miniCalDate.getFullYear().toString();
-            const monthStr = String(miniCalDate.getMonth() + 1).padStart(2, '0');
-            const targetMonthPrefix = `${yearStr}-${monthStr}`;
+            const targetYearPrefix = `${yearStr}`;
 
-            document.getElementById('hol-time-filter-label').textContent = `${miniCalDate.toLocaleDateString('th-TH', { month: 'long', year: 'numeric' })}`;
+            document.getElementById('hol-time-filter-label').textContent = `ปี ${miniCalDate.getFullYear() + 543}`;
             document.getElementById('hol-table-title-label').textContent = currentHolFilter === 'all' ? `ทั้งหมด` : `${currentHolFilter}`;
 
             const holTypeMapping = {
@@ -3798,7 +3800,7 @@ function switchTab(activeTabId) {
             };
 
             const filteredHols = holsToUse.filter(h => {
-                let matchTime = h.holidayDate && h.holidayDate.startsWith(targetMonthPrefix); 
+                let matchTime = h.holidayDate && h.holidayDate.startsWith(targetYearPrefix); // กรองตามปีแทนเดือน 
                 const typeTh = holTypeMapping[h.holidayType] || 'อื่นๆ';
                 const searchString = [h.holidayName || '', typeTh].join(' ').toLowerCase();
                 const matchText = searchInput ? searchString.includes(searchInput) : true;
@@ -3995,6 +3997,20 @@ function switchTab(activeTabId) {
         document.getElementById('mini-cal-next')?.addEventListener('click', () => {
             miniCalDate.setMonth(miniCalDate.getMonth() + 1);
             holCurrentPage = 1; holCardCurrentPage = 1; currentHolFilter = 'all'; document.getElementById('hol-search-input').value = '';
+            renderMiniCalendar();
+            renderHolidaySummary();
+        });
+
+        // --- เพิ่ม Event ให้ปุ่ม รีเซ็ตปฏิทินจิ๋ว ---
+        document.getElementById('btn-mini-cal-reset')?.addEventListener('click', () => {
+            miniCalDate = getThaiDate(); // กลับมาเดือนปัจจุบัน
+            currentHolFilter = 'all';    // ยกเลิกการเลือกการ์ด
+            holCurrentPage = 1; 
+            holCardCurrentPage = 1; 
+            
+            const searchInput = document.getElementById('hol-search-input');
+            if (searchInput) searchInput.value = ''; // ล้างช่องค้นหา
+
             renderMiniCalendar();
             renderHolidaySummary();
         });
