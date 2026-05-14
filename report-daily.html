@@ -1412,7 +1412,53 @@ function switchTab(activeTabId) {
         projInput?.addEventListener('input', (e) => renderProjectDropdown(e.target.value));
         projBtn?.addEventListener('click', () => { projInput.focus(); renderProjectDropdown(''); });
 
-        window.selectProject = (name) => { if(projInput) projInput.value = name; projList?.classList.add('hidden'); };
+        window.selectProject = (name) => { 
+            if(projInput) projInput.value = name; 
+            projList?.classList.add('hidden'); 
+            
+            // --- เพิ่มเติม: ดึงข้อมูลระบบงานและยี่ห้อของโครงการนี้มาแสดงอัตโนมัติ ---
+            if (name) {
+                // หากลุ่มงานทั้งหมดที่ตรงกับชื่อโครงการที่เลือก
+                const projectTasks = allTasks.filter(t => t.projectName === name);
+                if (projectTasks.length > 0) {
+                    const uniqueSystems = new Map();
+                    
+                    // วนลูปเก็บข้อมูลระบบงานและยี่ห้อที่ไม่ซ้ำกัน
+                    projectTasks.forEach(task => {
+                        if (Array.isArray(task.systems)) {
+                            task.systems.forEach(s => {
+                                const sName = (s.system || '').trim();
+                                const bName = (s.brand || '').trim();
+                                if (sName === '' && bName === '') return;
+                                
+                                const key = `${sName}|${bName}`;
+                                if (!uniqueSystems.has(key)) {
+                                    uniqueSystems.set(key, { system: sName, brand: bName, qty: s.qty || '' });
+                                }
+                            });
+                        }
+                    });
+
+                    // ถ้าระบบเคยบันทึกข้อมูลยี่ห้อในโครงการนี้ไว้ ให้อัปเดตตารางขวามือ
+                    if (uniqueSystems.size > 0) {
+                        currentSystems = []; // ล้างช่องว่างที่ไม่ได้กรอก
+                        let i = 0;
+                        uniqueSystems.forEach(value => {
+                            currentSystems.push({
+                                id: 'sys_auto_' + Date.now() + '_' + (i++),
+                                checked: true, // ติ๊กถูกเปิดใช้งานให้อัตโนมัติ
+                                system: value.system,
+                                brand: value.brand,
+                                qty: value.qty
+                            });
+                        });
+                        renderSystems(); // รีเฟรชหน้าจอการ์ดระบบงาน
+                        showNotification(`ดึงประวัติระบบงานของโครงการ "${name}" แล้ว`, "success");
+                    }
+                }
+            }
+        };
+        
         window.addAndSelectProject = async (name) => {
             if(!currentUser || currentUserRole === 'monitor') return;
             try {
