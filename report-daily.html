@@ -3252,7 +3252,7 @@ function switchTab(activeTabId) {
             e.preventDefault(); if (!currentUser || currentUserRole === 'monitor') return;
             const btn = document.getElementById('submit-holiday-btn'); if (btn) { btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> บันทึก...`; btn.disabled = true; }
             const holidayData = { holidayType: document.getElementById('holidayType')?.value || 'holiday', holidayDate: document.getElementById('holidayDate')?.value || '', holidayName: document.getElementById('holidayName')?.value || '', ownerId: currentUser.uid, ownerEmail: currentUser.email, createdAt: Date.now() };
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), holidayData); showNotification("บันทึกวันหยุด/วันลาสำเร็จ"); holidayModal?.classList.add('hidden'); } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } finally { if (btn) { btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; btn.disabled = false; lucide.createIcons(); } }
+            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), holidayData);await recordLog('เพิ่ม', 'เพิ่มวันหยุด/ลา: ' + holidayData.holidayName); showNotification("บันทึกวันหยุด/วันลาสำเร็จ"); holidayModal?.classList.add('hidden'); } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } finally { if (btn) { btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; btn.disabled = false; lucide.createIcons(); } }
         });
 
         window.deleteHoliday = async (id) => {
@@ -3260,7 +3260,7 @@ function switchTab(activeTabId) {
             const holidayToRestore = allHolidays.find(h => h.id === id); if (!holidayToRestore) return;
             if (currentUserRole === 'user' && holidayToRestore.ownerId !== currentUser.uid) return showNotification("คุณลบได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
             const { id: docId, ...holidayData } = holidayToRestore;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id)); showNotification("ลบรายการวันหยุด/วันลาแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id), holidayData); showNotification("ย้อนกลับการลบสำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch(e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id));await recordLog('ลบ', 'ลบวันหยุด/ลา: ' + holidayData.holidayName); showNotification("ลบรายการวันหยุด/วันลาแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id), holidayData); showNotification("ย้อนกลับการลบสำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch(e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
 
         window.openAddTaskFromCalendar = (dateString) => { currentEditTaskId = null; resetFormToAddMode(); const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = dateString; switchTab('manage'); };
@@ -4691,13 +4691,6 @@ function switchTab(activeTabId) {
 
         window.goToLogPage = (page) => { logCurrentPage = page; renderActivityLogs(); };
         document.getElementById('btn-search-logs')?.addEventListener('click', () => { logCurrentPage = 1; renderActivityLogs(); });
-
-        // แทรกการบันทึก Log ในฟังก์ชัน Add/Update เดิมทั้งหมดแบบอัตโนมัติ
-        const _originalTaskFormSubmit = document.getElementById('task-form').onsubmit;
-        // เราใช้วิธีดักจับที่ปุ่มบันทึกงานโดยตรง
-        document.getElementById('submit-btn')?.addEventListener('click', () => {
-            // การบันทึก Task Log ไปทำต่อจากกระบวนการสำเร็จ (ใส่ไว้ใน taskForm submit listener ในไฟล์เดิม)
-        });
 
         // ดักแก้ Export ปุ่ม
         document.getElementById('btn-log-export-excel')?.addEventListener('click', () => {
