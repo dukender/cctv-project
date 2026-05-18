@@ -1048,7 +1048,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA",
@@ -4572,26 +4572,55 @@ function switchTab(activeTabId) {
             if (fieldView && !fieldView.classList.contains('hidden')) renderFieldCalendar();
         };
         // --- ระบบประวัติการลงงาน (Activity Log) ---
-        function loadLogs() {
+        async function fetchAndRenderLogs() {
             if (!currentUser) return;
             
-            // ดึงข้อมูลแค่ 500 รายการล่าสุด ป้องกันการกิน Quota Read ทะลุ (500 logs = 500 reads ต่อการโหลด)
-            const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_logs');
-            const q = query(logsRef, orderBy('createdAt', 'desc'), limit(500));
+            const tbody = document.getElementById('logs-table-body');
+            const searchBtn = document.getElementById('btn-search-logs');
+            
+            // เปลี่ยนปุ่มเป็นสถานะโหลด
+            if (searchBtn) {
+                searchBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังดึงข้อมูล...`;
+                searchBtn.disabled = true;
+            }
+            if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500 font-medium"><i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 text-[#5b5fc7]"></i>กำลังดึงข้อมูลประวัติ...</td></tr>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
 
-            unsubscribeLogs = onSnapshot(q, (snapshot) => {
+            try {
+                const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_logs');
+                const q = query(logsRef, orderBy('createdAt', 'desc'), limit(500)); // โหลดสูงสุด 500 รายการล่าสุด
+                
+                const querySnapshot = await getDocs(q); // ดึงข้อมูล 1 ครั้ง ไม่เฝ้าดูแบบ Realtime
                 let logs = [];
-                snapshot.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
-                allLogs = logs; // ไม่ต้อง sort ซ้ำเพราะ orderBy('createdAt', 'desc') จัดการให้แล้ว
-                if (window.currentActiveTab === 'activity-log') renderActivityLogs();
-            });
+                querySnapshot.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
+                allLogs = logs;
+                
+                // คืนค่าปุ่ม
+                if (searchBtn) {
+                    searchBtn.innerHTML = `<i data-lucide="search" class="w-4 h-4"></i> ค้นหาประวัติ`;
+                    searchBtn.disabled = false;
+                }
+                
+                hasSearchedLogs = true; // จำไว้ว่าเคยกดค้นหาแล้ว
+                logCurrentPage = 1;
+                renderActivityLogs(); // ไปเรียกฟังก์ชันสร้างตาราง
+            } catch(e) {
+                console.error("Error fetching logs: ", e);
+                if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-red-500 font-medium">เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>`;
+                if (searchBtn) {
+                    searchBtn.innerHTML = `<i data-lucide="search" class="w-4 h-4"></i> ค้นหาประวัติ`;
+                    searchBtn.disabled = false;
+                }
+            }
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
-        // โหลด Logs ทันทีที่ล็อกอินเสร็จ
+        // ยกเลิกโหลด Logs อัตโนมัติ เพื่อประหยัดโควต้า Read
+        let hasSearchedLogs = false;
+        
         const _originalInitApp = initializeUserApp;
         initializeUserApp = async function(user) {
             await _originalInitApp(user);
-            loadLogs();
         };
         const _originalSignOut = document.getElementById('btn-logout').onclick;
         document.getElementById('btn-logout').addEventListener('click', () => { if(unsubscribeLogs) unsubscribeLogs(); });
@@ -4670,7 +4699,11 @@ function switchTab(activeTabId) {
             const paginatedLogs = visibleLogs.slice(startIndex, startIndex + itemsPerPage);
 
             tbody.innerHTML = '';
-            if (paginatedLogs.length === 0) {
+            if (!hasSearchedLogs) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-10 text-center text-gray-500 font-medium bg-gray-50/50"><i data-lucide="search" class="w-10 h-10 mx-auto mb-3 opacity-30 text-[#5b5fc7]"></i>กรุณากดปุ่ม "ค้นหาประวัติ" เพื่อดึงข้อมูล<br><span class="text-xs text-gray-400 mt-1 block">(ระบบไม่ดึงข้อมูลอัตโนมัติ เพื่อประหยัดโควต้าฐานข้อมูล)</span></td></tr>`;
+                document.getElementById('logs-pagination').innerHTML = '';
+                countEl.textContent = `0 รายการ`;
+            } else if (paginatedLogs.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบประวัติการลงงานตามเงื่อนไขที่เลือก</td></tr>`;
                 document.getElementById('logs-pagination').innerHTML = '';
             } else {
@@ -4701,7 +4734,11 @@ function switchTab(activeTabId) {
         }
 
         window.goToLogPage = (page) => { logCurrentPage = page; renderActivityLogs(); };
-        document.getElementById('btn-search-logs')?.addEventListener('click', () => { logCurrentPage = 1; renderActivityLogs(); });
+        
+        // เมื่อกดค้นหา ให้ไปดึงข้อมูลใหม่จาก Firebase
+        document.getElementById('btn-search-logs')?.addEventListener('click', () => { 
+            fetchAndRenderLogs(); 
+        });
 
         // ดักแก้ Export ปุ่ม
         document.getElementById('btn-log-export-excel')?.addEventListener('click', () => {
