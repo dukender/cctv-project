@@ -1050,6 +1050,17 @@ function switchTab(activeTabId) {
             }
             window.currentActiveTab = activeTabId;
 
+            // --- เพิ่มเติม: เด้งกลับไปบนสุดทุกครั้งที่เปลี่ยนหน้าจอ และรีเซ็ตปุ่มซ่อนไว้ ---
+            const mainScrollArea = document.querySelector('main');
+            if (mainScrollArea) {
+                mainScrollArea.scrollTop = 0;
+                const btnScrollTop = document.getElementById('btn-scroll-top');
+                if (btnScrollTop) {
+                    btnScrollTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    btnScrollTop.classList.remove('opacity-100', 'translate-y-0');
+                }
+            }
+
             // ซ่อนทุกหน้าจอ
             document.querySelectorAll('[id^="view-"]').forEach(v => {
                 v.classList.add('hidden');
