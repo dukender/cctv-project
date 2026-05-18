@@ -4166,7 +4166,7 @@ function switchTab(activeTabId) {
         if (mainScrollArea && btnScrollTop) {
             mainScrollArea.addEventListener('scroll', () => {
                 // ถ้าเลื่อนลงมาเกิน 300px ให้แสดงปุ่ม
-                if (mainScrollArea.scrollTop > 300) {
+                if (mainScrollArea.scrollTop > 250) {
                     btnScrollTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
                     btnScrollTop.classList.add('opacity-100', 'translate-y-0');
                 } else {
