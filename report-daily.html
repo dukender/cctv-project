@@ -834,12 +834,16 @@
                                     </div>
                                     <div id="log-user-filter-list" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden max-h-48 overflow-y-auto p-1.5 space-y-1"></div>
                                 </div>
-                                <div>
+                                <div class="relative" id="log-type-dropdown-wrapper">
                                     <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">ประเภท</label>
-                                    <div class="border border-gray-200 rounded-md p-2 bg-gray-50 space-y-1.5">
-                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1 rounded"><input type="checkbox" value="เพิ่ม" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> เพิ่มข้อมูล</label>
-                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1 rounded"><input type="checkbox" value="แก้ไข" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> แก้ไขข้อมูล</label>
-                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1 rounded"><input type="checkbox" value="ลบ" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> ลบข้อมูล</label>
+                                    <div id="log-type-dropdown-btn" class="flex items-center justify-between w-full px-3 py-2 bg-white border border-gray-200 rounded-md cursor-pointer hover:border-[#5b5fc7] transition-colors shadow-sm">
+                                        <span id="log-type-dropdown-text" class="text-sm text-gray-600 truncate select-none">ทั้งหมด</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                    <div id="log-type-filter-list" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden p-1.5 space-y-1">
+                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1.5 rounded transition-colors"><input type="checkbox" value="เพิ่ม" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]" onchange="window.updateLogTypeText()"> <span class="truncate">เพิ่มข้อมูล</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1.5 rounded transition-colors"><input type="checkbox" value="แก้ไข" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]" onchange="window.updateLogTypeText()"> <span class="truncate">แก้ไขข้อมูล</span></label>
+                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1.5 rounded transition-colors"><input type="checkbox" value="ลบ" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]" onchange="window.updateLogTypeText()"> <span class="truncate">ลบข้อมูล</span></label>
                                     </div>
                                 </div>
                             </div>
@@ -1818,6 +1822,10 @@ function switchTab(activeTabId) {
             const logUserWrapper = document.getElementById('log-user-dropdown-wrapper');
             if (logUserWrapper && !logUserWrapper.contains(e.target)) {
                 document.getElementById('log-user-filter-list')?.classList.add('hidden');
+            }
+            const logTypeWrapper = document.getElementById('log-type-dropdown-wrapper');
+            if (logTypeWrapper && !logTypeWrapper.contains(e.target)) {
+                document.getElementById('log-type-filter-list')?.classList.add('hidden');
             }
             
             // ปิด Dropdown ปีปฏิทิน เมื่อคลิกที่อื่น
@@ -4651,6 +4659,24 @@ function switchTab(activeTabId) {
             e.stopPropagation();
             document.getElementById('log-user-filter-list')?.classList.toggle('hidden');
         });
+        window.updateLogTypeText = () => {
+            const checked = document.querySelectorAll('.log-type-cb:checked');
+            const total = document.querySelectorAll('.log-type-cb').length;
+            const textEl = document.getElementById('log-type-dropdown-text');
+            if (!textEl) return;
+            if (checked.length === 0 || checked.length === total) {
+                textEl.textContent = 'ทั้งหมด';
+            } else if (checked.length === 1) {
+                textEl.textContent = checked[0].parentNode.textContent.trim();
+            } else {
+                textEl.textContent = `เลือก ${checked.length} รายการ`;
+            }
+        };
+
+        document.getElementById('log-type-dropdown-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('log-type-filter-list')?.classList.toggle('hidden');
+        });
         function populateLogUserDropdown() {
             const container = document.getElementById('log-user-filter-list');
             if(!container) return;
@@ -4679,6 +4705,7 @@ function switchTab(activeTabId) {
 
         function renderActivityLogs() {
             populateLogUserDropdown(); // รีเฟรชรายชื่อในตัวกรอง
+            window.updateLogTypeText(); // อัปเดตข้อความปุ่มประเภท
 
             const tbody = document.getElementById('logs-table-body');
             const countEl = document.getElementById('log-count');
