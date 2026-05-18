@@ -129,7 +129,10 @@
                             <i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
                         </button>
                         <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
-                        <button id="tab-field-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="map-pin" class="w-5 h-5"></i> ปฏิทินเข้าหน้างาน</button>
+                        <button id="tab-field-calendar" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
+                            <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
+                            <i data-lucide="map-pin" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">ปฏิทินเข้าหน้างาน</span>
+                        </button>
                         <button id="tab-holiday-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="tent" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปวันหยุด / วันลา</span>
@@ -4389,14 +4392,14 @@ function switchTab(activeTabId) {
                 if(tasksArray.length === 0) return `<div class="text-center py-6 text-gray-400 text-sm border border-dashed border-gray-200 rounded-lg bg-gray-50/50">ไม่มีงานที่ต้องเข้าหน้างาน</div>`;
                 return tasksArray.map(t => {
                     let assigns = Array.isArray(t.assignment) && t.assignment.length > 0 ? t.assignment.join(', ') : (t.assignment || 'ไม่ระบุ');
-                    let notesText = t.notes && t.notes.length > 0 ? t.notes.filter(n=>n.text).map(n => n.text).join(' ') : 'ไม่มีรายละเอียด';
-                    if(!notesText) notesText = 'ไม่มีรายละเอียด';
+                    let projName = t.projectName || 'ไม่ได้ระบุโครงการ';
+                    let taskName = t.taskName || 'ไม่มีชื่องาน';
                     
                     return `<div class="p-3.5 rounded-lg border border-orange-200 bg-orange-50/30 shadow-sm flex flex-col gap-1.5 relative overflow-hidden cursor-pointer hover:bg-orange-50 transition-colors" onclick="openDayModal('${t.receiveDate}')">
                         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-orange-500"></div>
                         <div class="font-bold text-orange-600 pl-2 text-sm"><i data-lucide="calendar" class="w-3.5 h-3.5 inline pb-0.5"></i> ${formatDate(t.receiveDate)}</div>
-                        <div class="text-gray-800 pl-2 text-sm font-bold truncate">${t.taskName} <span class="font-normal text-gray-500 text-xs ml-1">- ${notesText}</span></div>
-                        <div class="text-gray-700 pl-2 text-xs flex items-center gap-1.5 mt-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400"></i> <span class="font-medium truncate">${t.workLocation}</span></div>
+                        <div class="text-gray-800 pl-2 text-sm font-bold truncate" title="${projName} - ${taskName}">${projName} <span class="font-normal text-gray-600 text-xs ml-1">- ${taskName}</span></div>
+                        <div class="text-gray-700 pl-2 text-xs flex items-center gap-1.5 mt-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400"></i> <span class="font-medium truncate">${t.workLocation || 'ไม่ระบุสถานที่'}</span></div>
                         <div class="text-gray-700 pl-2 text-xs flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5 text-gray-400"></i> <span class="truncate">${assigns}</span></div>
                     </div>`;
                 }).join('');
