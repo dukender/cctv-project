@@ -3736,6 +3736,7 @@ function switchTab(activeTabId) {
                     <td class="px-6 py-4 text-center text-sm text-gray-600 font-medium">${lastActiveStr}</td>
                     <td class="px-6 py-4 text-center">${sessionDisplay}</td>
                     <td class="px-6 py-4 text-right whitespace-nowrap">
+                        <button onclick="event.preventDefault(); window.forceLogoutUser('${u.email}')" class="p-2 text-orange-500 hover:bg-orange-100 rounded-md mr-1 transition-colors" title="บังคับเตะออกจากระบบ" ${disableDelete}><i data-lucide="log-out" class="w-4 h-4"></i></button>
                         <button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}', '${u.viewStartDate || ''}', '${u.viewEndDate || ''}', '${safeName}', '${safePos}', '${safeMonitor}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                         <button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                     </td>
@@ -3837,6 +3838,21 @@ function switchTab(activeTabId) {
             const userToRestore = allUsers.find(u => u.email === email); if (!userToRestore) return;
             const { id: docId, ...userData } = userToRestore;
             try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email)); showNotification(`ลบข้อมูลสิทธิ์ของ ${email} แล้ว`, "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), userData); showNotification("ย้อนกลับการลบสิทธิ์สำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
+        };
+        window.forceLogoutUser = async (email) => {
+            if (currentUserRole !== 'admin' || email === 'dukender7188@gmail.com') return;
+            if (confirm(`คุณแน่ใจหรือไม่ที่จะบังคับให้ผู้ใช้ ${email} ออกจากระบบทันที?`)) {
+                try {
+                    // เปลี่ยน sessionId เพื่อให้ระบบเครื่องปลายทางเตะออก (onSnapshot จะตรวจเจอ)
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), { 
+                        sessionId: 'force_logout_' + Date.now(), 
+                        isOnline: false 
+                    }, { merge: true });
+                    showNotification(`สั่งเตะ ${email} ออกจากระบบแล้ว`, "success");
+                } catch (e) {
+                    showNotification("เกิดข้อผิดพลาดในการสั่งเตะผู้ใช้ออก", "error");
+                }
+            }
         };
 
         // --- เพิ่ม Event Listeners สำหรับปุ่ม Export ในหน้า สรุปโครงการ (Fix) ---
