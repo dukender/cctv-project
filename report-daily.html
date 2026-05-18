@@ -4700,7 +4700,7 @@ function switchTab(activeTabId) {
 
             tbody.innerHTML = '';
             if (!hasSearchedLogs) {
-                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-10 text-center text-gray-500 font-medium bg-gray-50/50"><i data-lucide="search" class="w-10 h-10 mx-auto mb-3 opacity-30 text-[#5b5fc7]"></i>กรุณากดปุ่ม "ค้นหาประวัติ" เพื่อดึงข้อมูล<br><span class="text-xs text-gray-400 mt-1 block">(ระบบไม่ดึงข้อมูลอัตโนมัติ เพื่อประหยัดโควต้าฐานข้อมูล)</span></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-10 text-center text-gray-500 font-medium bg-gray-50/50"><i data-lucide="search" class="w-10 h-10 mx-auto mb-3 opacity-30 text-[#5b5fc7]"></i>กรุณากดปุ่ม "ค้นหาประวัติ" เพื่อดึงข้อมูล<br><span class="text-xs text-gray-400 mt-1 block"></span></td></tr>`;
                 document.getElementById('logs-pagination').innerHTML = '';
                 countEl.textContent = `0 รายการ`;
             } else if (paginatedLogs.length === 0) {
