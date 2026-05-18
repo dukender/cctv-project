@@ -996,24 +996,25 @@
             const options = [20, 40, 60, 80, 100].map(val => `<option value="${val}" ${itemsPerPage === val ? 'selected' : ''}>${val}</option>`).join('');
             
             container.innerHTML = `
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-gray-50/50 rounded-b-lg border-t border-gray-100 mt-2">
+            <div class="sticky left-0 flex items-center justify-between gap-4 p-3 sm:p-4 bg-gray-50/50 rounded-b-lg border-t border-gray-100 mt-2 overflow-x-auto no-scrollbar w-full whitespace-nowrap" style="max-width: calc(100vw - 16px);">
                 
-                <div class="text-sm font-medium text-gray-600 w-full sm:w-auto text-center sm:text-left">
-                    รวมทั้งหมด <span class="font-bold text-[#5b5fc7] text-base mx-1">${totalItems.toLocaleString('th-TH')}</span> รายการ
+                <div class="text-xs sm:text-sm font-medium text-gray-600 shrink-0">
+                    รวมทั้งหมด <span class="font-bold text-[#5b5fc7] text-sm sm:text-base mx-1">${totalItems.toLocaleString('th-TH')}</span> รายการ
                 </div>
 
-                <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto justify-center sm:justify-end">
-                    <div class="flex items-center gap-2">
-                        <button onclick="${goToFuncStr}(${currentPage - 1})" class="p-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-sm" ${currentPage === 1 ? 'disabled' : ''}><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
-                        <div class="px-3 py-1.5 bg-white border border-gray-300 rounded-md font-bold text-gray-700 text-sm shadow-sm">หน้า ${currentPage} / ${totalPages}</div>
-                        <button onclick="${goToFuncStr}(${currentPage + 1})" class="p-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-sm" ${currentPage === totalPages ? 'disabled' : ''}><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                <div class="flex items-center gap-3 sm:gap-6 shrink-0">
+                    <div class="flex items-center gap-1 sm:gap-2">
+                        <button onclick="${goToFuncStr}(${currentPage - 1})" class="p-1 sm:p-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-sm" ${currentPage === 1 ? 'disabled' : ''}><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                        <div class="px-2 sm:px-3 py-1 sm:py-1.5 bg-white border border-gray-300 rounded-md font-bold text-gray-700 text-xs sm:text-sm shadow-sm">หน้า ${currentPage} / ${totalPages}</div>
+                        <button onclick="${goToFuncStr}(${currentPage + 1})" class="p-1 sm:p-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-sm" ${currentPage === totalPages ? 'disabled' : ''}><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
                     </div>
-                    <div class="flex items-center gap-2 text-sm text-gray-600 bg-white px-3 py-1.5 border border-gray-200 rounded-md shadow-sm">
+                    
+                    <div class="flex items-center gap-2 text-xs sm:text-sm text-gray-600 bg-white px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-200 rounded-md shadow-sm">
                         <span class="font-medium hidden sm:inline">แสดงหน้าละ</span>
                         <select onchange="changeItemsPerPage(this.value)" class="bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none text-[#5b5fc7] font-bold cursor-pointer transition-shadow">
                             ${options}
                         </select>
-                        <span class="font-medium">รายการ</span>
+                        <span class="font-medium hidden sm:inline">รายการ</span>
                     </div>
                 </div>
 
