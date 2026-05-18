@@ -826,10 +826,13 @@
                                         <input type="date" id="log-end-date" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600">
                                     </div>
                                 </div>
-                                <div>
+                                <div class="relative" id="log-user-dropdown-wrapper">
                                     <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">ผู้ใช้</label>
-                                    <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-md p-2 bg-gray-50 space-y-1" id="log-user-filter-list">
-                                        </div>
+                                    <div id="log-user-dropdown-btn" class="flex items-center justify-between w-full px-3 py-2 bg-white border border-gray-200 rounded-md cursor-pointer hover:border-[#5b5fc7] transition-colors shadow-sm">
+                                        <span id="log-user-dropdown-text" class="text-sm text-gray-600 truncate select-none">ทั้งหมด</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 pointer-events-none"></i>
+                                    </div>
+                                    <div id="log-user-filter-list" class="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden max-h-48 overflow-y-auto p-1.5 space-y-1"></div>
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">ประเภท</label>
@@ -1811,6 +1814,11 @@ function switchTab(activeTabId) {
             if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) taskTypeList?.classList.add('hidden');
             if (assignmentWrapper && !assignmentWrapper.contains(e.target)) assignmentList?.classList.add('hidden');
             if (dashProjWrapper && !dashProjWrapper.contains(e.target)) dashProjList?.classList.add('hidden');
+            
+            const logUserWrapper = document.getElementById('log-user-dropdown-wrapper');
+            if (logUserWrapper && !logUserWrapper.contains(e.target)) {
+                document.getElementById('log-user-filter-list')?.classList.add('hidden');
+            }
             
             // ปิด Dropdown ปีปฏิทิน เมื่อคลิกที่อื่น
             const yearWrapper = document.getElementById('custom-year-wrapper');
@@ -4625,6 +4633,24 @@ function switchTab(activeTabId) {
         const _originalSignOut = document.getElementById('btn-logout').onclick;
         document.getElementById('btn-logout').addEventListener('click', () => { if(unsubscribeLogs) unsubscribeLogs(); });
 
+        window.updateLogUserText = () => {
+            const checked = document.querySelectorAll('.log-user-cb:checked');
+            const total = document.querySelectorAll('.log-user-cb').length;
+            const textEl = document.getElementById('log-user-dropdown-text');
+            if (!textEl) return;
+            if (checked.length === 0 || checked.length === total) {
+                textEl.textContent = 'ทั้งหมด';
+            } else if (checked.length === 1) {
+                textEl.textContent = checked[0].value;
+            } else {
+                textEl.textContent = `เลือก ${checked.length} รายการ`;
+            }
+        };
+
+        document.getElementById('log-user-dropdown-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('log-user-filter-list')?.classList.toggle('hidden');
+        });
         function populateLogUserDropdown() {
             const container = document.getElementById('log-user-filter-list');
             if(!container) return;
@@ -4646,8 +4672,9 @@ function switchTab(activeTabId) {
             }
 
             Array.from(emailsToShow).sort().forEach(email => {
-                container.innerHTML += `<label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-200 p-1 rounded"><input type="checkbox" value="${email}" class="log-user-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> <span class="truncate">${email}</span></label>`;
+                container.innerHTML += `<label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1.5 rounded transition-colors"><input type="checkbox" value="${email}" class="log-user-cb w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]" onchange="window.updateLogUserText()"> <span class="truncate">${email}</span></label>`;
             });
+            window.updateLogUserText(); // รีเฟรชข้อความทันทีเมื่อโหลดเสร็จ
         }
 
         function renderActivityLogs() {
