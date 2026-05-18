@@ -129,6 +129,7 @@
                             <i data-lucide="briefcase" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปลูกค้า</span>
                         </button>
                         <button id="tab-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="calendar-days" class="w-5 h-5"></i> ปฏิทินงาน</button>
+                        <button id="tab-field-calendar" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="map-pin" class="w-5 h-5"></i> ปฏิทินเข้าหน้างาน</button>
                         <button id="tab-holiday-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
                             <i data-lucide="tent" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปวันหยุด / วันลา</span>
@@ -639,6 +640,63 @@
                     </div>
                 </div>
 
+                <div id="view-field-calendar" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col xl:flex-row gap-6 items-start">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full xl:w-8/12 flex-1">
+                            <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+                                <div class="flex items-center gap-2 sm:gap-3 text-xl sm:text-2xl font-bold text-gray-800">
+                                    <i data-lucide="map-pin" class="w-6 h-6 text-orange-500 shrink-0"></i>
+                                    <select id="field-calendar-month-select" class="bg-white border border-gray-200 text-gray-800 text-lg sm:text-xl font-bold rounded-md px-2 py-1 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none cursor-pointer shadow-sm hover:border-orange-500 transition-colors appearance-none pr-8 relative bg-no-repeat bg-[right_0.5rem_center] bg-[length:1em_1em]" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E');">
+                                        <option value="0">มกราคม</option><option value="1">กุมภาพันธ์</option><option value="2">มีนาคม</option>
+                                        <option value="3">เมษายน</option><option value="4">พฤษภาคม</option><option value="5">มิถุนายน</option>
+                                        <option value="6">กรกฎาคม</option><option value="7">สิงหาคม</option><option value="8">กันยายน</option>
+                                        <option value="9">ตุลาคม</option><option value="10">พฤศจิกายน</option><option value="11">ธันวาคม</option>
+                                    </select>
+                                    <div class="relative" id="field-custom-year-wrapper">
+                                        <div id="field-custom-year-btn" class="bg-white border border-gray-200 text-gray-800 text-lg sm:text-xl font-bold rounded-md px-3 py-1 cursor-pointer shadow-sm hover:border-orange-500 transition-colors flex items-center gap-2">
+                                            <span id="field-custom-year-display"></span>
+                                            <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500"></i>
+                                        </div>
+                                        <div id="field-custom-year-menu" class="absolute left-0 mt-1 w-full min-w-[130px] bg-white border border-gray-200 rounded-md shadow-lg z-50 hidden overflow-hidden">
+                                            <ul id="field-custom-year-list" class="max-h-[190px] overflow-y-auto text-base"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                                    <div class="flex gap-2">
+                                        <button id="field-prev-month" class="p-2 border border-gray-200 rounded-md hover:bg-orange-50 text-gray-600 transition-colors"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
+                                        <button id="field-today-btn" class="px-4 py-2 border border-gray-200 rounded-md hover:bg-orange-50 text-gray-700 font-medium text-sm transition-colors">วันนี้</button>
+                                        <button id="field-next-month" class="p-2 border border-gray-200 rounded-md hover:bg-orange-50 text-gray-600 transition-colors"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-7 gap-px mb-2 text-center text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                <div class="text-red-500 py-2">อา.</div><div class="py-2">จ.</div><div class="py-2">อ.</div><div class="py-2">พ.</div><div class="py-2">พฤ.</div><div class="py-2">ศ.</div><div class="text-orange-500 py-2">ส.</div>
+                            </div>
+                            <div id="field-calendar-grid" class="grid grid-cols-7 gap-2"></div>
+                        </div>
+                        
+                        <div class="w-full xl:w-4/12 shrink-0 flex flex-col gap-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col h-fit">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0">
+                                    <i data-lucide="map" class="w-5 h-5 text-orange-500"></i>
+                                    งานเข้าพื้นที่ วันนี้
+                                </h3>
+                                <div id="field-today-tasks-list" class="flex flex-col gap-3"></div>
+                            </div>
+                            
+                            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 flex flex-col h-fit">
+                                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b border-gray-100 pb-3 shrink-0">
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-orange-400"></i>
+                                    งานเข้าพื้นที่ พรุ่งนี้
+                                </h3>
+                                <div id="field-tomorrow-tasks-list" class="flex flex-col gap-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="view-holiday-summary" class="hidden animate-fade-in pb-10">
                     <div class="flex flex-col lg:flex-row gap-6 items-start">
                         <div class="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
@@ -1133,7 +1191,8 @@ function switchTab(activeTabId) {
 
             // เรียกการทำงานดึงข้อมูล
             if (activeTabId === 'dashboard' && typeof renderDashboard === 'function') renderDashboard(); 
-            else if (activeTabId === 'calendar' && typeof renderCalendar === 'function') renderCalendar(); 
+            else if (activeTabId === 'calendar' && typeof renderCalendar === 'function') renderCalendar();
+            else if (activeTabId === 'field-calendar' && typeof renderFieldCalendar === 'function') renderFieldCalendar();    
             else if (activeTabId === 'list' && typeof filterAndRenderTasks === 'function') filterAndRenderTasks(); 
             else if (activeTabId === 'project-summary' && typeof renderProjectSummary === 'function') renderProjectSummary(); 
             else if (activeTabId === 'tasktype-summary' && typeof renderTasktypeSummary === 'function') renderTasktypeSummary(); 
@@ -1158,6 +1217,7 @@ function switchTab(activeTabId) {
         
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
+        document.getElementById('tab-field-calendar')?.addEventListener('click', () => switchTab('field-calendar'));
         document.getElementById('tab-holiday-summary')?.addEventListener('click', () => switchTab('holiday-summary'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
         document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
@@ -4233,6 +4293,156 @@ function switchTab(activeTabId) {
             });
         }
 
+        // --- Logic สำหรับหน้า ปฏิทินเข้าหน้างาน (Field Calendar) ---
+        let fieldCalDate = getThaiDate();
+
+        function renderFieldCalendar() {
+            const grid = document.getElementById('field-calendar-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            
+            const year = fieldCalDate.getFullYear();
+            const month = fieldCalDate.getMonth();
+            const yearStr = year.toString();
+            
+            const calMonthSel = document.getElementById('field-calendar-month-select');
+            if (calMonthSel) calMonthSel.value = month;
+            
+            const yearDisplay = document.getElementById('field-custom-year-display');
+            const yearList = document.getElementById('field-custom-year-list');
+            if (yearDisplay) yearDisplay.innerHTML = `<span class="text-gray-700">${year + 543}</span> <span class="text-gray-500 text-sm font-normal">(${year})</span>`;
+            
+            if (yearList && yearList.children.length === 0) {
+                let listHtml = '';
+                for(let y = year - 100; y <= year + 100; y++) {
+                    listHtml += `<li class="field-year-option px-3 py-2 hover:bg-orange-50 cursor-pointer flex justify-between items-center transition-colors border-b border-gray-100 last:border-0" data-year="${y}"><span class="text-gray-600 font-bold">${y + 543}</span> <span class="text-gray-500 text-sm font-normal">(${y})</span></li>`;
+                }
+                yearList.innerHTML = listHtml;
+                yearList.querySelectorAll('.field-year-option').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        fieldCalDate.setFullYear(parseInt(e.currentTarget.getAttribute('data-year')));
+                        document.getElementById('field-custom-year-menu').classList.add('hidden');
+                        renderFieldCalendar();
+                    });
+                });
+            }
+
+            // กรองเฉพาะงานที่ ไม่ใช่ Office
+            const allFilteredTasks = getTasksByFilter();
+            const fieldTasks = allFilteredTasks.filter(t => {
+                const loc = (t.workLocation || '').trim().toLowerCase();
+                return loc !== '' && loc !== 'office' && loc !== 'ออฟฟิศ';
+            });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); 
+            const today = getThaiDate();
+            
+            for(let i = 0; i < firstDay; i++) {
+                grid.innerHTML += `<div class="bg-gray-50/30 border border-gray-100 rounded-lg p-1.5 h-[130px] opacity-50"></div>`;
+            }
+
+            for(let day = 1; day <= daysInMonth; day++) {
+                const cellDate = new Date(year, month, day);
+                const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+                const dateString = `${year}-${String(month+1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayFieldTasks = fieldTasks.filter(t => t.receiveDate === dateString);
+                
+                let tasksHtml = '';
+                dayFieldTasks.forEach(t => {
+                    let assigns = Array.isArray(t.assignment) && t.assignment.length > 0 ? t.assignment.join(',') : (t.assignment || 'ไม่ระบุ');
+                    const loc = t.workLocation || 'ไม่ระบุสถานที่';
+                    const displayText = `${assigns} - ${loc}`;
+                    
+                    tasksHtml += `<div class="text-[11px] bg-orange-50 border border-orange-200 text-orange-700 rounded px-1.5 py-1 mb-1 truncate cursor-default hover:bg-orange-100 transition-colors" title="${t.taskName} | ${displayText}">
+                        <i data-lucide="map-pin" class="w-3 h-3 inline pb-0.5"></i> <span class="font-semibold">${displayText}</span>
+                    </div>`;
+                });
+
+                const isToday = cellDate.getDate() === today.getDate() && cellDate.getMonth() === today.getMonth() && cellDate.getFullYear() === today.getFullYear();
+                let cellBgBorderClass = isWeekend ? 'bg-gray-100/60 border-gray-200' : 'bg-white border-gray-200 hover:border-orange-300';
+                let numberColor = isWeekend ? 'text-red-500' : 'text-gray-700';
+                
+                if (isToday) cellBgBorderClass = 'bg-orange-50/30 border-orange-400 border-2';
+
+                const dayNumberClass = isToday ? 'bg-orange-500 text-white rounded-full w-7 h-7 flex items-center justify-center font-bold shadow-sm' : `${numberColor} font-semibold w-7 h-7 flex items-center justify-center`;
+
+                grid.innerHTML += `<div onclick="openDayModal('${dateString}')" class="${cellBgBorderClass} border rounded-lg p-1.5 h-[130px] flex flex-col transition-colors cursor-pointer group/cell relative">
+                    <div class="flex justify-end items-start mb-1">
+                        <span class="${dayNumberClass} text-xs shrink-0">${day}</span>
+                    </div>
+                    <div class="flex-1 overflow-hidden pb-1 no-scrollbar overflow-y-auto">${tasksHtml}</div>
+                </div>`;
+            }
+
+            // --- Render Cards ด้านขวา ---
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth()+1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
+            const todayTasks = fieldTasks.filter(t => t.receiveDate === todayStr);
+            const tomorrowTasks = fieldTasks.filter(t => t.receiveDate === tomorrowStr);
+
+            const generateCardHtml = (tasksArray, titleDateStr) => {
+                if(tasksArray.length === 0) return `<div class="text-center py-6 text-gray-400 text-sm border border-dashed border-gray-200 rounded-lg bg-gray-50/50">ไม่มีงานที่ต้องเข้าหน้างาน</div>`;
+                return tasksArray.map(t => {
+                    let assigns = Array.isArray(t.assignment) && t.assignment.length > 0 ? t.assignment.join(', ') : (t.assignment || 'ไม่ระบุ');
+                    let notesText = t.notes && t.notes.length > 0 ? t.notes.filter(n=>n.text).map(n => n.text).join(' ') : 'ไม่มีรายละเอียด';
+                    if(!notesText) notesText = 'ไม่มีรายละเอียด';
+                    
+                    return `<div class="p-3.5 rounded-lg border border-orange-200 bg-orange-50/30 shadow-sm flex flex-col gap-1.5 relative overflow-hidden cursor-pointer hover:bg-orange-50 transition-colors" onclick="openDayModal('${t.receiveDate}')">
+                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-orange-500"></div>
+                        <div class="font-bold text-orange-600 pl-2 text-sm"><i data-lucide="calendar" class="w-3.5 h-3.5 inline pb-0.5"></i> ${formatDate(t.receiveDate)}</div>
+                        <div class="text-gray-800 pl-2 text-sm font-bold truncate">${t.taskName} <span class="font-normal text-gray-500 text-xs ml-1">- ${notesText}</span></div>
+                        <div class="text-gray-700 pl-2 text-xs flex items-center gap-1.5 mt-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-gray-400"></i> <span class="font-medium truncate">${t.workLocation}</span></div>
+                        <div class="text-gray-700 pl-2 text-xs flex items-center gap-1.5"><i data-lucide="users" class="w-3.5 h-3.5 text-gray-400"></i> <span class="truncate">${assigns}</span></div>
+                    </div>`;
+                }).join('');
+            };
+
+            const todayListContainer = document.getElementById('field-today-tasks-list');
+            const tomorrowListContainer = document.getElementById('field-tomorrow-tasks-list');
+
+            if(todayListContainer) todayListContainer.innerHTML = generateCardHtml(todayTasks, todayStr);
+            if(tomorrowListContainer) tomorrowListContainer.innerHTML = generateCardHtml(tomorrowTasks, tomorrowStr);
+
+            lucide.createIcons();
+        }
+
+        // จัดการ Event Listeners ของปฏิทินเข้าหน้างาน
+        document.getElementById('field-prev-month')?.addEventListener('click', () => { fieldCalDate.setMonth(fieldCalDate.getMonth() - 1); renderFieldCalendar(); });
+        document.getElementById('field-next-month')?.addEventListener('click', () => { fieldCalDate.setMonth(fieldCalDate.getMonth() + 1); renderFieldCalendar(); });
+        document.getElementById('field-today-btn')?.addEventListener('click', () => { fieldCalDate = getThaiDate(); renderFieldCalendar(); });
+        document.getElementById('field-calendar-month-select')?.addEventListener('change', (e) => { fieldCalDate.setMonth(parseInt(e.target.value)); renderFieldCalendar(); });
+
+        const fieldYearBtn = document.getElementById('field-custom-year-btn');
+        const fieldYearMenu = document.getElementById('field-custom-year-menu');
+        fieldYearBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            fieldYearMenu.classList.toggle('hidden');
+            if(!fieldYearMenu.classList.contains('hidden')) {
+                const selectedEl = document.querySelector(`.field-year-option[data-year="${fieldCalDate.getFullYear()}"]`);
+                if(selectedEl) {
+                    const ul = fieldYearMenu.querySelector('ul');
+                    ul.scrollTop = selectedEl.offsetTop - (ul.clientHeight / 2) + (selectedEl.clientHeight / 2);
+                }
+            }
+        });
+        document.addEventListener('mousedown', (e) => {
+            if (fieldYearMenu && !document.getElementById('field-custom-year-wrapper').contains(e.target)) {
+                fieldYearMenu.classList.add('hidden');
+            }
+        });
+
+        // 🌟 เพิ่มคำสั่งให้ดึงข้อมูล ปฏิทินเข้าหน้างาน อัปเดตพร้อมตารางเดิม 🌟
+        const _originalRenderTasksForField = filterAndRenderTasks;
+        filterAndRenderTasks = function() {
+            _originalRenderTasksForField();
+            const fieldView = document.getElementById('view-field-calendar');
+            if (fieldView && !fieldView.classList.contains('hidden')) renderFieldCalendar();
+        };
         // ----------------------------------------------------
         lucide.createIcons();
     </script>
