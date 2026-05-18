@@ -138,6 +138,7 @@
                             <i data-lucide="tent" class="w-4 h-4 relative z-10"></i> <span class="relative z-10">สรุปวันหยุด / วันลา</span>
                         </button>
                         <button id="tab-list" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="table" class="w-5 h-5"></i> รายการงานประจำวัน</button>
+                        <button id="tab-activity-log" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="history" class="w-5 h-5"></i> ประวัติการลงงาน</button>
                         <button id="tab-users" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800 admin-only"><i data-lucide="user" class="w-5 h-5"></i> จัดการผู้ใช้</button>
                         <button id="tab-manage" class="hidden w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="file-plus" class="w-5 h-5"></i> เพิ่ม / แก้ไขงาน</button>
                     </div>
@@ -809,7 +810,67 @@
                         </div>
                     </div>
                 </div>
+                
+                <div id="view-activity-log" class="hidden animate-fade-in pb-10">
+                    <div class="flex flex-col lg:flex-row gap-6 items-start">
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 w-full lg:w-[320px] shrink-0 flex flex-col min-h-[500px]">
+                            <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+                                <i data-lucide="history" class="w-5 h-5 text-[#5b5fc7]"></i> ค้นหาประวัติ
+                            </h2>
+                            <div class="space-y-5 flex-1">
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">ช่วงวันที่</label>
+                                    <div class="flex flex-col gap-2">
+                                        <input type="date" id="log-start-date" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600">
+                                        <span class="text-center text-xs text-gray-400">ถึง</span>
+                                        <input type="date" id="log-end-date" class="w-full px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-gray-600">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">ผู้ใช้</label>
+                                    <div class="max-h-32 overflow-y-auto border border-gray-200 rounded-md p-2 bg-gray-50 space-y-1" id="log-user-filter-list">
+                                        </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wider">ประเภท</label>
+                                    <div class="border border-gray-200 rounded-md p-2 bg-gray-50 space-y-1.5">
+                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1 rounded"><input type="checkbox" value="เพิ่ม" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> เพิ่มข้อมูล</label>
+                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1 rounded"><input type="checkbox" value="แก้ไข" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> แก้ไขข้อมูล</label>
+                                        <label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-100 p-1 rounded"><input type="checkbox" value="ลบ" class="log-type-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> ลบข้อมูล</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <button id="btn-search-logs" class="w-full bg-[#5b5fc7] hover:bg-[#4a4e9e] text-white font-medium py-2.5 rounded-md transition-colors flex justify-center items-center gap-2 shadow-sm"><i data-lucide="search" class="w-4 h-4"></i> ค้นหาประวัติ</button>
+                            </div>
+                        </div>
 
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex-1 min-w-0 w-full">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 border-b border-gray-100 pb-4">
+                                <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">รายละเอียดประวัติ <span id="log-count" class="text-[#5b5fc7] text-base ml-2">0 รายการ</span></h3>
+                                <div class="flex items-center gap-1 border-l border-gray-200 pl-2">
+                                    <button id="btn-log-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative" title="ส่งออกเป็น Excel"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
+                                    <button id="btn-log-export-pdf" class="p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative" title="ส่งออกเป็น PDF"><i data-lucide="file-text" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[8px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">PDF</span></button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto min-h-[300px]">
+                                <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="logs-summary-table">
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th>
+                                            <th class="px-6 py-4 font-semibold text-center">วัน/เดือน/ปี เวลา</th>
+                                            <th class="px-6 py-4 font-semibold">ผู้ใช้</th>
+                                            <th class="px-6 py-4 font-semibold text-center">ประเภท</th>
+                                            <th class="px-6 py-4 font-semibold w-full">รายละเอียด</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="logs-table-body" class="divide-y divide-gray-100 bg-white"></tbody>
+                                </table>
+                                <div id="logs-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="view-users" class="hidden animate-fade-in pb-10 admin-only">
                     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full relative">
                         <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-400"></div>
@@ -987,7 +1048,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBGjNRjZstg9XuKA9X-CCCsKT2ZwJ7KtNA",
@@ -1020,6 +1081,19 @@
 
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
+        let allLogs = [], logCurrentPage = 1, unsubscribeLogs = null;
+        
+        async function recordLog(actionType, detailsStr) {
+            if (!currentUser) return;
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_logs'), {
+                    action: actionType,
+                    details: detailsStr,
+                    ownerEmail: currentUser.email.toLowerCase(),
+                    createdAt: Date.now()
+                });
+            } catch(e) { console.error('Log Error:', e); }
+        }
         window.currentActiveTab = 'list'; window.previousTab = 'list'; // ตัวแปรจำหน้าล่าสุด
         let chartInstances = { time: null, value: null, responsible: null, customer: null, assignment: null, project: null, tasktype: null };
         
@@ -1203,7 +1277,8 @@ function switchTab(activeTabId) {
             else if (activeTabId === 'brandsum-summary' && typeof renderBrandsumSummary === 'function') renderBrandsumSummary(); 
             else if (activeTabId === 'responsible-summary' && typeof renderResponsibleSummary === 'function') renderResponsibleSummary(); 
             else if (activeTabId === 'customer-summary' && typeof renderCustomerSummary === 'function') renderCustomerSummary(); 
-            else if (activeTabId === 'holiday-summary' && typeof renderHolidaySummary === 'function') renderHolidaySummary(); 
+            else if (activeTabId === 'holiday-summary' && typeof renderHolidaySummary === 'function') renderHolidaySummary();
+            else if (activeTabId === 'activity-log' && typeof renderActivityLogs === 'function') renderActivityLogs();
             else if (activeTabId === 'manage') { 
                 document.querySelectorAll('#form-title').forEach(t => t.innerText = typeof currentEditTaskId !== 'undefined' && currentEditTaskId ? "แก้ไขรายละเอียดงาน" : "เพิ่มรายละเอียดงานใหม่"); 
             }
@@ -1223,6 +1298,7 @@ function switchTab(activeTabId) {
         document.getElementById('tab-field-calendar')?.addEventListener('click', () => switchTab('field-calendar'));
         document.getElementById('tab-holiday-summary')?.addEventListener('click', () => switchTab('holiday-summary'));
         document.getElementById('tab-list')?.addEventListener('click', () => switchTab('list'));
+        document.getElementById('tab-activity-log')?.addEventListener('click', () => switchTab('activity-log'));
         document.getElementById('tab-project-summary')?.addEventListener('click', () => switchTab('project-summary'));
         document.getElementById('tab-tasktype-summary')?.addEventListener('click', () => switchTab('tasktype-summary'));
         document.getElementById('tab-system-summary')?.addEventListener('click', () => switchTab('system-summary'));
@@ -1606,6 +1682,7 @@ function switchTab(activeTabId) {
             try {
                 projInput.value = 'กำลังเพิ่ม...';
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), { name: name, createdAt: Date.now(), ownerId: currentUser.uid, ownerEmail: currentUser.email, status: 'in_progress' });
+                await recordLog('เพิ่ม', 'เพิ่มโครงการ: ' + name);
                 selectProject(name); showNotification(`เพิ่มโครงการ "${name}" แล้ว`);
             } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มโครงการ", "error"); projInput.value = ''; }
         };
@@ -1648,7 +1725,12 @@ function switchTab(activeTabId) {
 
         window.addAndSelectTaskType = async (name) => {
             if(!currentUser || currentUserRole === 'monitor' || !name) return;
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), { name: name, createdAt: Date.now() }); selectTaskType(name); showNotification(`เพิ่มประเภทงาน "${name}" แล้ว`); } 
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), { name: name, createdAt: Date.now() }); 
+                await recordLog('เพิ่ม', 'เพิ่มประเภทงาน: ' + name); 
+                selectTaskType(name); 
+                showNotification(`เพิ่มประเภทงาน "${name}" แล้ว`); 
+            } 
             catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มประเภทงาน", "error"); }
         };
         const assignmentInputArea = document.getElementById('assignment-input-area'), assignmentInput = document.getElementById('assignmentInput'), assignmentList = document.getElementById('assignment-dropdown-list'), assignmentUl = document.getElementById('assignment-options-ul'), assignmentWrapper = document.getElementById('assignment-dropdown-wrapper'), assignmentChipsContainer = document.getElementById('assignment-chips-container');
@@ -1681,7 +1763,12 @@ function switchTab(activeTabId) {
         };
         window.addAndSelectAssignment = async (name) => {
             if(!currentUser || currentUserRole === 'monitor' || !name) return;
-            try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_assignments'), { name: name, createdAt: Date.now() }); selectAssignment(name); showNotification(`เพิ่มการมอบหมาย "${name}" แล้ว`); } 
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_assignments'), { name: name, createdAt: Date.now() }); 
+                await recordLog('เพิ่ม', 'เพิ่มการมอบหมาย: ' + name); 
+                selectAssignment(name); 
+                showNotification(`เพิ่มการมอบหมาย "${name}" แล้ว`); 
+            } 
             catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มการมอบหมาย", "error"); }
         };
         
@@ -1697,7 +1784,18 @@ function switchTab(activeTabId) {
             const { id, ...itemData } = itemToRestore;
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId));
+                let optionTypeName = collectionName === 'daily_projects' ? 'โครงการ' : collectionName === 'daily_task_types' ? 'ประเภทงาน' : collectionName === 'daily_systems' ? 'ระบบงาน' : collectionName === 'daily_brands' ? 'ยี่ห้ออุปกรณ์' : 'การมอบหมาย';
+                await recordLog('ลบ', `ลบตัวเลือก${optionTypeName}: ${itemData.name}`);
+                
                 showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => {
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); 
+                        await recordLog('เพิ่ม', `ย้อนกลับการลบ${optionTypeName}: ${itemData.name}`);
+                        showNotification("ย้อนกลับการลบสำเร็จ", "success");
+                        if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); 
+                        if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
+                    } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); }
+                });
                     try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับการลบสำเร็จ", "success");
                     if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
                     } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); }
@@ -2891,6 +2989,7 @@ function switchTab(activeTabId) {
             try {
                 document.getElementById(`sys-input-${rowId}`).value = 'กำลังเพิ่ม...';
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_systems'), { name: name, createdAt: Date.now() });
+                await recordLog('เพิ่ม', 'เพิ่มระบบงาน: ' + name);
                 selectSys(rowId, name); showNotification(`เพิ่มระบบงาน "${name}" แล้ว`);
             } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่ม", "error"); selectSys(rowId, ''); }
         };
@@ -2922,6 +3021,7 @@ function switchTab(activeTabId) {
             try {
                 document.getElementById(`brand-input-${rowId}`).value = 'กำลังเพิ่ม...';
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_brands'), { name: name, createdAt: Date.now() });
+                await recordLog('เพิ่ม', 'เพิ่มยี่ห้ออุปกรณ์: ' + name);
                 selectBrand(rowId, name); showNotification(`เพิ่มยี่ห้ออุปกรณ์ "${name}" แล้ว`);
             } catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่ม", "error"); selectBrand(rowId, ''); }
         };
@@ -3338,8 +3438,17 @@ function switchTab(activeTabId) {
             const systemsToSave = currentSystems.filter(s => s.checked && (s.system.trim() !== '' || s.brand.trim() !== '')).map(s => ({ system: s.system.trim(), brand: s.brand.trim(), qty: s.qty ? parseInt(String(s.qty).replace(/,/g, ''), 10) || '' : '' }));
             const taskData = { taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', taskType: selectedTaskTypes, receiveDate: document.getElementById('receiveDate')?.value || '', responsibleName: document.getElementById('responsibleName')?.value || '', assignment: selectedAssignments, customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, systems: systemsToSave, updatedAt: Date.now() };
             try {
-                if (currentEditTaskId) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); showNotification("อัปเดตงานเรียบร้อยแล้ว"); }
-                else { taskData.createdAt = Date.now(); taskData.ownerId = currentUser.uid; taskData.ownerEmail = currentUser.email; await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); }
+                if (currentEditTaskId) { 
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); 
+                    await recordLog('แก้ไข', 'แก้ไขงาน: ' + taskData.taskName);
+                    showNotification("อัปเดตงานเรียบร้อยแล้ว"); 
+                }
+                else { 
+                    taskData.createdAt = Date.now(); taskData.ownerId = currentUser.uid; taskData.ownerEmail = currentUser.email; 
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData); 
+                    await recordLog('เพิ่ม', 'เพิ่มงาน: ' + taskData.taskName);
+                    showNotification("เพิ่มงานใหม่เรียบร้อยแล้ว"); 
+                }
                 resetFormToAddMode(); switchTab(window.previousTab || 'list');
             } catch (error) { showNotification("เกิดข้อผิดพลาดในการบันทึก", "error"); } finally { submitBtn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i> บันทึกข้อมูล`; submitBtn.disabled = false; lucide.createIcons(); }
         });
@@ -3374,7 +3483,8 @@ function switchTab(activeTabId) {
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id));
                 if (projectToDeleteId) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId));
-                showNotification("ลบงานเรียบร้อยแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id), taskData); if (projectToDeleteId && projectToDeleteData) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId), projectToDeleteData); showNotification("ย้อนกลับการลบสำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } });
+                await recordLog('ลบ', 'ลบงาน: ' + taskData.taskName);
+                showNotification("ลบงานเรียบร้อยแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', id), taskData); if (projectToDeleteId && projectToDeleteData) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId), projectToDeleteData); await recordLog('เพิ่ม', 'ย้อนกลับการลบงาน: ' + taskData.taskName); showNotification("ย้อนกลับการลบสำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } });
             } catch (error) { showNotification("เกิดข้อผิดพลาดในการลบงาน", "error"); }
         };
 
@@ -4450,6 +4560,156 @@ function switchTab(activeTabId) {
             const fieldView = document.getElementById('view-field-calendar');
             if (fieldView && !fieldView.classList.contains('hidden')) renderFieldCalendar();
         };
+        // --- ระบบประวัติการลงงาน (Activity Log) ---
+        function loadLogs() {
+            if (!currentUser) return;
+            
+            // ดึงข้อมูลแค่ 500 รายการล่าสุด ป้องกันการกิน Quota Read ทะลุ (500 logs = 500 reads ต่อการโหลด)
+            const logsRef = collection(db, 'artifacts', appId, 'public', 'data', 'daily_logs');
+            const q = query(logsRef, orderBy('createdAt', 'desc'), limit(500));
+
+            unsubscribeLogs = onSnapshot(q, (snapshot) => {
+                let logs = [];
+                snapshot.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
+                allLogs = logs; // ไม่ต้อง sort ซ้ำเพราะ orderBy('createdAt', 'desc') จัดการให้แล้ว
+                if (window.currentActiveTab === 'activity-log') renderActivityLogs();
+            });
+        }
+
+        // โหลด Logs ทันทีที่ล็อกอินเสร็จ
+        const _originalInitApp = initializeUserApp;
+        initializeUserApp = async function(user) {
+            await _originalInitApp(user);
+            loadLogs();
+        };
+        const _originalSignOut = document.getElementById('btn-logout').onclick;
+        document.getElementById('btn-logout').addEventListener('click', () => { if(unsubscribeLogs) unsubscribeLogs(); });
+
+        function populateLogUserDropdown() {
+            const container = document.getElementById('log-user-filter-list');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            let emailsToShow = new Set();
+            if (currentUserRole === 'admin') {
+                allUsers.forEach(u => emailsToShow.add(u.email));
+            } else if (currentUserRole === 'monitor') {
+                let monitorAllowed = currentUserData?.monitorEmails || [];
+                monitorAllowed.forEach(em => emailsToShow.add(em));
+            } else {
+                emailsToShow.add(currentUser.email);
+            }
+
+            if(emailsToShow.size === 0) {
+                container.innerHTML = '<div class="text-xs text-gray-400 italic">ไม่พบผู้ใช้</div>';
+                return;
+            }
+
+            Array.from(emailsToShow).sort().forEach(email => {
+                container.innerHTML += `<label class="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:bg-gray-200 p-1 rounded"><input type="checkbox" value="${email}" class="log-user-cb w-4 h-4 text-[#5b5fc7] rounded focus:ring-[#5b5fc7]"> <span class="truncate">${email}</span></label>`;
+            });
+        }
+
+        function renderActivityLogs() {
+            populateLogUserDropdown(); // รีเฟรชรายชื่อในตัวกรอง
+
+            const tbody = document.getElementById('logs-table-body');
+            const countEl = document.getElementById('log-count');
+            if (!tbody) return;
+
+            // ดึงค่าจากตัวกรอง
+            const sDate = document.getElementById('log-start-date').value;
+            const eDate = document.getElementById('log-end-date').value;
+            
+            const checkedUsers = Array.from(document.querySelectorAll('.log-user-cb:checked')).map(cb => cb.value);
+            const checkedTypes = Array.from(document.querySelectorAll('.log-type-cb:checked')).map(cb => cb.value);
+
+            // กรองสิทธิ์พื้นฐานก่อน
+            let visibleLogs = allLogs;
+            if (currentUserRole !== 'admin') {
+                if (currentUserRole === 'monitor') {
+                    let allowed = currentUserData?.monitorEmails || [];
+                    visibleLogs = visibleLogs.filter(l => allowed.includes(l.ownerEmail));
+                } else {
+                    visibleLogs = visibleLogs.filter(l => l.ownerEmail === currentUser.email);
+                }
+            }
+
+            // กรองตามฟอร์ม
+            visibleLogs = visibleLogs.filter(l => {
+                let logDateStr = new Date(l.createdAt).toLocaleDateString('en-CA', {timeZone: 'Asia/Bangkok'}); // YYYY-MM-DD
+                
+                let matchDate = true;
+                if (sDate && eDate) matchDate = logDateStr >= sDate && logDateStr <= eDate;
+                else if (sDate) matchDate = logDateStr >= sDate;
+                else if (eDate) matchDate = logDateStr <= eDate;
+
+                let matchUser = checkedUsers.length === 0 || checkedUsers.includes(l.ownerEmail);
+                let matchType = checkedTypes.length === 0 || checkedTypes.includes(l.action);
+
+                return matchDate && matchUser && matchType;
+            });
+
+            countEl.textContent = `${visibleLogs.length.toLocaleString('th-TH')} รายการ`;
+
+            const totalPages = Math.ceil(visibleLogs.length / itemsPerPage) || 1;
+            if (logCurrentPage > totalPages) logCurrentPage = totalPages;
+            
+            const startIndex = (logCurrentPage - 1) * itemsPerPage;
+            const paginatedLogs = visibleLogs.slice(startIndex, startIndex + itemsPerPage);
+
+            tbody.innerHTML = '';
+            if (paginatedLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-gray-400 font-medium bg-gray-50/50">ไม่พบประวัติการลงงานตามเงื่อนไขที่เลือก</td></tr>`;
+                document.getElementById('logs-pagination').innerHTML = '';
+            } else {
+                paginatedLogs.forEach((log, index) => {
+                    const globalIndex = startIndex + index + 1;
+                    const logDate = new Date(log.createdAt);
+                    const dateStr = logDate.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Bangkok' });
+                    const timeStr = logDate.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Bangkok' }) + ' น.';
+                    
+                    let badgeClass = 'bg-gray-100 text-gray-600';
+                    if(log.action === 'เพิ่ม') badgeClass = 'bg-blue-100 text-blue-700 border border-blue-200';
+                    else if(log.action === 'แก้ไข') badgeClass = 'bg-yellow-100 text-yellow-700 border border-yellow-200';
+                    else if(log.action === 'ลบ') badgeClass = 'bg-red-100 text-red-700 border border-red-200';
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td>
+                            <td class="px-6 py-3 text-center text-gray-600 font-medium whitespace-nowrap">${dateStr} <span class="text-xs text-gray-400 ml-1">${timeStr}</span></td>
+                            <td class="px-6 py-3 text-indigo-600 font-medium truncate">${log.ownerEmail}</td>
+                            <td class="px-6 py-3 text-center"><span class="px-2.5 py-1 rounded text-xs font-bold ${badgeClass}">${log.action}</span></td>
+                            <td class="px-6 py-3 text-gray-700 whitespace-normal min-w-[200px]">${log.details}</td>
+                        </tr>
+                    `;
+                });
+                renderTablePagination('logs-pagination', logCurrentPage, totalPages, 'goToLogPage', visibleLogs.length);
+            }
+            lucide.createIcons();
+        }
+
+        window.goToLogPage = (page) => { logCurrentPage = page; renderActivityLogs(); };
+        document.getElementById('btn-search-logs')?.addEventListener('click', () => { logCurrentPage = 1; renderActivityLogs(); });
+
+        // แทรกการบันทึก Log ในฟังก์ชัน Add/Update เดิมทั้งหมดแบบอัตโนมัติ
+        const _originalTaskFormSubmit = document.getElementById('task-form').onsubmit;
+        // เราใช้วิธีดักจับที่ปุ่มบันทึกงานโดยตรง
+        document.getElementById('submit-btn')?.addEventListener('click', () => {
+            // การบันทึก Task Log ไปทำต่อจากกระบวนการสำเร็จ (ใส่ไว้ใน taskForm submit listener ในไฟล์เดิม)
+        });
+
+        // ดักแก้ Export ปุ่ม
+        document.getElementById('btn-log-export-excel')?.addEventListener('click', () => {
+            const table = document.getElementById('logs-summary-table');
+            const wb = XLSX.utils.table_to_book(table, {sheet: "Activity Log"});
+            XLSX.writeFile(wb, `ActivityLog_${getThaiDateString()}.xlsx`);
+            showNotification('Export Excel สำเร็จ');
+        });
+        document.getElementById('btn-log-export-pdf')?.addEventListener('click', () => {
+            showNotification('กำลังเตรียมไฟล์ PDF...', 'success');
+            html2pdf().set({ margin: 0.4, filename: `ActivityLog_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(document.getElementById('logs-summary-table')).save().then(() => showNotification('Export PDF สำเร็จ'));
+        });
         // ----------------------------------------------------
         lucide.createIcons();
     </script>
