@@ -4163,21 +4163,30 @@ function switchTab(activeTabId) {
         const mainScrollArea = document.querySelector('main');
         const btnScrollTop = document.getElementById('btn-scroll-top');
         
+        const handleScroll = () => {
+            if (!btnScrollTop) return;
+            // ดักค่า Scroll ทั้งจาก main และ window ป้องกันปัญหาบนมือถือบางรุ่น
+            const scrollPos = (mainScrollArea ? mainScrollArea.scrollTop : 0) || window.scrollY || document.documentElement.scrollTop;
+            
+            // ลดระยะลงเหลือ 100px ให้แสดงปุ่มไวขึ้น แม้หน้านั้นจะเนื้อหาไม่ยาวมาก
+            if (scrollPos > 100) {
+                btnScrollTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                btnScrollTop.classList.add('opacity-100', 'translate-y-0');
+            } else {
+                btnScrollTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                btnScrollTop.classList.remove('opacity-100', 'translate-y-0');
+            }
+        };
+
         if (mainScrollArea && btnScrollTop) {
-            mainScrollArea.addEventListener('scroll', () => {
-                // ถ้าเลื่อนลงมาเกิน 300px ให้แสดงปุ่ม
-                if (mainScrollArea.scrollTop > 250) {
-                    btnScrollTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    btnScrollTop.classList.add('opacity-100', 'translate-y-0');
-                } else {
-                    btnScrollTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    btnScrollTop.classList.remove('opacity-100', 'translate-y-0');
-                }
-            });
+            // ผูก Event เข้ากับทั้ง main และ window
+            mainScrollArea.addEventListener('scroll', handleScroll);
+            window.addEventListener('scroll', handleScroll);
 
             // เมื่อกดปุ่ม ให้เลื่อนกลับขึ้นไปบนสุดแบบสมูท
             btnScrollTop.addEventListener('click', () => {
-                mainScrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+                if (mainScrollArea) mainScrollArea.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             });
         }
 
