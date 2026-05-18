@@ -974,7 +974,44 @@
         window.setDashValueFilter = (filterType) => { dashValueFilter = filterType; if(typeof renderDashboard === 'function') renderDashboard(); };
         let dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null };
         let globalEmailFilter = 'all';
-        let itemsPerPage = 20, listCurrentPage = 1, summaryCurrentPage = 1;
+        
+        // 1. กำหนดค่าเริ่มต้น: มือถือโชว์ 20, คอมพิวเตอร์โชว์ 40
+        let itemsPerPage = window.innerWidth < 768 ? 20 : 40;
+        let listCurrentPage = 1, summaryCurrentPage = 1, tasktypeCurrentPage = 1, systemCurrentPage = 1, brandsumCurrentPage = 1, respCurrentPage = 1, custCurrentPage = 1, holCurrentPage = 1;
+
+        // 2. ฟังก์ชันรับค่าเมื่อผู้ใช้เลือก Dropdown โชว์จำนวนรายการ
+        window.changeItemsPerPage = (val) => {
+            itemsPerPage = parseInt(val);
+            listCurrentPage = 1; summaryCurrentPage = 1; tasktypeCurrentPage = 1; systemCurrentPage = 1;
+            brandsumCurrentPage = 1; respCurrentPage = 1; custCurrentPage = 1; holCurrentPage = 1;
+            switchTab(window.currentActiveTab); // รีเฟรชหน้า
+        };
+
+        // 3. ฟังก์ชันกลางสำหรับวาดปุ่ม [<] หน้า 1 / 5 [>] และ Dropdown จำนวนแถว
+        window.renderTablePagination = function(containerId, currentPage, totalPages, goToFuncStr, totalItems) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            if (totalItems === 0) { container.innerHTML = ''; return; } 
+            
+            const options = [20, 40, 60, 80, 100].map(val => `<option value="${val}" ${itemsPerPage === val ? 'selected' : ''}>${val}</option>`).join('');
+            
+            container.innerHTML = `
+            <div class="flex flex-col sm:flex-row justify-center sm:justify-end items-center gap-4 sm:gap-6 p-4 bg-gray-50/50 rounded-b-lg border-t border-gray-100 mt-2">
+                <div class="flex items-center gap-2">
+                    <button onclick="${goToFuncStr}(${currentPage - 1})" class="p-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-sm" ${currentPage === 1 ? 'disabled' : ''}><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                    <div class="px-3 py-1.5 bg-white border border-gray-300 rounded-md font-bold text-gray-700 text-sm shadow-sm">หน้า ${currentPage} / ${totalPages}</div>
+                    <button onclick="${goToFuncStr}(${currentPage + 1})" class="p-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50 transition-colors shadow-sm" ${currentPage === totalPages ? 'disabled' : ''}><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                </div>
+                <div class="flex items-center gap-2 text-sm text-gray-600 bg-white px-3 py-1.5 border border-gray-200 rounded-md shadow-sm">
+                    <span class="font-medium">แสดงหน้าละ</span>
+                    <select onchange="changeItemsPerPage(this.value)" class="bg-gray-50 border border-gray-200 rounded px-1.5 py-0.5 focus:ring-1 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none text-[#5b5fc7] font-bold cursor-pointer transition-shadow">
+                        ${options}
+                    </select>
+                    <span class="font-medium">รายการ</span>
+                </div>
+            </div>`;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        };
 
         const statusEl = document.getElementById('user-status');
         const taskForm = document.getElementById('task-form');
@@ -1704,9 +1741,7 @@ function switchTab(activeTabId) {
                     const valInputHTML = `<input type="text" class="w-full text-right px-2 py-1.5 border border-gray-200 rounded text-sm focus:ring-1 focus:ring-[#5b5fc7] focus:border-[#5b5fc7] outline-none transition-shadow font-medium text-gray-700 bg-gray-50 hover:bg-white" value="${displayVal}" placeholder="0" onkeyup="let v=this.value.replace(/[^\\d.]/g,''); if(v){let parts=v.split('.'); parts[0]=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,','); this.value=parts.join('.');}else{this.value='';}" onblur="updateProjectValue('${p.id}', this.value)" ${currentUserRole === 'monitor' ? 'disabled' : ''}>`;
                     tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-4 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-4 text-center text-sm text-gray-600">${p.earliestDate ? formatDate(p.earliestDate) : '-'}</td><td class="px-6 py-4 font-bold text-[#5b5fc7] cursor-pointer hover:underline" onclick="openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">${p.name}</td><td class="px-4 py-4 pr-6">${valInputHTML}</td><td class="px-4 py-4 text-center">${checkboxHTML('in_progress')}</td><td class="px-4 py-4 text-center">${checkboxHTML('won')}</td><td class="px-4 py-4 text-center">${checkboxHTML('lost')}</td></tr>`;
                 });
-                if (paginationContainer && finalDisplayProjectData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, finalDisplayProjectData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${finalDisplayProjectData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToSummaryPage(${summaryCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${summaryCurrentPage} / ${totalPages}</div><button onclick="goToSummaryPage(${summaryCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${summaryCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                } else if(paginationContainer) paginationContainer.innerHTML = '';
+                renderTablePagination('summary-pagination', summaryCurrentPage, totalPages, 'goToSummaryPage', finalDisplayProjectData.length);
             }
             lucide.createIcons();
         }
@@ -1913,9 +1948,7 @@ function switchTab(activeTabId) {
                     `;
                 });
 
-                if (paginationContainer && tableData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${tasktypeCurrentPage} / ${totalTablePages}</div><button onclick="goToTasktypeSummaryPage(${tasktypeCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${tasktypeCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                } else if(paginationContainer) { paginationContainer.innerHTML = ''; }
+                renderTablePagination('tasktype-summary-pagination', tasktypeCurrentPage, totalTablePages, 'goToTasktypeSummaryPage', tableData.length);
             }
             lucide.createIcons();
         }
@@ -2029,7 +2062,7 @@ function switchTab(activeTabId) {
                     const globalIndex = startTableIndex + index + 1, projectNameHtml = row.projectName === 'ไม่ได้ระบุโครงการ' ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
                     tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td><td class="px-6 py-3">${projectNameHtml}</td><td class="px-6 py-3 font-medium text-indigo-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td><td class="px-4 py-3 text-center font-semibold text-gray-800">${row.taskCount}</td></tr>`;
                 });
-                if (paginationContainer && tableData.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(startTableIndex + itemsPerPage, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToSystemSummaryPage(${systemCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${systemCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${systemCurrentPage} / ${totalTablePages}</div><button onclick="goToSystemSummaryPage(${systemCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${systemCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`; else if(paginationContainer) paginationContainer.innerHTML = '';
+                renderTablePagination('system-summary-pagination', systemCurrentPage, totalTablePages, 'goToSystemSummaryPage', tableData.length);
             }
             lucide.createIcons();
         }
@@ -2117,7 +2150,7 @@ function switchTab(activeTabId) {
                     const globalIndex = startTableIndex + index + 1, projectNameHtml = row.projectName === 'ไม่ได้ระบุโครงการ' ? `<span class="text-gray-500 italic">${row.projectName}</span>` : `<span class="font-bold text-gray-800 cursor-pointer hover:text-[#5b5fc7] hover:underline" onclick="window.openProjectDetailModal('${row.projectName.replace(/'/g, "\\'")}')">${row.projectName}</span>`;
                     tbody.innerHTML += `<tr class="hover:bg-gray-50 transition-colors"><td class="px-4 py-3 text-center font-medium text-gray-500">${globalIndex}</td><td class="px-4 py-3 text-center text-sm text-gray-600">${row.latestDate ? formatDate(row.latestDate) : '-'}</td><td class="px-6 py-3">${projectNameHtml}</td><td class="px-6 py-3 font-medium text-indigo-600 max-w-xs truncate" title="${row.displayType}">${row.displayType}</td><td class="px-4 py-3 text-center font-semibold text-gray-800">${row.taskCount}</td></tr>`;
                 });
-                if (paginationContainer && tableData.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(startTableIndex + itemsPerPage, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToBrandsumSummaryPage(${brandsumCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${brandsumCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${brandsumCurrentPage} / ${totalTablePages}</div><button onclick="goToBrandsumSummaryPage(${brandsumCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${brandsumCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`; else if(paginationContainer) paginationContainer.innerHTML = '';
+                renderTablePagination('brandsum-summary-pagination', brandsumCurrentPage, totalTablePages, 'goToBrandsumSummaryPage', tableData.length);
             }
             lucide.createIcons();
         }
@@ -2337,10 +2370,7 @@ function switchTab(activeTabId) {
                     `;
                 });
 
-                if (paginationContainer && tableData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToRespSummaryPage(${respCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${respCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${respCurrentPage} / ${totalTablePages}</div><button onclick="goToRespSummaryPage(${respCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${respCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                } else if(paginationContainer) {
-                    paginationContainer.innerHTML = '';
+                renderTablePagination('resp-summary-pagination', respCurrentPage, totalTablePages, 'goToRespSummaryPage', tableData.length);
                 }
             }
             lucide.createIcons();
@@ -2598,10 +2628,7 @@ function switchTab(activeTabId) {
                     `;
                 });
 
-                if (paginationContainer && tableData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startTableIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToCustSummaryPage(${custCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${custCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${custCurrentPage} / ${totalTablePages}</div><button onclick="goToCustSummaryPage(${custCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${custCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                } else if(paginationContainer) {
-                    paginationContainer.innerHTML = '';
+                renderTablePagination('cust-summary-pagination', custCurrentPage, totalTablePages, 'goToCustSummaryPage', tableData.length);
                 }
             }
             lucide.createIcons();
@@ -3190,9 +3217,7 @@ function switchTab(activeTabId) {
                 tr.innerHTML = `<td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td><td class="px-6 py-4 text-center text-sm text-gray-600 whitespace-nowrap">${task.receiveDate ? formatDate(task.receiveDate) : '-'}</td><td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td><td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td><td class="px-6 py-4 text-right action-cell"><div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${actionBtns}</div></td>`;
                 tableBody.appendChild(tr);
             });
-            if (paginationContainer) {
-                if (tasks.length > itemsPerPage) paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-[#5b5fc7]">${startIndex + 1}</span> ถึง <span class="font-bold text-[#5b5fc7]">${Math.min(endIndex, tasks.length)}</span> จากทั้งหมด <span class="font-bold text-[#5b5fc7]">${tasks.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToListPage(${listCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-[#5b5fc7]">หน้า ${listCurrentPage} / ${totalPages}</div><button onclick="goToListPage(${listCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${listCurrentPage === totalPages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                else paginationContainer.innerHTML = '';
+            renderTablePagination('list-pagination', listCurrentPage, totalPages, 'goToListPage', tasks.length);
             }
             lucide.createIcons(); applyRoleUI();
         }
@@ -4020,10 +4045,7 @@ function switchTab(activeTabId) {
                     `;
                 });
 
-                if (paginationContainer && tableData.length > itemsPerPage) {
-                    paginationContainer.innerHTML = `<div class="flex justify-between items-center text-sm text-gray-600 p-4 bg-gray-50/50 rounded-b-lg mt-2"><div>แสดงรายการที่ <span class="font-bold text-red-600">${startTableIndex + 1}</span> ถึง <span class="font-bold text-red-600">${Math.min(endTableIndex, tableData.length)}</span> จากทั้งหมด <span class="font-bold text-red-600">${tableData.length}</span> รายการ</div><div class="flex gap-2"><button onclick="goToHolSummaryPage(${holCurrentPage - 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${holCurrentPage === 1 ? 'disabled' : ''}>ก่อนหน้า</button><div class="px-4 py-1.5 bg-white border border-gray-300 rounded-md font-semibold text-red-600">หน้า ${holCurrentPage} / ${totalTablePages}</div><button onclick="goToHolSummaryPage(${holCurrentPage + 1})" class="px-4 py-1.5 border border-gray-300 bg-white rounded-md hover:bg-gray-50 disabled:opacity-50" ${holCurrentPage === totalTablePages ? 'disabled' : ''}>ถัดไป</button></div></div>`;
-                } else if(paginationContainer) {
-                    paginationContainer.innerHTML = '';
+                renderTablePagination('hol-summary-pagination', holCurrentPage, totalTablePages, 'goToHolSummaryPage', tableData.length);
                 }
             }
             lucide.createIcons();
