@@ -783,7 +783,7 @@
                             </div>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-sm whitespace-nowrap border border-gray-100 rounded-lg overflow-hidden" id="users-table-admin">
-                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">ระดับสิทธิ์</th><th class="px-6 py-4 font-semibold">ชื่อ</th><th class="px-6 py-4 font-semibold">ตำแหน่ง</th><th class="px-6 py-4 font-semibold">อีเมล</th><th class="px-6 py-4 font-semibold">ผู้ใช้ที่ดูได้</th><th class="px-6 py-4 font-semibold">สิทธิ์ดูข้อมูล</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-center">เข้าใช้งานล่าสุด</th><th class="px-6 py-4 font-semibold text-center">ระยะเวลาเข้าใช้งาน</th><th class="px-6 py-4 font-semibold text-left">จัดการ</th></tr></thead>
+                                    <thead class="bg-gray-100 text-gray-600 uppercase text-xs tracking-wider"><tr><th class="px-6 py-4 font-semibold">ระดับสิทธิ์</th><th class="px-6 py-4 font-semibold">ชื่อ</th><th class="px-6 py-4 font-semibold">ตำแหน่ง</th><th class="px-6 py-4 font-semibold">อีเมล</th><th class="px-6 py-4 font-semibold">ผู้ใช้ที่ดูได้</th><th class="px-6 py-4 font-semibold">สิทธิ์ดูข้อมูล</th><th class="px-6 py-4 font-semibold">สถานะออนไลน์</th><th class="px-6 py-4 font-semibold text-center">เข้าใช้งานล่าสุด</th><th class="px-6 py-4 font-semibold text-center">ระยะเวลาเข้าใช้งาน</th><th class="px-6 py-4 font-semibold text-center">จัดการ</th></tr></thead>
                                     <tbody id="users-table-body-admin" class="divide-y divide-gray-100"></tbody>
                                 </table>
                             </div>
@@ -3735,7 +3735,7 @@ function switchTab(activeTabId) {
                     <td class="px-6 py-4">${onlineStatusHtml}</td>
                     <td class="px-6 py-4 text-center text-sm text-gray-600 font-medium">${lastActiveStr}</td>
                     <td class="px-6 py-4 text-center">${sessionDisplay}</td>
-                    <td class="px-6 py-4 text-left whitespace-nowrap">
+                    <td class="px-6 py-4 text-center whitespace-nowrap">
                         <button onclick="event.preventDefault(); window.forceLogoutUser('${u.email}')" class="p-2 text-orange-500 hover:bg-orange-100 rounded-md mr-1 transition-colors" title="บังคับเตะออกจากระบบ" ${disableDelete}><i data-lucide="log-out" class="w-4 h-4"></i></button>
                         <button onclick="event.preventDefault(); window.editUserRole('${u.email}', '${u.role}', '${u.viewStartDate || ''}', '${u.viewEndDate || ''}', '${safeName}', '${safePos}', '${safeMonitor}')" class="p-2 text-blue-600 hover:bg-blue-100 rounded-md mr-1 transition-colors" title="แก้ไขสิทธิ์" ${disableDelete}><i data-lucide="edit-3" class="w-4 h-4"></i></button>
                         <button onclick="event.preventDefault(); window.deleteUserRole('${u.email}')" class="p-2 text-red-500 hover:bg-red-100 rounded-md transition-colors" title="ลบออกจากระบบ" ${disableDelete}><i data-lucide="trash-2" class="w-4 h-4"></i></button>
