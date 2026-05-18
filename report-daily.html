@@ -1782,6 +1782,7 @@ function switchTab(activeTabId) {
             else if (collectionName === 'daily_assignments') itemToRestore = allAssignments.find(t => t.id === docId);
             if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
+            
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId));
                 let optionTypeName = collectionName === 'daily_projects' ? 'โครงการ' : collectionName === 'daily_task_types' ? 'ประเภทงาน' : collectionName === 'daily_systems' ? 'ระบบงาน' : collectionName === 'daily_brands' ? 'ยี่ห้ออุปกรณ์' : 'การมอบหมาย';
@@ -1794,12 +1795,10 @@ function switchTab(activeTabId) {
                         showNotification("ย้อนกลับการลบสำเร็จ", "success");
                         if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); 
                         if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
+                        if (collectionName === 'daily_assignments') renderAssignmentDropdown(assignmentInput?.value || '');
                     } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); }
                 });
-                    try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId), itemData); showNotification("ย้อนกลับการลบสำเร็จ", "success");
-                    if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
-                    } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); }
-                });
+                
                 if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); 
                 if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
                 if (collectionName === 'daily_assignments') renderAssignmentDropdown(assignmentInput?.value || '');
@@ -3260,7 +3259,17 @@ function switchTab(activeTabId) {
             const holidayToRestore = allHolidays.find(h => h.id === id); if (!holidayToRestore) return;
             if (currentUserRole === 'user' && holidayToRestore.ownerId !== currentUser.uid) return showNotification("คุณลบได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
             const { id: docId, ...holidayData } = holidayToRestore;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id));await recordLog('ลบ', 'ลบวันหยุด/ลา: ' + holidayData.holidayName); showNotification("ลบรายการวันหยุด/วันลาแล้ว", "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id), holidayData); showNotification("ย้อนกลับการลบสำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch(e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
+            try { 
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id));
+                await recordLog('ลบ', 'ลบวันหยุด/ลา: ' + holidayData.holidayName); 
+                showNotification("ลบรายการวันหยุด/วันลาแล้ว", "success", async () => { 
+                    try { 
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_holidays', id), holidayData); 
+                        await recordLog('เพิ่ม', 'ย้อนกลับการลบวันหยุด/ลา: ' + holidayData.holidayName);
+                        showNotification("ย้อนกลับการลบสำเร็จ", "success"); 
+                    } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } 
+                }); 
+            } catch(e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
 
         window.openAddTaskFromCalendar = (dateString) => { currentEditTaskId = null; resetFormToAddMode(); const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = dateString; switchTab('manage'); };
@@ -3971,6 +3980,7 @@ function switchTab(activeTabId) {
                 if (roleInput === 'monitor') dataToSave.monitorEmails = monitorEmails;
                 
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailInput), dataToSave, { merge: true });
+                await recordLog('แก้ไข', `อัปเดตสิทธิ์ผู้ใช้: ${emailInput} (สิทธิ์: ${roleInput})`);
                 showNotification(`บันทึกข้อมูลสำหรับ ${emailInput} สำเร็จ`);
                 document.getElementById('user-role-form').reset();
                 window.toggleMonitorList('user');
@@ -4010,7 +4020,7 @@ function switchTab(activeTabId) {
             if (currentUserRole !== 'admin' || email === 'dukender7188@gmail.com') return;
             const userToRestore = allUsers.find(u => u.email === email); if (!userToRestore) return;
             const { id: docId, ...userData } = userToRestore;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email)); showNotification(`ลบข้อมูลสิทธิ์ของ ${email} แล้ว`, "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), userData); showNotification("ย้อนกลับการลบสิทธิ์สำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email));await recordLog('ลบ', `ลบผู้ใช้: ${email}`); showNotification(`ลบข้อมูลสิทธิ์ของ ${email} แล้ว`, "success", async () => { try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', email), userData); showNotification("ย้อนกลับการลบสิทธิ์สำเร็จ", "success"); } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); } }); } catch (e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
         window.forceLogoutUser = async (email) => {
             if (currentUserRole !== 'admin' || email === 'dukender7188@gmail.com') return;
@@ -4021,6 +4031,7 @@ function switchTab(activeTabId) {
                         sessionId: 'force_logout_' + Date.now(), 
                         isOnline: false 
                     }, { merge: true });
+                    await recordLog('แก้ไข', `สั่งเตะผู้ใช้ ${email} ออกจากระบบ`);
                     showNotification(`สั่งเตะ ${email} ออกจากระบบแล้ว`, "success");
                 } catch (e) {
                     showNotification("เกิดข้อผิดพลาดในการสั่งเตะผู้ใช้ออก", "error");
