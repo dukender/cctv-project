@@ -1354,6 +1354,24 @@ function switchTab(activeTabId) {
             if (currentUserRole === 'monitor') { roleRestrictedActions.forEach(el => el.style.display = 'none'); actionCells.forEach(el => el.style.display = 'none'); if(tabManage) tabManage.style.display = 'none'; } else { roleRestrictedActions.forEach(el => el.style.display = ''); actionCells.forEach(el => el.style.display = ''); }
         }
 
+        window.getAllowedOptions = (optionsList, optionType = '') => {
+            if (currentUserRole === 'admin') return optionsList;
+            let allowedEmails = [currentUser.email.toLowerCase()];
+            
+            // อนุญาตให้ดึงชื่อตัวเลือกของเพื่อนได้ เฉพาะ Monitor หรือ (User ที่เป็นหมวดหมู่ที่อนุญาต)
+            const isAllowedTypeForUser = ['project', 'assignment', 'system', 'brand'].includes(optionType);
+            if (currentUserData && Array.isArray(currentUserData.monitorEmails)) {
+                if (currentUserRole === 'monitor' || (currentUserRole === 'user' && isAllowedTypeForUser)) {
+                    allowedEmails.push(...currentUserData.monitorEmails.map(e => e.toLowerCase()));
+                }
+            }
+            
+            return optionsList.filter(item => {
+                if (!item.ownerEmail) return true; // ค่า Default กลางของระบบ
+                return allowedEmails.includes(item.ownerEmail.toLowerCase());
+            });
+        };
+
         function filterDataByRole(dataList) {
             let filtered = dataList;
             if (currentUserRole !== 'admin' && currentUserRole !== 'monitor') {
@@ -1616,7 +1634,7 @@ function switchTab(activeTabId) {
             if(!projUl) return;
             projUl.innerHTML = '';
             const q = query.toLowerCase().trim();
-            let allowedProjects = allProjects;
+            let allowedProjects = window.getAllowedOptions(allProjects, 'project');
             if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
                 const tasksToUse = getTasksByFilter();
                 const activeProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
@@ -1710,9 +1728,10 @@ function switchTab(activeTabId) {
             if(!taskTypeUl) return;
             taskTypeUl.innerHTML = '';
             const q = query.toLowerCase().trim();
-            const availableTypes = allTaskTypes.filter(t => !selectedTaskTypes.includes(t.name));
+            const allowedTaskTypes = window.getAllowedOptions(allTaskTypes, 'tasktype');
+            const availableTypes = allowedTaskTypes.filter(t => !selectedTaskTypes.includes(t.name));
             const filtered = availableTypes.filter(t => t.name.toLowerCase().includes(q));
-            if (q && !allTaskTypes.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') taskTypeUl.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectTaskType('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            if (q && !allowedTaskTypes.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') taskTypeUl.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectTaskType('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
             if (filtered.length === 0 && !q) taskTypeUl.innerHTML += availableTypes.length === 0 ? `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว... (พิมพ์เพื่อเพิ่มใหม่)</li>` : `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
             else filtered.forEach(t => {
                 const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_task_types', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
@@ -1751,9 +1770,10 @@ function switchTab(activeTabId) {
         window.removeAssignment = (tag) => { selectedAssignments = selectedAssignments.filter(t => t !== tag); renderAssignmentChips(); };
         function renderAssignmentDropdown(query = '') {
             if(!assignmentUl) return; assignmentUl.innerHTML = ''; const q = query.toLowerCase().trim();
-            const availableAssigns = allAssignments.filter(t => !selectedAssignments.includes(t.name));
+            const allowedAssigns = window.getAllowedOptions(allAssignments, 'assignment');
+            const availableAssigns = allowedAssigns.filter(t => !selectedAssignments.includes(t.name));
             const filtered = availableAssigns.filter(t => t.name.toLowerCase().includes(q));
-            if (q && !allAssignments.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') assignmentUl.innerHTML += `<li class="px-4 py-2 hover:bg-rose-50 text-rose-600 cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectAssignment('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            if (q && !allowedAssigns.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') assignmentUl.innerHTML += `<li class="px-4 py-2 hover:bg-rose-50 text-rose-600 cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectAssignment('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
             if (filtered.length === 0 && !q) assignmentUl.innerHTML += availableAssigns.length === 0 ? `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว... (พิมพ์เพื่อเพิ่มใหม่)</li>` : `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
             else filtered.forEach(t => {
                 const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_assignments', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1" title="ลบรายการนี้ออกจากฐานข้อมูล"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
@@ -1852,14 +1872,20 @@ function switchTab(activeTabId) {
             const tasksToUse = getTasksByFilter();
             const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
             let visibleProjects = [];
-            if (currentUserRole === 'admin' || currentUserRole === 'monitor') {
+            if (currentUserRole === 'admin') {
                 if (globalEmailFilter === 'all') visibleProjects = [...allProjects];
                 else {
                     const targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
                     visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name));
                 }
+            } else if (currentUserRole === 'monitor') {
+                if (globalEmailFilter === 'all') visibleProjects = window.getAllowedOptions(allProjects, 'project');
+                else {
+                    const targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
+                    visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name));
+                }
             } else {
-                visibleProjects = allProjects.filter(p => p.ownerId === currentUser.uid || userProjectNames.has(p.name));
+                visibleProjects = window.getAllowedOptions(allProjects, 'project');
             }
             if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
                 const dateFilteredProjectNames = new Set(filterDataByRole(visibleProjects).map(p => p.name));
@@ -2980,9 +3006,11 @@ function switchTab(activeTabId) {
         // -- Logic Dropdown ระบบงาน --
         window.renderSysDropdown = (rowId, query = '') => {
             const ul = document.getElementById(`sys-ul-${rowId}`), list = document.getElementById(`sys-list-${rowId}`);
-            if(!ul || !list) return; ul.innerHTML = ''; const q = query.toLowerCase().trim();
-            const filtered = allSystemsData.filter(p => p.name.toLowerCase().includes(q));
-            if (q && !allSystemsData.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
+            if(!ul || !list) return; ul.innerHTML = ''; 
+            const q = query.toLowerCase().trim();
+            const allowedSystems = window.getAllowedOptions(allSystemsData, 'system');
+            const filtered = allowedSystems.filter(p => p.name.toLowerCase().includes(q));
+            if (q && !allowedSystems.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
                 ul.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectSys('${rowId}', '${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
             }
             if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อเพิ่มรายการใหม่...</li>`;
@@ -3012,9 +3040,11 @@ function switchTab(activeTabId) {
         // -- Logic Dropdown ยี่ห้ออุปกรณ์ --
         window.renderBrandDropdown = (rowId, query = '') => {
             const ul = document.getElementById(`brand-ul-${rowId}`), list = document.getElementById(`brand-list-${rowId}`);
-            if(!ul || !list) return; ul.innerHTML = ''; const q = query.toLowerCase().trim();
-            const filtered = allBrandsData.filter(p => p.name.toLowerCase().includes(q));
-            if (q && !allBrandsData.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
+            if(!ul || !list) return; ul.innerHTML = ''; 
+            const q = query.toLowerCase().trim();
+            const allowedBrands = window.getAllowedOptions(allBrandsData, 'brand');
+            const filtered = allowedBrands.filter(p => p.name.toLowerCase().includes(q));
+            if (q && !allowedBrands.some(p => p.name.toLowerCase() === q) && currentUserRole !== 'monitor') {
                 ul.innerHTML += `<li class="px-4 py-2 hover:bg-[#eef1ff] text-[#5b5fc7] cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectBrand('${rowId}', '${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
             }
             if (filtered.length === 0 && !q) ul.innerHTML += `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อเพิ่มรายการใหม่...</li>`;
@@ -3974,7 +4004,7 @@ function switchTab(activeTabId) {
             const btn = document.getElementById('btn-save-user');
             
             let monitorEmails = [];
-            if (roleInput === 'monitor') {
+            if (roleInput === 'monitor' || roleInput === 'user') {
                 const checked = document.querySelectorAll('.monitor-email-cb:checked');
                 checked.forEach(cb => monitorEmails.push(cb.value));
             }
@@ -3993,7 +4023,7 @@ function switchTab(activeTabId) {
                     viewEndDate: endDateInput, 
                     updatedAt: Date.now() 
                 };
-                if (roleInput === 'monitor') dataToSave.monitorEmails = monitorEmails;
+                if (roleInput === 'monitor' || roleInput === 'user') dataToSave.monitorEmails = monitorEmails;
                 
                 await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', emailInput), dataToSave, { merge: true });
                 await recordLog('แก้ไข', `อัปเดตสิทธิ์ผู้ใช้: ${emailInput} (สิทธิ์: ${roleInput})`);
@@ -4018,7 +4048,7 @@ function switchTab(activeTabId) {
             
             window.toggleMonitorList(role);
             document.querySelectorAll('.monitor-email-cb').forEach(cb => cb.checked = false);
-            if (role === 'monitor' && monitorListStr) {
+            if ((role === 'monitor' || role === 'user') && monitorListStr) {
                 try {
                     const arr = JSON.parse(decodeURIComponent(monitorListStr));
                     arr.forEach(em => {
