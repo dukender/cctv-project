@@ -1402,7 +1402,7 @@ function switchTab(activeTabId) {
         window.toggleMonitorList = (role) => {
             const wrapper = document.getElementById('monitor-list-wrapper');
             if (wrapper) {
-                if (role === 'monitor') wrapper.classList.remove('hidden');
+                if (role === 'monitor' || role === 'user') wrapper.classList.remove('hidden');
                 else wrapper.classList.add('hidden');
             }
         };
