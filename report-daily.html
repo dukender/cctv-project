@@ -3918,55 +3918,28 @@ function switchTab(activeTabId) {
         document.getElementById('btn-export-dash-pdf')?.addEventListener('click', () => {
             if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
             showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
+            
             const element = document.getElementById('view-dashboard');
+            // บังคับให้ element ชิดซ้ายและไม่ขยายล้นจอ
+            element.style.marginLeft = "0";
+            element.style.marginRight = "auto";
+            
             const controls = element.querySelector('.mb-6.bg-white'); 
             if (controls) controls.style.display = 'none';
 
-            // 1. ปลดล็อกการถูกตัดขอบ (Overflow) ของหน้าจอทั้งหมดชั่วคราว
-            document.body.classList.remove('overflow-hidden');
-            document.getElementById('main-app')?.classList.remove('overflow-hidden');
-            const mainWrap = element.closest('main');
-            if (mainWrap) { mainWrap.classList.remove('overflow-y-auto'); }
-
-            // 2. บังคับความกว้างหน้าจอไว้ที่ 1200px ให้สัดส่วนสวยงาม
+            // บีบความกว้างให้พอดี A3 แนวตั้ง (ประมาณ 1050px คือจุดที่กำลังสวย)
             const originalWidth = element.style.width;
-            element.style.width = '1200px';
-
-            const legends = element.querySelectorAll('[id^="legend-"]');
-            legends.forEach(el => {
-                el.classList.remove('max-h-[300px]', 'overflow-y-auto');
-                el.querySelectorAll('.truncate').forEach(span => {
-                    span.dataset.wasTruncate = "true";
-                    span.classList.remove('truncate');
-                    span.classList.add('whitespace-normal');
-                    span.style.minWidth = 'max-content';
-                });
-            });
+            element.style.width = '1050px';
 
             html2pdf().set({ 
-                margin: 5, 
+                margin: [5, 5, 5, 5], // บน ซ้าย ล่าง ขวา
                 filename: `Dashboard_${getThaiDateString()}.pdf`, 
-                image: { type: 'jpeg', quality: 1 }, 
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 1200, scrollX: 0, scrollY: 0 }, 
+                image: { type: 'jpeg', quality: 0.98 }, 
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 1050 }, 
                 jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' } 
             }).from(element).save().then(() => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
-                
-                // 3. คืนค่าการตัดขอบหน้าจอกลับมาให้ใช้งานได้ปกติ
-                document.body.classList.add('overflow-hidden');
-                document.getElementById('main-app')?.classList.add('overflow-hidden');
-                if (mainWrap) { mainWrap.classList.add('overflow-y-auto'); }
-
-                legends.forEach(el => {
-                    el.classList.add('max-h-[300px]', 'overflow-y-auto');
-                    el.querySelectorAll('[data-was-truncate="true"]').forEach(span => {
-                        span.classList.add('truncate');
-                        span.classList.remove('whitespace-normal');
-                        span.style.minWidth = '';
-                        delete span.dataset.wasTruncate;
-                    });
-                });
                 showNotification("Export PDF สำเร็จ"); 
             });
         });
@@ -3978,59 +3951,24 @@ function switchTab(activeTabId) {
             const controls = element.querySelector('.mb-6.bg-white'); 
             if (controls) controls.style.display = 'none';
             
-            // 1. ปลดล็อกการถูกตัดขอบ (Overflow) ของหน้าจอทั้งหมดชั่วคราว
-            document.body.classList.remove('overflow-hidden');
-            document.getElementById('main-app')?.classList.remove('overflow-hidden');
-            const mainWrap = element.closest('main');
-            if (mainWrap) { mainWrap.classList.remove('overflow-y-auto'); }
-
+            // บังคับชิดซ้ายและบีบความกว้าง
+            element.style.marginLeft = "0";
+            element.style.marginRight = "auto";
             const originalWidth = element.style.width;
-            element.style.width = '1200px';
+            element.style.width = '1050px';
 
-            const legends = element.querySelectorAll('[id^="legend-"]');
-            legends.forEach(el => {
-                el.classList.remove('max-h-[300px]', 'overflow-y-auto');
-                el.querySelectorAll('.truncate').forEach(span => {
-                    span.dataset.wasTruncate = "true";
-                    span.classList.remove('truncate');
-                    span.classList.add('whitespace-normal');
-                    span.style.minWidth = 'max-content';
-                });
-            });
-
-            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1200, scrollX: 0, scrollY: 0, backgroundColor: '#f5f5f5' }).then(canvas => { 
+            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1050, backgroundColor: '#f5f5f5' }).then(canvas => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
                 
-                // 3. คืนค่าการตัดขอบหน้าจอกลับมาให้ใช้งานได้ปกติ
-                document.body.classList.add('overflow-hidden');
-                document.getElementById('main-app')?.classList.add('overflow-hidden');
-                if (mainWrap) { mainWrap.classList.add('overflow-y-auto'); }
-
-                legends.forEach(el => {
-                    el.classList.add('max-h-[300px]', 'overflow-y-auto');
-                    el.querySelectorAll('[data-was-truncate="true"]').forEach(span => {
-                        span.classList.add('truncate');
-                        span.classList.remove('whitespace-normal');
-                        span.style.minWidth = '';
-                        delete span.dataset.wasTruncate;
-                    });
-                });
-                
                 const link = document.createElement('a'); 
                 link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                link.href = canvas.toDataURL('image/jpeg', 1.0); 
+                link.href = canvas.toDataURL('image/jpeg', 0.95); 
                 link.click(); 
                 showNotification("Export JPG สำเร็จ"); 
             }).catch(err => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
-                
-                document.body.classList.add('overflow-hidden');
-                document.getElementById('main-app')?.classList.add('overflow-hidden');
-                if (mainWrap) { mainWrap.classList.add('overflow-y-auto'); }
-
-                legends.forEach(el => el.classList.add('max-h-[300px]', 'overflow-y-auto'));
                 showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); 
             });
         });
