@@ -3916,61 +3916,15 @@ function switchTab(activeTabId) {
         };
 
         document.getElementById('btn-export-dash-pdf')?.addEventListener('click', () => {
-            if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
-            showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
-            
-            const element = document.getElementById('view-dashboard');
-            // บังคับให้ element ชิดซ้ายและไม่ขยายล้นจอ
-            element.style.marginLeft = "0";
-            element.style.marginRight = "auto";
-            
-            const controls = element.querySelector('.mb-6.bg-white'); 
-            if (controls) controls.style.display = 'none';
-
-            // บีบความกว้างให้พอดี A3 แนวตั้ง (ประมาณ 1050px คือจุดที่กำลังสวย)
-            const originalWidth = element.style.width;
-            element.style.width = '1050px';
-
-            html2pdf().set({ 
-                margin: [5, 5, 5, 5], // บน ซ้าย ล่าง ขวา
-                filename: `Dashboard_${getThaiDateString()}.pdf`, 
-                image: { type: 'jpeg', quality: 0.98 }, 
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 1050 }, 
-                jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' } 
-            }).from(element).save().then(() => { 
-                if (controls) controls.style.display = ''; 
-                element.style.width = originalWidth;
-                showNotification("Export PDF สำเร็จ"); 
-            });
+            if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
+            const element = document.getElementById('view-dashboard'), controls = element.querySelector('.mb-6.bg-white'); if (controls) controls.style.display = 'none';
+            html2pdf().set({ margin: 0.4, filename: `Dashboard_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => { if (controls) controls.style.display = ''; showNotification("Export PDF สำเร็จ"); });
         });
 
         document.getElementById('btn-export-dash-jpg')?.addEventListener('click', () => {
-            if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
-            showNotification("กำลังเตรียมไฟล์ภาพ JPG แดชบอร์ด...", "success");
-            const element = document.getElementById('view-dashboard');
-            const controls = element.querySelector('.mb-6.bg-white'); 
-            if (controls) controls.style.display = 'none';
-            
-            // บังคับชิดซ้ายและบีบความกว้าง
-            element.style.marginLeft = "0";
-            element.style.marginRight = "auto";
-            const originalWidth = element.style.width;
-            element.style.width = '1050px';
-
-            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1050, backgroundColor: '#f5f5f5' }).then(canvas => { 
-                if (controls) controls.style.display = ''; 
-                element.style.width = originalWidth;
-                
-                const link = document.createElement('a'); 
-                link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                link.href = canvas.toDataURL('image/jpeg', 0.95); 
-                link.click(); 
-                showNotification("Export JPG สำเร็จ"); 
-            }).catch(err => { 
-                if (controls) controls.style.display = ''; 
-                element.style.width = originalWidth;
-                showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); 
-            });
+            if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ภาพ JPG แดชบอร์ด...", "success");
+            const element = document.getElementById('view-dashboard'), controls = element.querySelector('.mb-6.bg-white'); if (controls) controls.style.display = 'none';
+            html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#f5f5f5' }).then(canvas => { if (controls) controls.style.display = ''; const link = document.createElement('a'); link.download = `Dashboard_${getThaiDateString()}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); showNotification("Export JPG สำเร็จ"); }).catch(err => { if (controls) controls.style.display = ''; showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); });
         });
 
         document.getElementById('btn-export-excel')?.addEventListener('click', () => {
