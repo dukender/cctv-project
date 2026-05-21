@@ -43,30 +43,17 @@
             .text-3xl { font-size: 26px !important; line-height: 32px !important; } 
         }
         @media print {
-    /* ซ่อนส่วนประกอบ UI ที่ไม่ต้องการให้ติดไปกับกระดาษ */
-    header, aside, #btn-scroll-top, .action-cell, .role-restricted-action, #btn-export-dash-pdf, #btn-export-dash-jpg, #btn-summary-export-excel, #btn-summary-export-pdf, #btn-tasktype-export-excel, #btn-tasktype-export-pdf, #btn-system-export-excel, #btn-system-export-pdf, #btn-brandsum-export-excel, #btn-brandsum-export-pdf, #btn-resp-export-excel, #btn-resp-export-pdf, #btn-cust-export-excel, #btn-cust-export-pdf, #btn-log-export-excel, #btn-log-export-pdf {
-        display: none !important;
-    }
-
-    /* ปรับ Layout ให้เต็มหน้ากระดาษ */
-    body, html, main {
-        background: white !important;
-        overflow: visible !important;
-        height: auto !important;
-        width: 100% !important;
-    }
-    
-    #main-app {
-        display: block !important;
-        height: auto !important;
-    }
-
-    /* ปรับขนาดตารางหรือตารางข้อมูลให้พอดีหน้า */
-    table { width: 100% !important; font-size: 10pt !important; }
-    
-    /* ปรับให้ Dashboard ขยายเต็ม */
-    #view-dashboard { display: block !important; }
-}
+            header, aside, #btn-scroll-top, [id^="btn-export-"], [id^="btn-summary-export-"], [id^="btn-tasktype-export-"], [id^="btn-system-export-"], [id^="btn-brandsum-export-"], [id^="btn-resp-export-"], [id^="btn-cust-export-"], [id^="btn-log-export-"] {
+                display: none !important;
+            }
+            body, html, main { background: white !important; overflow: visible !important; height: auto !important; width: 100% !important; }
+            #main-app { display: block !important; height: auto !important; }
+            /* พิมพ์เฉพาะส่วนที่เปิดอยู่ */
+            #main-app > div:not(header) { display: none !important; }
+            main > div { display: none !important; }
+            main > div:not(.hidden) { display: block !important; width: 100% !important; }
+            table { width: 100% !important; border-collapse: collapse !important; font-size: 10pt !important; }
+        }
     </style>
 </head>
 <body class="text-gray-800 antialiased h-screen flex flex-col overflow-hidden">
