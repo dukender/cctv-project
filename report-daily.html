@@ -3915,61 +3915,48 @@ function switchTab(activeTabId) {
             return a3Canvas;
         };
 
+        // ฟังก์ชันช่วยจัดการขอบเขตการมองเห็นก่อน Export
+        const prepareElementForExport = (element) => {
+            const originalStyles = {
+                cssText: element.style.cssText,
+                width: element.style.width,
+                overflows: []
+            };
+            // บังคับ Dashboard ให้ชิดซ้าย, ขนาดคงที่, และไม่สนขอบเขตเดิม
+            element.style.cssText = "position: absolute !important; top: 0 !important; left: 0 !important; width: 1100px !important; margin: 0 !important; z-index: 9999;";
+            
+            // ปลดล็อก overflow ของทุก parent container ที่ครอบ dashboard อยู่
+            let p = element.parentElement;
+            while (p && p !== document.body) {
+                originalStyles.overflows.push({ el: p, style: p.style.overflow });
+                p.style.setProperty('overflow', 'visible', 'important');
+                p = p.parentElement;
+            }
+            return originalStyles;
+        };
+
+        const restoreElementAfterExport = (element, originalStyles) => {
+            element.style.cssText = originalStyles.cssText;
+            element.style.width = originalWidth;
+            originalStyles.overflows.forEach(o => o.el.style.overflow = o.style);
+        };
+
         document.getElementById('btn-export-dash-pdf')?.addEventListener('click', () => {
             if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
             showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
             const element = document.getElementById('view-dashboard');
-            const controls = element.querySelector('.mb-6.bg-white'); 
-            if (controls) controls.style.display = 'none';
-
-            // บังคับความกว้างเพื่อให้สัดส่วนล็อคที่ 1100px (ป้องกันการไหลตกขอบ)
             const originalWidth = element.style.width;
-            element.style.width = '1100px';
-
-            // ปลดล็อกการตัดขอบข้อความ ให้ข้อความยาวๆ ขึ้นบรรทัดใหม่แทนการทะลุขอบขวา
-            const legends = element.querySelectorAll('[id^="legend-"]');
-            legends.forEach(el => {
-                el.classList.remove('max-h-[300px]', 'overflow-y-auto');
-                el.querySelectorAll('.truncate').forEach(span => {
-                    span.dataset.wasTruncate = "true";
-                    span.classList.remove('truncate');
-                    span.classList.add('whitespace-normal', 'break-words');
-                });
-            });
-
-            // ปลดล็อก Parent Overflow ทั้งหมด เพื่อไม่ให้แคปเจอร์แล้วโดนตัดซ้าย-ขวาทิ้ง
-            let p = element.parentElement;
-            while (p && p !== document) {
-                p.dataset.origOverflow = p.style.overflow || '';
-                p.style.setProperty('overflow', 'visible', 'important');
-                p = p.parentElement;
-            }
+            const originalStyles = prepareElementForExport(element);
 
             html2pdf().set({ 
                 margin: 5, 
                 filename: `Dashboard_${getThaiDateString()}.pdf`, 
                 image: { type: 'jpeg', quality: 1 }, 
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 1100, width: 1100, scrollX: 0 }, 
-                jsPDF: { unit: 'mm', format: 'a3', orientation: 'landscape' } 
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 1100, scrollX: 0, scrollY: 0 }, 
+                jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' } 
             }).from(element).save().then(() => { 
-                if (controls) controls.style.display = ''; 
+                restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
-                
-                legends.forEach(el => {
-                    el.classList.add('max-h-[300px]', 'overflow-y-auto');
-                    el.querySelectorAll('[data-was-truncate="true"]').forEach(span => {
-                        span.classList.add('truncate');
-                        span.classList.remove('whitespace-normal', 'break-words');
-                        delete span.dataset.wasTruncate;
-                    });
-                });
-                
-                // คืนค่า Overflow กลับเป็นเหมือนเดิม
-                let pRestore = element.parentElement;
-                while (pRestore && pRestore !== document) {
-                    pRestore.style.overflow = pRestore.dataset.origOverflow || '';
-                    pRestore = pRestore.parentElement;
-                }
                 showNotification("Export PDF สำเร็จ"); 
             });
         });
@@ -3978,74 +3965,21 @@ function switchTab(activeTabId) {
             if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
             showNotification("กำลังเตรียมไฟล์ภาพ JPG แดชบอร์ด...", "success");
             const element = document.getElementById('view-dashboard');
-            const controls = element.querySelector('.mb-6.bg-white'); 
-            if (controls) controls.style.display = 'none';
-            
             const originalWidth = element.style.width;
-            element.style.width = '1100px';
+            const originalStyles = prepareElementForExport(element);
 
-            const legends = element.querySelectorAll('[id^="legend-"]');
-            legends.forEach(el => {
-                el.classList.remove('max-h-[300px]', 'overflow-y-auto');
-                el.querySelectorAll('.truncate').forEach(span => {
-                    span.dataset.wasTruncate = "true";
-                    span.classList.remove('truncate');
-                    span.classList.add('whitespace-normal', 'break-words');
-                });
-            });
-
-            // ปลดล็อก Parent Overflow ทั้งหมด
-            let p = element.parentElement;
-            while (p && p !== document) {
-                p.dataset.origOverflow = p.style.overflow || '';
-                p.style.setProperty('overflow', 'visible', 'important');
-                p = p.parentElement;
-            }
-
-            html2canvas(element, { 
-    scale: 2, 
-    useCORS: true, 
-    windowWidth: 1200, // บังคับความกว้างหน้าจอเรนเดอร์
-    windowHeight: element.scrollHeight, // บังคับความสูงตามเนื้อหาจริง
-    scrollX: 0, 
-    scrollY: 0, 
-    backgroundColor: '#f5f5f5' 
-}).then(canvas => { 
-                if (controls) controls.style.display = ''; 
+            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1100, scrollX: 0, scrollY: 0, backgroundColor: '#f5f5f5' }).then(canvas => { 
+                restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
                 
-                legends.forEach(el => {
-                    el.classList.add('max-h-[300px]', 'overflow-y-auto');
-                    el.querySelectorAll('[data-was-truncate="true"]').forEach(span => {
-                        span.classList.add('truncate');
-                        span.classList.remove('whitespace-normal', 'break-words');
-                        delete span.dataset.wasTruncate;
-                    });
-                });
-                
-                // คืนค่า Overflow กลับเป็นเหมือนเดิม
-                let pRestore = element.parentElement;
-                while (pRestore && pRestore !== document) {
-                    pRestore.style.overflow = pRestore.dataset.origOverflow || '';
-                    pRestore = pRestore.parentElement;
-                }
-
                 const link = document.createElement('a'); 
                 link.download = `Dashboard_${getThaiDateString()}.jpg`; 
                 link.href = canvas.toDataURL('image/jpeg', 1.0); 
                 link.click(); 
                 showNotification("Export JPG สำเร็จ"); 
             }).catch(err => { 
-                if (controls) controls.style.display = ''; 
+                restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
-                legends.forEach(el => el.classList.add('max-h-[300px]', 'overflow-y-auto'));
-                
-                let pRestore = element.parentElement;
-                while (pRestore && pRestore !== document) {
-                    pRestore.style.overflow = pRestore.dataset.origOverflow || '';
-                    pRestore = pRestore.parentElement;
-                }
-
                 showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); 
             });
         });
