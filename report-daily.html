@@ -3900,6 +3900,21 @@ function switchTab(activeTabId) {
         document.getElementById('btn-view-month')?.addEventListener('click', () => { dashTimeView = 'month'; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
         document.getElementById('btn-view-week')?.addEventListener('click', () => { dashTimeView = 'week'; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
 
+        // ฟังก์ชันสร้าง Canvas สัดส่วน A3 แนวตั้ง (297x420mm) เพื่อบีบทุกอย่างลง 1 หน้าเต็มขอบ
+        const createA3Canvas = (originalCanvas) => {
+            const targetWidth = 2384; 
+            const targetHeight = 3370; // สัดส่วน 1 : 1.414 (A3 Portrait)
+            const a3Canvas = document.createElement('canvas');
+            a3Canvas.width = targetWidth;
+            a3Canvas.height = targetHeight;
+            const ctx = a3Canvas.getContext('2d');
+            ctx.fillStyle = '#f5f5f5'; // เติมพื้นหลัง
+            ctx.fillRect(0, 0, targetWidth, targetHeight);
+            // บีบรูปภาพเดิมให้พอดีกรอบ A3 100% (ไม่สนสัดส่วนเดิม)
+            ctx.drawImage(originalCanvas, 0, 0, originalCanvas.width, originalCanvas.height, 0, 0, targetWidth, targetHeight);
+            return a3Canvas;
+        };
+
         document.getElementById('btn-export-dash-pdf')?.addEventListener('click', () => {
             if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
             showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
@@ -3907,7 +3922,6 @@ function switchTab(activeTabId) {
             const controls = element.querySelector('.mb-6.bg-white'); 
             if (controls) controls.style.display = 'none';
 
-            // บังคับความกว้างหน้าจอให้พอดีกับ A3 แนวตั้ง และปลดล็อกความสูงโดนัทกราฟ
             const originalWidth = element.style.width;
             element.style.width = '1120px';
             const legends = element.querySelectorAll('[id^="legend-"]');
@@ -3921,13 +3935,7 @@ function switchTab(activeTabId) {
                 });
             });
 
-            html2pdf().set({ 
-                margin: 0, 
-                filename: `Dashboard_${getThaiDateString()}.pdf`, 
-                image: { type: 'jpeg', quality: 1 }, 
-                html2canvas: { scale: 2, useCORS: true, windowWidth: 1120 }, 
-                jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } 
-            }).from(element).save().then(() => { 
+            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1120, backgroundColor: '#f5f5f5' }).then(canvas => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
                 legends.forEach(el => {
@@ -3939,7 +3947,17 @@ function switchTab(activeTabId) {
                         delete span.dataset.wasTruncate;
                     });
                 });
-                showNotification("Export PDF สำเร็จ"); 
+
+                // นำ Canvas ที่บีบลง A3 แล้ว ส่งไปทำ PDF
+                const a3Canvas = createA3Canvas(canvas);
+                html2pdf().set({ 
+                    margin: 0, 
+                    filename: `Dashboard_${getThaiDateString()}.pdf`, 
+                    image: { type: 'jpeg', quality: 1 }, 
+                    jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' } 
+                }).from(a3Canvas).save().then(() => { 
+                    showNotification("Export PDF สำเร็จ"); 
+                });
             });
         });
 
@@ -3950,7 +3968,6 @@ function switchTab(activeTabId) {
             const controls = element.querySelector('.mb-6.bg-white'); 
             if (controls) controls.style.display = 'none';
             
-            // บังคับความกว้างหน้าจอให้พอดีกับ A3 แนวตั้ง และปลดล็อกความสูงโดนัทกราฟ
             const originalWidth = element.style.width;
             element.style.width = '1120px';
             const legends = element.querySelectorAll('[id^="legend-"]');
@@ -3977,9 +3994,11 @@ function switchTab(activeTabId) {
                     });
                 });
                 
+                // นำ Canvas ที่บีบลง A3 แล้ว โหลดเป็น JPG
+                const a3Canvas = createA3Canvas(canvas);
                 const link = document.createElement('a'); 
                 link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                link.href = canvas.toDataURL('image/jpeg', 0.9); 
+                link.href = a3Canvas.toDataURL('image/jpeg', 1.0); 
                 link.click(); 
                 showNotification("Export JPG สำเร็จ"); 
             }).catch(err => { 
