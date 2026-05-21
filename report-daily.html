@@ -2223,7 +2223,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-tasktype-export-pdf')?.addEventListener('click', () => {
             if (currentTasktypeFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('tasktype-summary-table');
-            html2pdf().set({ margin: 0.4, filename: `TaskType_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+            html2pdf().set({ margin: 0, filename: `TaskType_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
         
         // --- Logic สำหรับหน้า สรุประบบงาน (System Summary) ---
@@ -2312,7 +2312,7 @@ function switchTab(activeTabId) {
         document.getElementById('system-search-input')?.addEventListener('input', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); }); document.getElementById('system-search-date')?.addEventListener('change', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); }); document.getElementById('system-search-month')?.addEventListener('change', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); }); document.getElementById('system-search-year')?.addEventListener('change', () => { systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); });
         document.getElementById('btn-system-reset-search')?.addEventListener('click', () => { const searchInput = document.getElementById('system-search-input'), timeType = document.getElementById('system-search-time-type'); if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } currentSystemFilter = 'all'; systemCurrentPage = 1; systemCardCurrentPage = 1; renderSystemSummary(); });
         document.getElementById('btn-system-export-excel')?.addEventListener('click', () => { if (currentSystemFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); const exportData = currentSystemFilteredData.map((r, idx) => ({ 'ลำดับ': idx + 1, 'วันที่รับงานล่าสุด': r.latestDate ? formatDate(r.latestDate) : '-', 'ชื่อโครงการ': r.projectName, 'ระบบงาน': r.displayType, 'จำนวนงาน (งาน)': r.taskCount })); const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "System Summary"); XLSX.writeFile(workbook, `System_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ"); });
-        document.getElementById('btn-system-export-pdf')?.addEventListener('click', () => { if (currentSystemFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('system-summary-table'); html2pdf().set({ margin: 0.4, filename: `System_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ")); });
+        document.getElementById('btn-system-export-pdf')?.addEventListener('click', () => { if (currentSystemFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('system-summary-table'); html2pdf().set({ margin: 0, filename: `System_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ")); });
 
         // --- Logic สำหรับหน้า สรุปยี่ห้ออุปกรณ์ (Brand Summary) ---
         let currentBrandsumFilteredData = [], currentBrandsumFilter = 'all', brandsumCurrentPage = 1, brandsumCardCurrentPage = 1; 
@@ -2400,7 +2400,7 @@ function switchTab(activeTabId) {
         document.getElementById('brandsum-search-input')?.addEventListener('input', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); }); document.getElementById('brandsum-search-date')?.addEventListener('change', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); }); document.getElementById('brandsum-search-month')?.addEventListener('change', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); }); document.getElementById('brandsum-search-year')?.addEventListener('change', () => { brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); });
         document.getElementById('btn-brandsum-reset-search')?.addEventListener('click', () => { const searchInput = document.getElementById('brandsum-search-input'), timeType = document.getElementById('brandsum-search-time-type'); if (searchInput) searchInput.value = ''; if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); } currentBrandsumFilter = 'all'; brandsumCurrentPage = 1; brandsumCardCurrentPage = 1; renderBrandsumSummary(); });
         document.getElementById('btn-brandsum-export-excel')?.addEventListener('click', () => { if (currentBrandsumFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); const exportData = currentBrandsumFilteredData.map((r, idx) => ({ 'ลำดับ': idx + 1, 'วันที่รับงานล่าสุด': r.latestDate ? formatDate(r.latestDate) : '-', 'ชื่อโครงการ': r.projectName, 'ยี่ห้ออุปกรณ์': r.displayType, 'จำนวนงาน (งาน)': r.taskCount })); const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(workbook, worksheet, "Brand Summary"); XLSX.writeFile(workbook, `Brand_Summary_${getThaiDateString()}.xlsx`); showNotification("Export Excel สำเร็จ"); });
-        document.getElementById('btn-brandsum-export-pdf')?.addEventListener('click', () => { if (currentBrandsumFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('brandsum-summary-table'); html2pdf().set({ margin: 0.4, filename: `Brand_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ")); });
+        document.getElementById('btn-brandsum-export-pdf')?.addEventListener('click', () => { if (currentBrandsumFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('brandsum-summary-table'); html2pdf().set({ margin: 0, filename: `Brand_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ")); });
         
         // --- Logic สำหรับหน้า สรุปผู้รับผิดชอบ (Responsible Summary) ---
         let currentRespFilteredData = [];
@@ -2656,7 +2656,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-resp-export-pdf')?.addEventListener('click', () => {
             if (currentRespFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('responsible-summary-table');
-            html2pdf().set({ margin: 0.4, filename: `Responsible_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+            html2pdf().set({ margin: 0, filename: `Responsible_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
 
         // --- Logic สำหรับหน้า สรุปลูกค้า (Customer Summary) ---
@@ -2913,7 +2913,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-cust-export-pdf')?.addEventListener('click', () => {
             if (currentCustFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('customer-summary-table');
-            html2pdf().set({ margin: 0.4, filename: `Customer_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+            html2pdf().set({ margin: 0, filename: `Customer_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
 
         // --- Note Rendering ---
@@ -3918,7 +3918,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-export-dash-pdf')?.addEventListener('click', () => {
             if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
             const element = document.getElementById('view-dashboard'), controls = element.querySelector('.mb-6.bg-white'); if (controls) controls.style.display = 'none';
-            html2pdf().set({ margin: 0.4.4, filename: `Dashboard_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => { if (controls) controls.style.display = ''; showNotification("Export PDF สำเร็จ"); });
+            html2pdf().set({ margin: 0.4, filename: `Dashboard_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => { if (controls) controls.style.display = ''; showNotification("Export PDF สำเร็จ"); });
         });
 
         document.getElementById('btn-export-dash-jpg')?.addEventListener('click', () => {
@@ -3941,7 +3941,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-export-pdf')?.addEventListener('click', () => {
             if (filteredTasks.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF...", "success");
             const element = document.getElementById('tasks-table'), actionCells = element.querySelectorAll('.action-cell'); actionCells.forEach(cell => cell.style.display = 'none');
-            html2pdf().set({ margin: 0.4, filename: `Daily_Tasks_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => { actionCells.forEach(cell => cell.style.display = ''); showNotification("Export PDF สำเร็จ"); });
+            html2pdf().set({ margin: 0, filename: `Daily_Tasks_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => { actionCells.forEach(cell => cell.style.display = ''); showNotification("Export PDF สำเร็จ"); });
         });
 
         function loadUsersList() {
@@ -4478,7 +4478,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-hol-export-pdf')?.addEventListener('click', () => {
             if (currentHolFilteredData.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             showNotification("กำลังเตรียมไฟล์ PDF...", "success"); const element = document.getElementById('hol-summary-table');
-            html2pdf().set({ margin: 0.4, filename: `Holiday_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
+            html2pdf().set({ margin: 0, filename: `Holiday_Summary_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(element).save().then(() => showNotification("Export PDF สำเร็จ"));
         });
 
         // --- ระบบปุ่มเลื่อนขึ้นบนสุด (Scroll to Top) ---
@@ -4882,7 +4882,7 @@ function switchTab(activeTabId) {
         });
         document.getElementById('btn-log-export-pdf')?.addEventListener('click', () => {
             showNotification('กำลังเตรียมไฟล์ PDF...', 'success');
-            html2pdf().set({ margin: 0.4, filename: `ActivityLog_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(document.getElementById('logs-summary-table')).save().then(() => showNotification('Export PDF สำเร็จ'));
+            html2pdf().set({ margin: 0, filename: `ActivityLog_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, windowWidth: 1120 }, jsPDF: { unit: 'in', format: 'a3', orientation: 'portrait' } }).from(document.getElementById('logs-summary-table')).save().then(() => showNotification('Export PDF สำเร็จ'));
         });
         // ----------------------------------------------------
         lucide.createIcons();
