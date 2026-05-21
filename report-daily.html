@@ -3922,8 +3922,11 @@ function switchTab(activeTabId) {
             const controls = element.querySelector('.mb-6.bg-white'); 
             if (controls) controls.style.display = 'none';
 
+            // บังคับความกว้าง 1200px (ระบบจะจำลองจอกว้าง แล้วบีบลง A3 แนวตั้งให้รักษาสัดส่วนเดิม)
             const originalWidth = element.style.width;
-            element.style.width = '1120px';
+            element.style.width = '1200px';
+
+            // ปลดล็อกความสูงของกราฟโดนัท และข้อความไม่ให้ถูกตัด (Truncate)
             const legends = element.querySelectorAll('[id^="legend-"]');
             legends.forEach(el => {
                 el.classList.remove('max-h-[300px]', 'overflow-y-auto');
@@ -3935,7 +3938,14 @@ function switchTab(activeTabId) {
                 });
             });
 
-            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1120, backgroundColor: '#f5f5f5' }).then(canvas => { 
+            // ตั้งค่าเป็น A3 แนวตั้ง (portrait) margin เล็กน้อย
+            html2pdf().set({ 
+                margin: 5, 
+                filename: `Dashboard_${getThaiDateString()}.pdf`, 
+                image: { type: 'jpeg', quality: 1 }, 
+                html2canvas: { scale: 2, useCORS: true, windowWidth: 1200 }, 
+                jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' } 
+            }).from(element).save().then(() => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
                 legends.forEach(el => {
@@ -3947,17 +3957,7 @@ function switchTab(activeTabId) {
                         delete span.dataset.wasTruncate;
                     });
                 });
-
-                // นำ Canvas ที่บีบลง A3 แล้ว ส่งไปทำ PDF
-                const a3Canvas = createA3Canvas(canvas);
-                html2pdf().set({ 
-                    margin: 0, 
-                    filename: `Dashboard_${getThaiDateString()}.pdf`, 
-                    image: { type: 'jpeg', quality: 1 }, 
-                    jsPDF: { unit: 'mm', format: 'a3', orientation: 'portrait' } 
-                }).from(a3Canvas).save().then(() => { 
-                    showNotification("Export PDF สำเร็จ"); 
-                });
+                showNotification("Export PDF สำเร็จ"); 
             });
         });
 
@@ -3969,7 +3969,8 @@ function switchTab(activeTabId) {
             if (controls) controls.style.display = 'none';
             
             const originalWidth = element.style.width;
-            element.style.width = '1120px';
+            element.style.width = '1200px';
+
             const legends = element.querySelectorAll('[id^="legend-"]');
             legends.forEach(el => {
                 el.classList.remove('max-h-[300px]', 'overflow-y-auto');
@@ -3981,7 +3982,7 @@ function switchTab(activeTabId) {
                 });
             });
 
-            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1120, backgroundColor: '#f5f5f5' }).then(canvas => { 
+            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1200, backgroundColor: '#f5f5f5' }).then(canvas => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
                 legends.forEach(el => {
@@ -3994,11 +3995,9 @@ function switchTab(activeTabId) {
                     });
                 });
                 
-                // นำ Canvas ที่บีบลง A3 แล้ว โหลดเป็น JPG
-                const a3Canvas = createA3Canvas(canvas);
                 const link = document.createElement('a'); 
                 link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                link.href = a3Canvas.toDataURL('image/jpeg', 1.0); 
+                link.href = canvas.toDataURL('image/jpeg', 1.0); 
                 link.click(); 
                 showNotification("Export JPG สำเร็จ"); 
             }).catch(err => { 
