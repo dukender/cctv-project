@@ -4002,7 +4002,15 @@ function switchTab(activeTabId) {
                 p = p.parentElement;
             }
 
-            html2canvas(element, { scale: 2, useCORS: true, windowWidth: 1100, width: 1100, scrollX: 0, backgroundColor: '#f5f5f5' }).then(canvas => { 
+            html2canvas(element, { 
+    scale: 2, 
+    useCORS: true, 
+    windowWidth: 1200, // บังคับความกว้างหน้าจอเรนเดอร์
+    windowHeight: element.scrollHeight, // บังคับความสูงตามเนื้อหาจริง
+    scrollX: 0, 
+    scrollY: 0, 
+    backgroundColor: '#f5f5f5' 
+}).then(canvas => { 
                 if (controls) controls.style.display = ''; 
                 element.style.width = originalWidth;
                 
