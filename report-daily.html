@@ -3918,7 +3918,7 @@ function switchTab(activeTabId) {
         document.getElementById('btn-export-dash-pdf')?.addEventListener('click', () => {
             if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ PDF แดชบอร์ด...", "success");
             const element = document.getElementById('view-dashboard'), controls = element.querySelector('.mb-6.bg-white'); if (controls) controls.style.display = 'none';
-            html2pdf().set({ margin: 0.4, filename: `Dashboard_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => { if (controls) controls.style.display = ''; showNotification("Export PDF สำเร็จ"); });
+            html2pdf().set({ margin: 0, filename: `Dashboard_${getThaiDateString()}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' } }).from(element).save().then(() => { if (controls) controls.style.display = ''; showNotification("Export PDF สำเร็จ"); });
         });
 
         document.getElementById('btn-export-dash-jpg')?.addEventListener('click', () => {
