@@ -3943,7 +3943,6 @@ function switchTab(activeTabId) {
             const originalWidth = element.style.width;
             const originalStyles = prepareElementForExport(element);
 
-            // เพิ่มเวลาให้เบราว์เซอร์จัดเรียงกราฟ Chart.js ใหม่หลังจากปลดล็อก CSS
             await new Promise(resolve => setTimeout(resolve, 500));
 
             html2canvas(element, { 
@@ -3959,28 +3958,22 @@ function switchTab(activeTabId) {
                 restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
                 
-                // แปลง canvas เป็น Blob แทน Data URL เพื่อแก้ปัญหา Chrome ไม่ยอมเซฟไฟล์ขนาดใหญ่
                 canvas.toBlob(function(blob) {
-                    if (!blob) {
-                        showNotification("เกิดข้อผิดพลาดในการแปลงไฟล์ภาพ", "error");
-                        return;
-                    }
                     const url = window.URL.createObjectURL(blob);
                     const link = document.createElement('a'); 
                     link.style.display = 'none';
                     link.href = url;
                     link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                    document.body.appendChild(link); // ต้องแนบลง DOM ก่อนถึงจะกดคลิกติด
+                    document.body.appendChild(link); // ต้องแนบลง DOM
                     link.click(); 
                     document.body.removeChild(link); 
-                    window.URL.revokeObjectURL(url); // คืนหน่วยความจำ
+                    window.URL.revokeObjectURL(url);
                     showNotification("Export JPG สำเร็จ"); 
                 }, 'image/jpeg', 1.0);
             }).catch(err => { 
                 restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
                 showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); 
-                console.error("html2canvas error:", err);
             });
         });
 
