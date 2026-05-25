@@ -3936,45 +3936,10 @@ function switchTab(activeTabId) {
             element.style.width = originalWidth;
             originalStyles.overflows.forEach(o => o.el.style.overflow = o.style);
         };
-        document.getElementById('btn-export-dash-jpg')?.addEventListener('click', async () => {
-            if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); 
-            showNotification("กำลังเตรียมไฟล์ภาพ JPG แดชบอร์ด...", "success");
-            const element = document.getElementById('view-dashboard');
-            const originalWidth = element.style.width;
-            const originalStyles = prepareElementForExport(element);
-
-            await new Promise(resolve => setTimeout(resolve, 500));
-
-            html2canvas(element, { 
-                scale: 2, 
-                useCORS: true, 
-                windowWidth: element.scrollWidth, 
-                windowHeight: element.scrollHeight,
-                scrollX: 0, 
-                scrollY: 0, 
-                backgroundColor: '#f8fafc',
-                logging: false
-            }).then(canvas => { 
-                restoreElementAfterExport(element, originalStyles);
-                element.style.width = originalWidth;
-                
-                canvas.toBlob(function(blob) {
-                    const url = window.URL.createObjectURL(blob);
-                    const link = document.createElement('a'); 
-                    link.style.display = 'none';
-                    link.href = url;
-                    link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                    document.body.appendChild(link); // ต้องแนบลง DOM
-                    link.click(); 
-                    document.body.removeChild(link); 
-                    window.URL.revokeObjectURL(url);
-                    showNotification("Export JPG สำเร็จ"); 
-                }, 'image/jpeg', 1.0);
-            }).catch(err => { 
-                restoreElementAfterExport(element, originalStyles);
-                element.style.width = originalWidth;
-                showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); 
-            });
+        document.getElementById('btn-export-dash-jpg')?.addEventListener('click', () => {
+            if (getTasksByFilter().length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error"); showNotification("กำลังเตรียมไฟล์ภาพ JPG แดชบอร์ด...", "success");
+            const element = document.getElementById('view-dashboard'), controls = element.querySelector('.mb-6.bg-white'); if (controls) controls.style.display = 'none';
+            html2canvas(element, { scale: 2, useCORS: true, backgroundColor: '#f5f5f5' }).then(canvas => { if (controls) controls.style.display = ''; const link = document.createElement('a'); link.download = `Dashboard_${getThaiDateString()}.jpg`; link.href = canvas.toDataURL('image/jpeg', 0.9); link.click(); showNotification("Export JPG สำเร็จ"); }).catch(err => { if (controls) controls.style.display = ''; showNotification("เกิดข้อผิดพลาดในการสร้างภาพ", "error"); });
         });
 
         document.getElementById('btn-export-excel')?.addEventListener('click', () => {
