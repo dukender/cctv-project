@@ -46,13 +46,16 @@
             header, aside, #btn-scroll-top, [id^="btn-export-"], [id^="btn-summary-export-"], [id^="btn-tasktype-export-"], [id^="btn-system-export-"], [id^="btn-brandsum-export-"], [id^="btn-resp-export-"], [id^="btn-cust-export-"], [id^="btn-log-export-"] {
                 display: none !important;
             }
-            body, html, main { background: white !important; overflow: visible !important; height: auto !important; width: 100% !important; }
-            #main-app { display: block !important; height: auto !important; }
-            /* พิมพ์เฉพาะส่วนที่เปิดอยู่ */
-            #main-app > div:not(header) { display: none !important; }
-            main > div { display: none !important; }
-            main > div:not(.hidden) { display: block !important; width: 100% !important; }
+            body, html, main, #main-app { background: white !important; overflow: visible !important; height: auto !important; width: 100% !important; display: block !important; }
+            
+            /* ซ่อนทุกหน้าจอ และบังคับแสดงเฉพาะโครงสร้างที่ Active */
+            .flex-1 { display: block !important; height: auto !important; overflow: visible !important; }
+            main > div { display: block !important; }
+            [id^="view-"] { display: none !important; }
+            [id^="view-"]:not(.hidden) { display: block !important; width: 100% !important; }
+            
             table { width: 100% !important; border-collapse: collapse !important; font-size: 10pt !important; }
+            canvas { max-width: 100% !important; height: auto !important; }
         }
     </style>
 </head>
@@ -78,7 +81,7 @@
         </div>
     </div>
 
-    <div id="main-app" class="hidden h-full flex flex-col overflow-hidden">
+    <div id="main-app" class="hidden flex-1 w-full h-full flex flex-col overflow-hidden min-h-0">
         <header class="bg-white border-b border-gray-200 shadow-sm z-10 shrink-0">
             <div class="w-full px-4 sm:px-6 h-16 flex items-center justify-between">
                 <div class="flex items-center gap-2 sm:gap-3">
@@ -112,7 +115,7 @@
             </div>
         </header>
 
-        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full relative">
+        <div class="flex flex-col lg:flex-row flex-1 overflow-hidden w-full relative min-h-0">
             <div id="sidebar-backdrop" class="absolute inset-0 bg-black/20 z-20 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
 
             <aside id="sidebar-menu" class="absolute lg:relative left-0 top-0 h-full w-64 shrink-0 lg:border-r border-gray-200 bg-white lg:bg-transparent z-30 lg:z-10 flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-300 shadow-xl lg:shadow-none">
@@ -157,7 +160,7 @@
                 </div>
             </aside>
 
-            <main class="flex-1 overflow-y-auto w-full bg-transparent pb-24 lg:pb-0"> <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
+            <main class="flex-1 overflow-y-auto w-full bg-transparent pb-24 lg:pb-0 min-h-0"> <div class="w-full px-2 sm:px-6 py-4 sm:py-6">
                     <div class="fixed bottom-6 right-6 z-[100] flex items-center gap-3">
                         <button id="btn-scroll-top" class="w-[50px] h-[50px] bg-white border border-gray-200 text-gray-500 hover:text-[#5b5fc7] hover:border-[#5b5fc7] rounded-full transition-all duration-300 flex items-center justify-center shadow-lg hover:shadow-xl opacity-0 pointer-events-none translate-y-4">
                             <i data-lucide="arrow-up" class="w-6 h-6"></i>
@@ -3944,9 +3947,9 @@ function switchTab(activeTabId) {
             await new Promise(resolve => setTimeout(resolve, 500));
 
             html2canvas(element, { 
-                scale: 2, // กำหนดสเกลความละเอียด 
+                scale: 2, 
                 useCORS: true, 
-                windowWidth: element.scrollWidth, // ใช้ความกว้างจริงของเนื้อหา
+                windowWidth: element.scrollWidth, 
                 windowHeight: element.scrollHeight,
                 scrollX: 0, 
                 scrollY: 0, 
@@ -3956,11 +3959,23 @@ function switchTab(activeTabId) {
                 restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
                 
-                const link = document.createElement('a'); 
-                link.download = `Dashboard_${getThaiDateString()}.jpg`; 
-                link.href = canvas.toDataURL('image/jpeg', 1.0); 
-                link.click(); 
-                showNotification("Export JPG สำเร็จ"); 
+                // แปลง canvas เป็น Blob แทน Data URL เพื่อแก้ปัญหา Chrome ไม่ยอมเซฟไฟล์ขนาดใหญ่
+                canvas.toBlob(function(blob) {
+                    if (!blob) {
+                        showNotification("เกิดข้อผิดพลาดในการแปลงไฟล์ภาพ", "error");
+                        return;
+                    }
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a'); 
+                    link.style.display = 'none';
+                    link.href = url;
+                    link.download = `Dashboard_${getThaiDateString()}.jpg`; 
+                    document.body.appendChild(link); // ต้องแนบลง DOM ก่อนถึงจะกดคลิกติด
+                    link.click(); 
+                    document.body.removeChild(link); 
+                    window.URL.revokeObjectURL(url); // คืนหน่วยความจำ
+                    showNotification("Export JPG สำเร็จ"); 
+                }, 'image/jpeg', 1.0);
             }).catch(err => { 
                 restoreElementAfterExport(element, originalStyles);
                 element.style.width = originalWidth;
