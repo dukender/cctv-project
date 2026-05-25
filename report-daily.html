@@ -965,7 +965,16 @@
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-4 sm:gap-x-8 sm:gap-y-6 pl-0 sm:pl-9">
                                     <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="calendar" class="w-4 h-4"></i> วันรับงาน</label><input type="date" id="receiveDate" required class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
-                                    <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบงาน</label><input type="text" id="responsibleName" required placeholder="ชื่อผู้รับผิดชอบ" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
+                                    <div>
+                                        <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="user" class="w-4 h-4"></i> ผู้รับผิดชอบงาน</label>
+                                        <div class="relative w-full" id="responsible-dropdown-wrapper">
+                                            <div class="flex flex-wrap items-center gap-1.5 w-full px-2 py-1.5 min-h-[38px] bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text" id="responsible-input-area">
+                                                <div id="responsible-chips-container" class="flex flex-wrap gap-1.5"></div>
+                                                <input type="text" id="responsibleInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="พิมพ์ค้นหา/เพิ่ม..." autocomplete="off">
+                                            </div>
+                                            <div id="responsible-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="responsible-options-ul"></ul></div>
+                                        </div>
+                                    </div>
                                     <div>
                                         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="arrow-right-left" class="w-4 h-4"></i> การมอบหมาย</label>
                                         <div class="relative w-full" id="assignment-dropdown-wrapper">
@@ -976,12 +985,30 @@
                                             <div id="assignment-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="assignment-options-ul"></ul></div>
                                         </div>
                                     </div>
-                                    <div><label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="map-pin" class="w-4 h-4"></i> สถานที่ปฏิบัติงาน</label><input type="text" id="workLocation" placeholder="ระบุสถานที่" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-sm"></div>
+                                    <div>
+                                        <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider"><i data-lucide="map-pin" class="w-4 h-4"></i> สถานที่ปฏิบัติงาน</label>
+                                        <div class="relative w-full" id="location-dropdown-wrapper">
+                                            <div class="flex flex-wrap items-center gap-1.5 w-full px-2 py-1.5 min-h-[38px] bg-gray-50 border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] focus-within:bg-white transition-colors cursor-text" id="location-input-area">
+                                                <div id="location-chips-container" class="flex flex-wrap gap-1.5"></div>
+                                                <input type="text" id="locationInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="พิมพ์ค้นหา/เพิ่ม..." autocomplete="off">
+                                            </div>
+                                            <div id="location-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="location-options-ul"></ul></div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="pl-0 sm:pl-9 mt-4">
                                     <div class="bg-gray-50 p-4 rounded-lg border border-gray-100">
                                         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider"><i data-lucide="briefcase" class="w-4 h-4"></i> ข้อมูลลูกค้า</label>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="text" id="customerName" placeholder="ชื่อลูกค้า" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"><input type="tel" id="customerPhone" placeholder="เบอร์โทรศัพท์" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm"></div>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div class="relative w-full" id="customer-dropdown-wrapper">
+                                                <div class="flex flex-wrap items-center gap-1.5 w-full px-3 py-1 bg-white border border-gray-200 rounded-md focus-within:ring-1 focus-within:ring-[#5b5fc7] transition-colors cursor-text min-h-[38px]" id="customer-input-area">
+                                                    <div id="customer-chips-container" class="flex flex-wrap gap-1.5"></div>
+                                                    <input type="text" id="customerInput" class="flex-1 min-w-[120px] bg-transparent outline-none text-sm py-0.5" placeholder="ชื่อลูกค้า (ค้นหา/เพิ่ม)" autocomplete="off">
+                                                </div>
+                                                <div id="customer-dropdown-list" class="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg hidden"><ul class="max-h-48 overflow-y-auto py-1 text-sm" id="customer-options-ul"></ul></div>
+                                            </div>
+                                            <input type="tel" id="customerPhone" placeholder="เบอร์โทรศัพท์ (ไม่บังคับ)" class="w-full px-3 py-2 bg-white border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] text-sm h-[38px]">
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="pl-0 sm:pl-9 mt-4">
@@ -1106,7 +1133,7 @@
             return `${thaiDate.getFullYear()}-${String(thaiDate.getMonth() + 1).padStart(2, '0')}-${String(thaiDate.getDate()).padStart(2, '0')}`;
         }
 
-        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [];
+        let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [], allResponsibles = [], selectedResponsibles = [], allCustomers = [], selectedCustomers = [], allLocations = [], selectedLocations = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let allLogs = [], logCurrentPage = 1, unsubscribeLogs = null;
         
@@ -1623,6 +1650,18 @@ function switchTab(activeTabId) {
                 allAssignments = []; snapshot.forEach(doc => allAssignments.push({id: doc.id, ...doc.data()}));
                 allAssignments.sort((a,b) => a.name.localeCompare(b.name, 'th'));
             });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_responsibles'), (snapshot) => {
+                allResponsibles = []; snapshot.forEach(doc => allResponsibles.push({id: doc.id, ...doc.data()}));
+                allResponsibles.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_customers'), (snapshot) => {
+                allCustomers = []; snapshot.forEach(doc => allCustomers.push({id: doc.id, ...doc.data()}));
+                allCustomers.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+            });
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_locations'), (snapshot) => {
+                allLocations = []; snapshot.forEach(doc => allLocations.push({id: doc.id, ...doc.data()}));
+                allLocations.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+            });
         }
 
         function loadTasks() {
@@ -1840,6 +1879,119 @@ function switchTab(activeTabId) {
             } 
             catch (e) { showNotification("เกิดข้อผิดพลาดในการเพิ่มการมอบหมาย", "error"); }
         };
+// --- Responsible Logic ---
+        const responsibleInputArea = document.getElementById('responsible-input-area'), responsibleInput = document.getElementById('responsibleInput'), responsibleList = document.getElementById('responsible-dropdown-list'), responsibleUl = document.getElementById('responsible-options-ul'), responsibleChipsContainer = document.getElementById('responsible-chips-container');
+        function renderResponsibleChips() {
+            if(!responsibleChipsContainer) return; responsibleChipsContainer.innerHTML = '';
+            selectedResponsibles.forEach(tag => {
+                responsibleChipsContainer.innerHTML += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-indigo-50 text-indigo-600 border border-indigo-200 text-sm font-medium">${tag}<button type="button" onclick="removeResponsible('${tag}')" class="text-indigo-500 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></span>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        window.removeResponsible = (tag) => { selectedResponsibles = selectedResponsibles.filter(t => t !== tag); renderResponsibleChips(); };
+        function renderResponsibleDropdown(query = '') {
+            if(!responsibleUl) return; responsibleUl.innerHTML = ''; const q = query.toLowerCase().trim();
+            const allowed = window.getAllowedOptions(allResponsibles, 'responsible');
+            const available = allowed.filter(t => !selectedResponsibles.includes(t.name));
+            const filtered = available.filter(t => t.name.toLowerCase().includes(q));
+            if (q && !allowed.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') responsibleUl.innerHTML += `<li class="px-4 py-2 hover:bg-indigo-50 text-indigo-600 cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectResponsible('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            if (filtered.length === 0 && !q) responsibleUl.innerHTML += available.length === 0 ? `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว...</li>` : `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+            else filtered.forEach(t => {
+                const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_responsibles', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                responsibleUl.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" onmousedown="selectResponsible('${t.name}')">${t.name}</span>${delBtn}</li>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons(); responsibleList.classList.remove('hidden');
+        }
+        responsibleInputArea?.addEventListener('click', () => responsibleInput?.focus());
+        responsibleInput?.addEventListener('focus', () => renderResponsibleDropdown(responsibleInput.value));
+        responsibleInput?.addEventListener('input', (e) => renderResponsibleDropdown(e.target.value));
+        window.selectResponsible = (name) => {
+            if (!selectedResponsibles.includes(name)) { selectedResponsibles.push(name); selectedResponsibles.sort((a, b) => a.localeCompare(b, 'th')); renderResponsibleChips(); }
+            if(responsibleInput) responsibleInput.value = ''; renderResponsibleDropdown(''); responsibleInput?.focus(); 
+        };
+        window.addAndSelectResponsible = async (name) => {
+            if(!currentUser || currentUserRole === 'monitor' || !name) return;
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_responsibles'), { name: name, createdAt: Date.now() }); 
+                await recordLog('เพิ่ม', 'เพิ่มผู้รับผิดชอบ: ' + name); selectResponsible(name); showNotification(`เพิ่ม "${name}" แล้ว`); 
+            } catch (e) { showNotification("ผิดพลาดในการเพิ่ม", "error"); }
+        };
+
+        // --- Customer Logic ---
+        const customerInputArea = document.getElementById('customer-input-area'), customerInput = document.getElementById('customerInput'), customerList = document.getElementById('customer-dropdown-list'), customerUl = document.getElementById('customer-options-ul'), customerChipsContainer = document.getElementById('customer-chips-container');
+        function renderCustomerChips() {
+            if(!customerChipsContainer) return; customerChipsContainer.innerHTML = '';
+            selectedCustomers.forEach(tag => {
+                customerChipsContainer.innerHTML += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-amber-50 text-amber-600 border border-amber-200 text-sm font-medium">${tag}<button type="button" onclick="removeCustomer('${tag}')" class="text-amber-500 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></span>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        window.removeCustomer = (tag) => { selectedCustomers = selectedCustomers.filter(t => t !== tag); renderCustomerChips(); };
+        function renderCustomerDropdown(query = '') {
+            if(!customerUl) return; customerUl.innerHTML = ''; const q = query.toLowerCase().trim();
+            const allowed = window.getAllowedOptions(allCustomers, 'customer');
+            const available = allowed.filter(t => !selectedCustomers.includes(t.name));
+            const filtered = available.filter(t => t.name.toLowerCase().includes(q));
+            if (q && !allowed.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') customerUl.innerHTML += `<li class="px-4 py-2 hover:bg-amber-50 text-amber-600 cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectCustomer('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            if (filtered.length === 0 && !q) customerUl.innerHTML += available.length === 0 ? `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว...</li>` : `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+            else filtered.forEach(t => {
+                const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_customers', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                customerUl.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" onmousedown="selectCustomer('${t.name}')">${t.name}</span>${delBtn}</li>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons(); customerList.classList.remove('hidden');
+        }
+        customerInputArea?.addEventListener('click', () => customerInput?.focus());
+        customerInput?.addEventListener('focus', () => renderCustomerDropdown(customerInput.value));
+        customerInput?.addEventListener('input', (e) => renderCustomerDropdown(e.target.value));
+        window.selectCustomer = (name) => {
+            if (!selectedCustomers.includes(name)) { selectedCustomers.push(name); selectedCustomers.sort((a, b) => a.localeCompare(b, 'th')); renderCustomerChips(); }
+            if(customerInput) customerInput.value = ''; renderCustomerDropdown(''); customerInput?.focus(); 
+        };
+        window.addAndSelectCustomer = async (name) => {
+            if(!currentUser || currentUserRole === 'monitor' || !name) return;
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_customers'), { name: name, createdAt: Date.now() }); 
+                await recordLog('เพิ่ม', 'เพิ่มลูกค้า: ' + name); selectCustomer(name); showNotification(`เพิ่ม "${name}" แล้ว`); 
+            } catch (e) { showNotification("ผิดพลาดในการเพิ่ม", "error"); }
+        };
+
+        // --- Location Logic ---
+        const locationInputArea = document.getElementById('location-input-area'), locationInput = document.getElementById('locationInput'), locationList = document.getElementById('location-dropdown-list'), locationUl = document.getElementById('location-options-ul'), locationChipsContainer = document.getElementById('location-chips-container');
+        function renderLocationChips() {
+            if(!locationChipsContainer) return; locationChipsContainer.innerHTML = '';
+            selectedLocations.forEach(tag => {
+                locationChipsContainer.innerHTML += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 text-teal-600 border border-teal-200 text-sm font-medium">${tag}<button type="button" onclick="removeLocation('${tag}')" class="text-teal-500 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-3.5 h-3.5"></i></button></span>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+        window.removeLocation = (tag) => { selectedLocations = selectedLocations.filter(t => t !== tag); renderLocationChips(); };
+        function renderLocationDropdown(query = '') {
+            if(!locationUl) return; locationUl.innerHTML = ''; const q = query.toLowerCase().trim();
+            const allowed = window.getAllowedOptions(allLocations, 'location');
+            const available = allowed.filter(t => !selectedLocations.includes(t.name));
+            const filtered = available.filter(t => t.name.toLowerCase().includes(q));
+            if (q && !allowed.some(t => t.name.toLowerCase() === q) && currentUserRole !== 'monitor') locationUl.innerHTML += `<li class="px-4 py-2 hover:bg-teal-50 text-teal-600 cursor-pointer flex items-center gap-2 font-medium" onmousedown="addAndSelectLocation('${q}')"><i data-lucide="plus-circle" class="w-4 h-4"></i> เพิ่ม "${query}"</li>`;
+            if (filtered.length === 0 && !q) locationUl.innerHTML += available.length === 0 ? `<li class="px-4 py-2 text-gray-400 italic">เลือกหมดแล้ว...</li>` : `<li class="px-4 py-2 text-gray-400 italic">พิมพ์เพื่อค้นหาหรือเพิ่ม...</li>`;
+            else filtered.forEach(t => {
+                const delBtn = currentUserRole === 'monitor' ? '' : `<button type="button" onmousedown="event.preventDefault(); event.stopPropagation(); deleteOptionData('daily_locations', '${t.id}')" class="text-gray-300 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                locationUl.innerHTML += `<li class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center group"><span class="flex-1 truncate" onmousedown="selectLocation('${t.name}')">${t.name}</span>${delBtn}</li>`;
+            });
+            if(typeof lucide !== 'undefined') lucide.createIcons(); locationList.classList.remove('hidden');
+        }
+        locationInputArea?.addEventListener('click', () => locationInput?.focus());
+        locationInput?.addEventListener('focus', () => renderLocationDropdown(locationInput.value));
+        locationInput?.addEventListener('input', (e) => renderLocationDropdown(e.target.value));
+        window.selectLocation = (name) => {
+            if (!selectedLocations.includes(name)) { selectedLocations.push(name); selectedLocations.sort((a, b) => a.localeCompare(b, 'th')); renderLocationChips(); }
+            if(locationInput) locationInput.value = ''; renderLocationDropdown(''); locationInput?.focus(); 
+        };
+        window.addAndSelectLocation = async (name) => {
+            if(!currentUser || currentUserRole === 'monitor' || !name) return;
+            try { 
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_locations'), { name: name, createdAt: Date.now() }); 
+                await recordLog('เพิ่ม', 'เพิ่มสถานที่: ' + name); selectLocation(name); showNotification(`เพิ่ม "${name}" แล้ว`); 
+            } catch (e) { showNotification("ผิดพลาดในการเพิ่ม", "error"); }
+        };
         
         window.deleteOptionData = async (collectionName, docId) => {
             if(!currentUser || currentUserRole === 'monitor') return;
@@ -1849,12 +2001,15 @@ function switchTab(activeTabId) {
             else if (collectionName === 'daily_systems') itemToRestore = allSystemsData.find(t => t.id === docId);
             else if (collectionName === 'daily_brands') itemToRestore = allBrandsData.find(t => t.id === docId);
             else if (collectionName === 'daily_assignments') itemToRestore = allAssignments.find(t => t.id === docId);
+            else if (collectionName === 'daily_responsibles') itemToRestore = allResponsibles.find(t => t.id === docId);
+            else if (collectionName === 'daily_customers') itemToRestore = allCustomers.find(t => t.id === docId);
+            else if (collectionName === 'daily_locations') itemToRestore = allLocations.find(t => t.id === docId);
             if (!itemToRestore) return;
             const { id, ...itemData } = itemToRestore;
             
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, docId));
-                let optionTypeName = collectionName === 'daily_projects' ? 'โครงการ' : collectionName === 'daily_task_types' ? 'ประเภทงาน' : collectionName === 'daily_systems' ? 'ระบบงาน' : collectionName === 'daily_brands' ? 'ยี่ห้ออุปกรณ์' : 'การมอบหมาย';
+                let optionTypeName = collectionName === 'daily_projects' ? 'โครงการ' : collectionName === 'daily_task_types' ? 'ประเภทงาน' : collectionName === 'daily_systems' ? 'ระบบงาน' : collectionName === 'daily_brands' ? 'ยี่ห้ออุปกรณ์' : collectionName === 'daily_responsibles' ? 'ผู้รับผิดชอบ' : collectionName === 'daily_customers' ? 'ลูกค้า' : collectionName === 'daily_locations' ? 'สถานที่' : 'การมอบหมาย';
                 await recordLog('ลบ', `ลบตัวเลือก${optionTypeName}: ${itemData.name}`);
                 
                 showNotification("ลบรายการออกจากระบบแล้ว", "success", async () => {
@@ -1864,13 +2019,19 @@ function switchTab(activeTabId) {
                         showNotification("ย้อนกลับการลบสำเร็จ", "success");
                         if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); 
                         if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
-                        if (collectionName === 'daily_assignments') renderAssignmentDropdown(assignmentInput?.value || '');
+                        if (collectionName === 'daily_assignments') renderAssignmentDropdown(document.getElementById('assignmentInput')?.value || '');
+                        if (collectionName === 'daily_responsibles') renderResponsibleDropdown(document.getElementById('responsibleInput')?.value || '');
+                        if (collectionName === 'daily_customers') renderCustomerDropdown(document.getElementById('customerInput')?.value || '');
+                        if (collectionName === 'daily_locations') renderLocationDropdown(document.getElementById('locationInput')?.value || '');
                     } catch (restoreError) { showNotification("เกิดข้อผิดพลาดในการย้อนกลับ", "error"); }
                 });
                 
                 if (collectionName === 'daily_projects') renderProjectDropdown(projInput?.value || ''); 
                 if (collectionName === 'daily_task_types') renderTaskTypeDropdown(taskTypeInput?.value || '');
-                if (collectionName === 'daily_assignments') renderAssignmentDropdown(assignmentInput?.value || '');
+                if (collectionName === 'daily_assignments') renderAssignmentDropdown(document.getElementById('assignmentInput')?.value || '');
+                if (collectionName === 'daily_responsibles') renderResponsibleDropdown(document.getElementById('responsibleInput')?.value || '');
+                if (collectionName === 'daily_customers') renderCustomerDropdown(document.getElementById('customerInput')?.value || '');
+                if (collectionName === 'daily_locations') renderLocationDropdown(document.getElementById('locationInput')?.value || '');
             } catch(e) { showNotification("เกิดข้อผิดพลาดในการลบ", "error"); }
         };
 
@@ -1879,6 +2040,9 @@ function switchTab(activeTabId) {
             if (projWrapper && !projWrapper.contains(e.target)) projList?.classList.add('hidden');
             if (taskTypeWrapper && !taskTypeWrapper.contains(e.target)) taskTypeList?.classList.add('hidden');
             if (assignmentWrapper && !assignmentWrapper.contains(e.target)) assignmentList?.classList.add('hidden');
+            if (document.getElementById('responsible-dropdown-wrapper') && !document.getElementById('responsible-dropdown-wrapper').contains(e.target)) document.getElementById('responsible-dropdown-list')?.classList.add('hidden');
+            if (document.getElementById('customer-dropdown-wrapper') && !document.getElementById('customer-dropdown-wrapper').contains(e.target)) document.getElementById('customer-dropdown-list')?.classList.add('hidden');
+            if (document.getElementById('location-dropdown-wrapper') && !document.getElementById('location-dropdown-wrapper').contains(e.target)) document.getElementById('location-dropdown-list')?.classList.add('hidden');
             if (dashProjWrapper && !dashProjWrapper.contains(e.target)) dashProjList?.classList.add('hidden');
 
             const monitorWrapper = document.getElementById('monitor-list-wrapper');
@@ -3546,6 +3710,9 @@ function switchTab(activeTabId) {
             if (taskForm) taskForm.reset(); currentEditTaskId = null; const projInputEl = document.getElementById('projectNameInput'); if(projInputEl) projInputEl.value = '';
             selectedTaskTypes = []; renderTaskTypeChips(); 
             selectedAssignments = []; renderAssignmentChips();
+            selectedResponsibles = []; renderResponsibleChips();
+            selectedCustomers = []; renderCustomerChips();
+            selectedLocations = []; renderLocationChips();
             const recDate = document.getElementById('receiveDate'); if (recDate) recDate.value = getThaiDateString();
             currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }]; renderNotes();
             currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '', qty: '' }]; renderSystems();
@@ -3557,7 +3724,20 @@ function switchTab(activeTabId) {
             const submitBtn = document.getElementById('submit-btn'); submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> กำลังบันทึก...`; submitBtn.disabled = true;
             const notesToSave = currentNotes.filter(n => n.completed || n.text.trim() !== '');
             const systemsToSave = currentSystems.filter(s => s.checked && (s.system.trim() !== '' || s.brand.trim() !== '')).map(s => ({ system: s.system.trim(), brand: s.brand.trim(), qty: s.qty ? parseInt(String(s.qty).replace(/,/g, ''), 10) || '' : '' }));
-            const taskData = { taskName: document.getElementById('taskName')?.value || '', projectName: document.getElementById('projectNameInput')?.value || '', taskType: selectedTaskTypes, receiveDate: document.getElementById('receiveDate')?.value || '', responsibleName: document.getElementById('responsibleName')?.value || '', assignment: selectedAssignments, customerName: document.getElementById('customerName')?.value || '', customerPhone: document.getElementById('customerPhone')?.value || '', workLocation: document.getElementById('workLocation')?.value || '', notes: notesToSave, systems: systemsToSave, updatedAt: Date.now() };
+            const taskData = { 
+                taskName: document.getElementById('taskName')?.value || '', 
+                projectName: document.getElementById('projectNameInput')?.value || '', 
+                taskType: selectedTaskTypes, 
+                receiveDate: document.getElementById('receiveDate')?.value || '', 
+                responsibleName: selectedResponsibles.join(', '), 
+                assignment: selectedAssignments, 
+                customerName: selectedCustomers.join(', '), 
+                customerPhone: document.getElementById('customerPhone')?.value || '', 
+                workLocation: selectedLocations.join(', '), 
+                notes: notesToSave, 
+                systems: systemsToSave, 
+                updatedAt: Date.now() 
+            };
             try {
                 if (currentEditTaskId) { 
                     await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', currentEditTaskId), taskData); 
@@ -3578,12 +3758,21 @@ function switchTab(activeTabId) {
             if (currentUserRole === 'monitor') return; const task = allTasks.find(t => t.id === taskId); if(!task) return;
             if (currentUserRole === 'user' && task.ownerId !== currentUser.uid) return showNotification("คุณแก้ไขได้เฉพาะรายการที่คุณสร้างเท่านั้น", "error");
             document.getElementById('day-detail-modal')?.classList.add('hidden');
-            ['taskName', 'receiveDate', 'responsibleName', 'customerName', 'customerPhone', 'workLocation'].forEach(field => { const el = document.getElementById(field); if (el) el.value = task[field] || ''; });
+            
+            // ลบ responsibleName, customerName, workLocation ออกจาก input ธรรมดา
+            ['taskName', 'receiveDate', 'customerPhone'].forEach(field => { const el = document.getElementById(field); if (el) el.value = task[field] || ''; });
             const projInputEl = document.getElementById('projectNameInput'); if (projInputEl) projInputEl.value = task.projectName || '';
+            
             if (Array.isArray(task.taskType)) { selectedTaskTypes = [...task.taskType]; selectedTaskTypes.sort((a, b) => a.localeCompare(b, 'th')); } else if (task.taskType && typeof task.taskType === 'string') selectedTaskTypes = [task.taskType]; else selectedTaskTypes = [];
             renderTaskTypeChips();
+            
             if (Array.isArray(task.assignment)) { selectedAssignments = [...task.assignment]; selectedAssignments.sort((a, b) => a.localeCompare(b, 'th')); } else if (task.assignment && typeof task.assignment === 'string') selectedAssignments = [task.assignment]; else selectedAssignments = [];
             renderAssignmentChips();
+
+            // แยกข้อความเก่าที่เคยเซฟไว้กลับมาเป็น Chips
+            selectedResponsibles = task.responsibleName ? task.responsibleName.split(',').map(s=>s.trim()).filter(Boolean) : []; renderResponsibleChips();
+            selectedCustomers = task.customerName ? task.customerName.split(',').map(s=>s.trim()).filter(Boolean) : []; renderCustomerChips();
+            selectedLocations = task.workLocation ? task.workLocation.split(',').map(s=>s.trim()).filter(Boolean) : []; renderLocationChips();
             if (task.notes && task.notes.length > 0) { currentNotes = JSON.parse(JSON.stringify(task.notes)); const lastNote = currentNotes[currentNotes.length - 1]; if (lastNote && lastNote.completed) currentNotes.push({ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }); } else currentNotes = [{ id: 'note_' + Date.now(), text: '', completed: false, completedAt: null }];
             renderNotes(); 
             if (task.systems && task.systems.length > 0) { currentSystems = task.systems.map((s, i) => ({ id: 'sys_edit_' + Date.now() + '_' + i, checked: true, system: s.system || '', brand: s.brand || '', qty: s.qty ? Number(s.qty).toLocaleString('th-TH') : '' })); } else { currentSystems = [{ id: 'sys_' + Date.now(), checked: false, system: '', brand: '', qty: '' }]; }
