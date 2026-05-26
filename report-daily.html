@@ -1099,6 +1099,34 @@
         </div>
     </div>
 
+    <div id="tour-guide-modal" class="fixed inset-0 bg-black/60 hidden z-[300] flex items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 flex flex-col overflow-hidden relative transform transition-all">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#5b5fc7] to-indigo-400"></div>
+            <button onclick="closeTourGuide()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <div class="p-6 sm:p-8 flex flex-col items-center text-center">
+                <div id="tour-icon-container" class="w-16 h-16 bg-indigo-50 text-[#5b5fc7] rounded-full flex items-center justify-center mb-5 shadow-inner">
+                    <i id="tour-icon" data-lucide="sparkles" class="w-8 h-8"></i>
+                </div>
+                <h3 id="tour-title" class="text-xl font-bold text-gray-800 mb-3">ยินดีต้อนรับสู่ระบบ</h3>
+                <p id="tour-desc" class="text-sm text-gray-600 mb-6 min-h-[60px] leading-relaxed">แนะนำการใช้งานเบื้องต้น</p>
+                
+                <div class="w-full flex flex-col sm:flex-row items-center justify-between mt-auto pt-4 border-t border-gray-100 gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer group w-full sm:w-auto justify-center">
+                        <input type="checkbox" id="tour-dont-show-cb" class="w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]">
+                        <span class="text-xs text-gray-500 group-hover:text-gray-700 transition-colors select-none">ไม่ต้องแสดงอีกในครั้งถัดไป</span>
+                    </label>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-center">
+                        <button onclick="changeTourStep(-1)" id="btn-tour-prev" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-xs hidden shadow-sm">ย้อนกลับ</button>
+                        <button onclick="changeTourStep(1)" id="btn-tour-next" class="px-6 py-2 bg-[#5b5fc7] text-white rounded-lg hover:bg-[#4a4e9e] transition-colors font-medium text-xs shadow-sm flex items-center gap-1.5 whitespace-nowrap">ถัดไป <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full bg-gray-100 h-1.5">
+                <div id="tour-progress" class="bg-[#5b5fc7] h-1.5 transition-all duration-300" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -1137,6 +1165,73 @@
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let allLogs = [], logCurrentPage = 1, unsubscribeLogs = null;
         
+        // --- ระบบ Tour Guide แนะนำการใช้งาน ---
+        const tourSteps = [
+            { icon: 'sparkles', title: 'ยินดีต้อนรับสู่ระบบ', desc: 'Daily Task Log คือระบบจัดการงานที่ช่วยให้คุณติดตามโครงการและหน้างานได้อย่างมีประสิทธิภาพ กดถัดไปเพื่อดูฟังก์ชันหลัก' },
+            { icon: 'file-plus', title: '1. เพิ่ม / แก้ไขงาน', desc: 'นี่คือเมนูหลักสำหรับบันทึกงานใหม่ ระบบจะช่วยดึงข้อมูลยี่ห้อและระบบงานล่าสุดที่เคยใช้ในโครงการนั้นมาให้อัตโนมัติ' },
+            { icon: 'layout-dashboard', title: '2. แดชบอร์ดและสรุป', desc: 'ดูภาพรวมของโครงการทั้งหมด สัดส่วนงานแยกตามลูกค้า และมูลค่างานที่กำลังดำเนินการแบบเรียลไทม์' },
+            { icon: 'calendar-days', title: '3. ปฏิทิน / การลางาน', desc: 'ดูตารางงานประจำเดือน และกดปุ่มเพิ่มวันหยุด/วันลา เพื่อเช็คโควตาวันลาคงเหลือของคุณได้ทันที' },
+            { icon: 'map-pin', title: '4. ปฏิทินเข้าหน้างาน', desc: 'ออกแบบมาเพื่อทีมช่าง/วิศวกร โดยจะกรองเฉพาะงานที่ต้องออกพื้นที่ (On-site) พร้อมระบุสถานที่ให้เห็นชัดเจน' },
+            { icon: 'download', title: '5. ออกรายงาน (Export)', desc: 'ในทุกหน้าสรุปข้อมูล คุณสามารถกดปุ่ม EXCEL หรือพิมพ์เป็น PDF/JPG เพื่อนำไปส่งเป็นรายงานได้ทันที' }
+        ];
+        let currentTourStep = 0;
+
+        window.openTourGuide = () => {
+            if (localStorage.getItem('hideDailyTaskTour') === 'true') return;
+            currentTourStep = 0;
+            const cb = document.getElementById('tour-dont-show-cb');
+            if (cb) cb.checked = false;
+            updateTourStepUI();
+            document.getElementById('tour-guide-modal').classList.remove('hidden');
+        };
+
+        window.closeTourGuide = () => {
+            const cb = document.getElementById('tour-dont-show-cb');
+            if (cb && cb.checked) {
+                localStorage.setItem('hideDailyTaskTour', 'true');
+            } else {
+                localStorage.removeItem('hideDailyTaskTour');
+            }
+            document.getElementById('tour-guide-modal').classList.add('hidden');
+        };
+
+        window.changeTourStep = (dir) => {
+            if (dir === 1 && currentTourStep === tourSteps.length - 1) {
+                closeTourGuide();
+            } else {
+                currentTourStep += dir;
+                updateTourStepUI();
+            }
+        };
+
+        window.updateTourStepUI = () => {
+            const step = tourSteps[currentTourStep];
+            const iconEl = document.getElementById('tour-icon');
+            if (iconEl) iconEl.setAttribute('data-lucide', step.icon);
+            document.getElementById('tour-title').textContent = step.title;
+            document.getElementById('tour-desc').textContent = step.desc;
+            
+            const progress = ((currentTourStep + 1) / tourSteps.length) * 100;
+            document.getElementById('tour-progress').style.width = `${progress}%`;
+            
+            const btnPrev = document.getElementById('btn-tour-prev');
+            const btnNext = document.getElementById('btn-tour-next');
+            
+            if (currentTourStep === 0) btnPrev.classList.add('hidden');
+            else btnPrev.classList.remove('hidden');
+            
+            if (currentTourStep === tourSteps.length - 1) {
+                btnNext.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i> เริ่มต้นใช้งาน`;
+                btnNext.classList.replace('bg-[#5b5fc7]', 'bg-green-600');
+                btnNext.classList.replace('hover:bg-[#4a4e9e]', 'hover:bg-green-700');
+            } else {
+                btnNext.innerHTML = `ถัดไป <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>`;
+                btnNext.classList.replace('bg-green-600', 'bg-[#5b5fc7]');
+                btnNext.classList.replace('hover:bg-green-700', 'hover:bg-[#4a4e9e]');
+            }
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        };
+
         async function recordLog(actionType, detailsStr) {
             if (!currentUser) return;
             try {
@@ -1586,6 +1681,9 @@ function switchTab(activeTabId) {
             if (presenceInterval) clearInterval(presenceInterval);
             presenceInterval = setInterval(() => updatePresence(true), 60000); 
             switchTab('list');
+            
+            // เรียกเปิด Guide หลังจากเข้าสู่ระบบเสร็จ (หน่วงเวลาเล็กน้อยให้หน้าจอโหลดเสร็จก่อน)
+            setTimeout(() => { openTourGuide(); }, 600);
         }
 
         onAuthStateChanged(auth, async (user) => {
