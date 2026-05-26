@@ -1740,44 +1740,42 @@ function switchTab(activeTabId) {
             if(projInput) projInput.value = name; 
             projList?.classList.add('hidden'); 
             
-            // --- เพิ่มเติม: ดึงข้อมูลระบบงานและยี่ห้อของโครงการนี้มาแสดงอัตโนมัติ ---
+            // --- ดึงข้อมูลระบบงานและยี่ห้ออ้างอิงจากงานที่อัปเดตล่าสุดของโครงการนี้เท่านั้น ---
             if (name) {
-                // หากลุ่มงานทั้งหมดที่ตรงกับชื่อโครงการที่เลือก
                 const projectTasks = allTasks.filter(t => t.projectName === name);
                 if (projectTasks.length > 0) {
-                    const uniqueSystems = new Map();
-                    
-                    // วนลูปเก็บข้อมูลระบบงานและยี่ห้อที่ไม่ซ้ำกัน
-                    projectTasks.forEach(task => {
-                        if (Array.isArray(task.systems)) {
-                            task.systems.forEach(s => {
-                                const sName = (s.system || '').trim();
-                                const bName = (s.brand || '').trim();
-                                if (sName === '' && bName === '') return;
-                                
-                                const key = `${sName}|${bName}`;
-                                if (!uniqueSystems.has(key)) {
-                                    uniqueSystems.set(key, { system: sName, brand: bName, qty: s.qty || '' });
-                                }
-                            });
-                        }
-                    });
+                    // ค้นหางานที่มีการบันทึกหรืออัปเดตล่าสุดเพียงงานเดียว
+                    const latestTask = projectTasks.reduce((latest, current) => {
+                        const currentVal = current.updatedAt || current.createdAt || 0;
+                        const latestVal = latest.updatedAt || latest.createdAt || 0;
+                        return currentVal > latestVal ? current : latest;
+                    }, projectTasks[0]);
 
-                    // ถ้าระบบเคยบันทึกข้อมูลยี่ห้อในโครงการนี้ไว้ ให้อัปเดตตารางขวามือ
-                    if (uniqueSystems.size > 0) {
+                    // ดึงเฉพาะข้อมูลระบบจากงานล่าสุดมาแสดงผล
+                    if (Array.isArray(latestTask.systems) && latestTask.systems.length > 0) {
                         currentSystems = []; // ล้างช่องว่างที่ไม่ได้กรอก
                         let i = 0;
-                        uniqueSystems.forEach(value => {
-                            currentSystems.push({
-                                id: 'sys_auto_' + Date.now() + '_' + (i++),
-                                checked: true, // ติ๊กถูกเปิดใช้งานให้อัตโนมัติ
-                                system: value.system,
-                                brand: value.brand,
-                                qty: value.qty
-                            });
+                        let hasValidSystem = false;
+                        
+                        latestTask.systems.forEach(s => {
+                            const sName = (s.system || '').trim();
+                            const bName = (s.brand || '').trim();
+                            if (sName !== '' || bName !== '') {
+                                hasValidSystem = true;
+                                currentSystems.push({
+                                    id: 'sys_auto_' + Date.now() + '_' + (i++),
+                                    checked: true, // ติ๊กถูกเปิดใช้งานให้อัตโนมัติ
+                                    system: sName,
+                                    brand: bName,
+                                    qty: s.qty || ''
+                                });
+                            }
                         });
-                        renderSystems(); // รีเฟรชหน้าจอการ์ดระบบงาน
-                        showNotification(`ดึงประวัติระบบงานของโครงการ "${name}" แล้ว`, "success");
+
+                        if (hasValidSystem) {
+                            renderSystems(); // รีเฟรชหน้าจอการ์ดระบบงาน
+                            showNotification(`ดึงข้อมูลระบบงานล่าสุดของโครงการ "${name}" แล้ว`, "success");
+                        }
                     }
                 }
             }
