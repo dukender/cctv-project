@@ -14,6 +14,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+    <style>
+        /* บังคับฟอนต์ให้ Pop-up ของ Guide เป็น Sarabun */
+        .driver-popover { font-family: 'Sarabun', sans-serif !important; }
+        .driver-popover-title { font-weight: 700 !important; color: #5b5fc7 !important; }
+        .driver-popover-next-btn { background-color: #5b5fc7 !important; color: white !important; border: none !important; text-shadow: none !important; }
+    </style>
     <script>
         tailwind.config = { theme: { extend: { fontFamily: { sans: ['Sarabun', 'sans-serif'] } } } }
     </script>
@@ -1028,7 +1036,7 @@
                                 </div> <!-- ปิด flex-1 ด้านซ้าย -->
                                     
                                     <!-- Card ด้านขวา สำหรับ ระบบงานและยี่ห้ออุปกรณ์ -->
-                                    <div class="w-full lg:w-[320px] shrink-0 bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
+                                    <div id="guide-system-card" class="w-full lg:w-[320px] shrink-0 bg-gray-50 border border-gray-200 rounded-lg p-4 shadow-sm">
                                         <label class="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider"><i data-lucide="server" class="w-4 h-4 text-[#5b5fc7]"></i> ข้อมูลระบบงาน / ยี่ห้อ</label>
                                         <div id="system-brand-list" class="space-y-3"></div>
                                         <button type="button" onclick="addSystemBrandRow()" class="mt-3 w-full py-2 bg-white border border-dashed border-gray-300 text-[#5b5fc7] rounded-md text-xs font-semibold hover:bg-indigo-50 transition-colors flex items-center justify-center gap-1 shadow-sm"><i data-lucide="plus" class="w-3 h-3"></i> เพิ่มระบบงาน</button>
@@ -1165,72 +1173,55 @@
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let allLogs = [], logCurrentPage = 1, unsubscribeLogs = null;
         
-        // --- ระบบ Tour Guide แนะนำการใช้งาน ---
-        const tourSteps = [
-            { icon: 'sparkles', title: 'ยินดีต้อนรับสู่ระบบ', desc: 'Daily Task Log คือระบบจัดการงานที่ช่วยให้คุณติดตามโครงการและหน้างานได้อย่างมีประสิทธิภาพ กดถัดไปเพื่อดูฟังก์ชันหลัก' },
-            { icon: 'file-plus', title: '1. เพิ่ม / แก้ไขงาน', desc: 'นี่คือเมนูหลักสำหรับบันทึกงานใหม่ ระบบจะช่วยดึงข้อมูลยี่ห้อและระบบงานล่าสุดที่เคยใช้ในโครงการนั้นมาให้อัตโนมัติ' },
-            { icon: 'layout-dashboard', title: '2. แดชบอร์ดและสรุป', desc: 'ดูภาพรวมของโครงการทั้งหมด สัดส่วนงานแยกตามลูกค้า และมูลค่างานที่กำลังดำเนินการแบบเรียลไทม์' },
-            { icon: 'calendar-days', title: '3. ปฏิทิน / การลางาน', desc: 'ดูตารางงานประจำเดือน และกดปุ่มเพิ่มวันหยุด/วันลา เพื่อเช็คโควตาวันลาคงเหลือของคุณได้ทันที' },
-            { icon: 'map-pin', title: '4. ปฏิทินเข้าหน้างาน', desc: 'ออกแบบมาเพื่อทีมช่าง/วิศวกร โดยจะกรองเฉพาะงานที่ต้องออกพื้นที่ (On-site) พร้อมระบุสถานที่ให้เห็นชัดเจน' },
-            { icon: 'download', title: '5. ออกรายงาน (Export)', desc: 'ในทุกหน้าสรุปข้อมูล คุณสามารถกดปุ่ม EXCEL หรือพิมพ์เป็น PDF/JPG เพื่อนำไปส่งเป็นรายงานได้ทันที' }
-        ];
-        let currentTourStep = 0;
+        // --- เริ่มต้นระบบ Tour Guide ---
+        const driver = window.driver.js.driver;
+        const driverObj = driver({
+            showProgress: true,
+            allowClose: false, // บังคับให้กดจากปุ่มปิด (X) เท่านั้น ไม่ให้คลิกพื้นที่ว่างแล้วปิด
+            nextBtnText: 'ถัดไป ➔',
+            prevBtnText: '⬅ ย้อนกลับ',
+            doneBtnText: 'เริ่มใช้งาน',
+            progressText: 'ขั้นตอนที่ {{current}} จาก {{total}}',
+            onDestroyStarted: () => {
+                // เมื่อผู้ใช้กดปิด (กากบาท) จะมี Confirm ถามว่าต้องการซ่อนถาวรหรือไม่
+                if (!driverObj.hasNextStep() || confirm("คุณต้องการปิดการแนะนำ และ ไม่ต้องแสดงอีก ในครั้งถัดไปใช่หรือไม่?")) {
+                    localStorage.setItem('hideDailyTaskGuide', 'true');
+                    driverObj.destroy();
+                } else {
+                    driverObj.destroy(); // ปิดรอบนี้เฉยๆ รอบหน้ายังเด้งอยู่
+                }
+            },
+            steps: [
+                { popover: { title: '🎉 ยินดีต้อนรับสู่ระบบ Daily Task Log', description: 'ระบบนี้จะช่วยจัดการงาน โครงการ และประวัติการใช้อุปกรณ์ของคุณให้เป็นระเบียบ เรามาดูวิธีใช้งานเมนูหลักๆ กันครับ' } },
+                { element: '#tab-dashboard', popover: { title: '1. แดชบอร์ดสถิติ', description: 'หน้าสรุปภาพรวม สัดส่วน และมูลค่าของงานทั้งหมดในรูปแบบกราฟ', side: "right", align: 'start' } },
+                { 
+                    element: '#tab-list', 
+                    popover: { title: '2. รายการงานประจำวัน', description: 'หน้ารวมประวัติการบันทึกงานทั้งหมดของคุณ', side: "right", align: 'start' },
+                    onHighlightStarted: () => switchTab('list') // บังคับเปลี่ยนหน้าก่อนไฮไลท์
+                },
+                { 
+                    element: '#view-list .overflow-x-auto', 
+                    popover: { title: 'ส่วนแสดงเนื้อหางาน', description: 'ตารางจะแสดงรายละเอียดต่างๆ คุณสามารถค้นหางานย้อนหลัง แก้ไข หรือลบงานได้จากตารางนี้เลย', side: "top", align: 'center' } 
+                },
+                { 
+                    element: '#tab-manage', 
+                    popover: { title: '3. เพิ่ม / แก้ไขงาน', description: 'เมนูหลักสำหรับการลงข้อมูลงานประจำวัน! (คลิกถัดไปเพื่อดูความสามารถพิเศษ)', side: "right", align: 'start' },
+                    onHighlightStarted: () => switchTab('manage') // บังคับเปลี่ยนไปหน้าเพิ่มงาน
+                },
+                { 
+                    element: '#guide-system-card', 
+                    popover: { title: 'ดึงข้อมูลอัจฉริยะ 🧠', description: 'เมื่อคุณเลือก "ชื่อโครงการ" ระบบจะดึงประวัติ ระบบงาน และ ยี่ห้อ ล่าสุดที่เคยบันทึกมาให้ตรงนี้อัตโนมัติ เพื่อให้คุณไม่ต้องเสียเวลาพิมพ์ใหม่!', side: "left", align: 'start' } 
+                }
+            ]
+        });
 
-        window.openTourGuide = () => {
-            if (localStorage.getItem('hideDailyTaskTour') === 'true') return;
-            currentTourStep = 0;
-            const cb = document.getElementById('tour-dont-show-cb');
-            if (cb) cb.checked = false;
-            updateTourStepUI();
-            document.getElementById('tour-guide-modal').classList.remove('hidden');
-        };
-
-        window.closeTourGuide = () => {
-            const cb = document.getElementById('tour-dont-show-cb');
-            if (cb && cb.checked) {
-                localStorage.setItem('hideDailyTaskTour', 'true');
-            } else {
-                localStorage.removeItem('hideDailyTaskTour');
+        window.startTourGuide = () => {
+            // ตรวจสอบว่าเคยติ๊ก "ไม่ต้องแสดงอีก" ไว้หรือไม่
+            if (localStorage.getItem('hideDailyTaskGuide') !== 'true') {
+                driverObj.drive();
             }
-            document.getElementById('tour-guide-modal').classList.add('hidden');
         };
-
-        window.changeTourStep = (dir) => {
-            if (dir === 1 && currentTourStep === tourSteps.length - 1) {
-                closeTourGuide();
-            } else {
-                currentTourStep += dir;
-                updateTourStepUI();
-            }
-        };
-
-        window.updateTourStepUI = () => {
-            const step = tourSteps[currentTourStep];
-            const iconEl = document.getElementById('tour-icon');
-            if (iconEl) iconEl.setAttribute('data-lucide', step.icon);
-            document.getElementById('tour-title').textContent = step.title;
-            document.getElementById('tour-desc').textContent = step.desc;
-            
-            const progress = ((currentTourStep + 1) / tourSteps.length) * 100;
-            document.getElementById('tour-progress').style.width = `${progress}%`;
-            
-            const btnPrev = document.getElementById('btn-tour-prev');
-            const btnNext = document.getElementById('btn-tour-next');
-            
-            if (currentTourStep === 0) btnPrev.classList.add('hidden');
-            else btnPrev.classList.remove('hidden');
-            
-            if (currentTourStep === tourSteps.length - 1) {
-                btnNext.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5"></i> เริ่มต้นใช้งาน`;
-                btnNext.classList.replace('bg-[#5b5fc7]', 'bg-green-600');
-                btnNext.classList.replace('hover:bg-[#4a4e9e]', 'hover:bg-green-700');
-            } else {
-                btnNext.innerHTML = `ถัดไป <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>`;
-                btnNext.classList.replace('bg-green-600', 'bg-[#5b5fc7]');
-                btnNext.classList.replace('hover:bg-green-700', 'hover:bg-[#4a4e9e]');
-            }
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        };
+        // --- สิ้นสุดส่วน Tour Guide ---
 
         async function recordLog(actionType, detailsStr) {
             if (!currentUser) return;
@@ -1681,9 +1672,9 @@ function switchTab(activeTabId) {
             if (presenceInterval) clearInterval(presenceInterval);
             presenceInterval = setInterval(() => updatePresence(true), 60000); 
             switchTab('list');
-            
-            // เรียกเปิด Guide หลังจากเข้าสู่ระบบเสร็จ (หน่วงเวลาเล็กน้อยให้หน้าจอโหลดเสร็จก่อน)
-            setTimeout(() => { openTourGuide(); }, 600);
+
+            // สั่งเปิด Guide หลังจากโหลดหน้าจอเสร็จ 0.5 วินาที
+            setTimeout(() => { window.startTourGuide(); }, 500);
         }
 
         onAuthStateChanged(auth, async (user) => {
