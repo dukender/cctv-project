@@ -17,9 +17,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
     <style>
-        /* บังคับฟอนต์ให้ Pop-up ของ Guide เป็น Sarabun */
+        /* บังคับฟอนต์ให้ Pop-up ของ Guide เป็น Sarabun และเพิ่มขนาดตัวอักษร */
         .driver-popover { font-family: 'Sarabun', sans-serif !important; }
-        .driver-popover-title { font-weight: 700 !important; color: #5b5fc7 !important; }
+        .driver-popover-title { font-weight: 700 !important; color: #5b5fc7 !important; font-size: 22px !important; } /* ขยายหัวข้อ */
+        .driver-popover-description { font-size: 18px !important; line-height: 1.6 !important; } /* ขยายเนื้อหาอธิบาย */
+        .driver-popover-footer button { font-size: 16px !important; padding: 6px 14px !important; } /* ขยายปุ่มกด */
         .driver-popover-next-btn { background-color: #5b5fc7 !important; color: white !important; border: none !important; text-shadow: none !important; }
     </style>
     <script>
@@ -1186,22 +1188,20 @@
             onPopoverRender: (popover, { config, state }) => {
                 const footer = popover.wrapper.querySelector('.driver-popover-footer');
                 if (footer && !footer.querySelector('.tour-checkbox-wrapper')) {
-                    // ปรับ Layout ของ Footer ให้แสดงผลแนวตั้งเพื่อให้กล่อง Checkbox อยู่ด้านล่างสุด
                     footer.style.display = 'flex';
                     footer.style.flexDirection = 'column';
                     footer.style.alignItems = 'stretch';
                     
                     const cbWrapper = document.createElement('div');
-                    cbWrapper.className = 'tour-checkbox-wrapper flex items-center justify-center mt-3 pt-3 border-t border-gray-100';
+                    cbWrapper.className = 'tour-checkbox-wrapper flex items-center justify-center mt-4 pt-3 border-t border-gray-100';
                     cbWrapper.innerHTML = `
                         <label class="flex items-center gap-2 cursor-pointer group">
-                            <input type="checkbox" id="driver-dont-show-cb" class="w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]">
-                            <span class="text-xs text-gray-500 group-hover:text-gray-700 transition-colors select-none">ไม่ต้องแสดงอีกในครั้งถัดไป</span>
+                            <input type="checkbox" id="driver-dont-show-cb" class="w-5 h-5 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7]">
+                            <span class="text-base text-gray-500 group-hover:text-gray-700 transition-colors select-none font-medium ml-1">ไม่ต้องแสดงอีกในครั้งถัดไป</span>
                         </label>
                     `;
                     footer.appendChild(cbWrapper);
 
-                    // ผูก Event การติ๊กเข้ากับ LocalStorage
                     const cb = document.getElementById('driver-dont-show-cb');
                     if (cb) {
                         cb.checked = localStorage.getItem('hideDailyTaskGuide') === 'true';
@@ -1216,7 +1216,6 @@
                 }
             },
             onDestroyStarted: () => {
-                // ถ้ากดกากบาทปิดกลางคัน ให้ถามยืนยันก่อน
                 if (!driverObj.hasNextStep()) {
                     driverObj.destroy();
                 } else if (confirm("คุณต้องการออกจากโหมดแนะนำการใช้งานใช่หรือไม่?")) {
@@ -1226,7 +1225,7 @@
             steps: [
                 { 
                     element: '#tab-dashboard', 
-                    popover: { title: '1. แดชบอร์ดสถิติ', description: 'เป็นเมนูแสดงสถิติงานโครงการต่างๆ ในรูปแบบกราฟ แท่ง, กราฟโดนัท มีระบบการกรองแบบรายสัปดาห์และรายเดือน', side: "right", align: 'start' }, 
+                    popover: { title: '1. แดชบอร์ดสถิติ', description: 'เป็นเมนูแสดงสถิติงานโครงการต่างๆ ในรูปแบบกราฟแท่ง, กราฟโดนัท มีระบบการกรองแบบรายสัปดาห์และรายเดือน', side: "right", align: 'start' }, 
                     onHighlightStarted: () => switchTab('dashboard') 
                 },
                 { 
@@ -1246,7 +1245,7 @@
                 },
                 { 
                     element: '#tab-brandsum-summary', 
-                    popover: { title: '5. สรุปยี่ห้ออุปกรณ์', description: 'เมนูสรุปจำนวนงาน โดยแยกเป็นยี่ห้ออุปกรณ์ เช่น Hikvision, dahua, uniview เป็นต้น และสามารถกดเพื่อดูเฉพาะยี่ห้อที่ต้องการนั้นๆ ได้', side: "right", align: 'start' }, 
+                    popover: { title: '5. สรุปยี่ห้ออุปกรณ์', description: 'เมนูสรุปจำนวนงาน โดยแยกเป็นยี่ห้ออุปกรณ์ เช่น Hikvision dahua uniview เป็นต้น และสามารถกดเพื่อดูเฉพาะยี่ห้อที่ต้องการนั้นๆ ได้', side: "right", align: 'start' }, 
                     onHighlightStarted: () => switchTab('brandsum-summary') 
                 },
                 { 
@@ -1286,7 +1285,7 @@
                 },
                 { 
                     element: '#tab-manage', 
-                    popover: { title: '13. เพิ่มงาน', description: 'เป็นปุ่มใช้สำหรับการเพิ่มข้อมูลงาน เมื่อเพิ่มข้อมูลแล้ว เมนูทุกอย่างก็จะอัพเดทให้โดยอัตโนมัติ<br><br><span class="text-red-500 text-xs font-semibold">*สิทธิ์ Monitor จะไม่มีเมนูนี้</span>', side: "right", align: 'start' }, 
+                    popover: { title: '13. เพิ่มงาน', description: 'เป็นปุ่มใช้สำหรับการเพิ่มข้อมูลงาน เมื่อเพิ่มข้อมูลแล้ว เมนูทุกอย่างก็จะอัพเดทให้โดยอัตโนมัติ<br><br><span class="text-red-500 text-base font-semibold">*สิทธิ์ Monitor จะไม่มีเมนูนี้</span>', side: "right", align: 'start' }, 
                     onHighlightStarted: () => switchTab('manage') 
                 }
             ]
