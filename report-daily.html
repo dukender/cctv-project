@@ -17,13 +17,15 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
     <style>
-        /* บังคับฟอนต์ให้ Pop-up ของ Guide เป็น Sarabun และปรับดีไซน์ขอบมน */
+        /* บังคับฟอนต์ให้ Pop-up ของ Guide เป็น Sarabun ปรับดีไซน์ขอบมน และขยายความกว้างขึ้น 1 เท่า */
         .driver-popover { 
             font-family: 'Sarabun', sans-serif !important; 
             border-radius: 16px !important; /* เพิ่มความมนให้เหมือน Card ในระบบ */
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1) !important; /* เพิ่มเงาให้น่าสนใจ */
             padding: 24px !important;
             border: 1px solid #eef1ff !important;
+            width: 600px !important; /* [เพิ่ม] ขยายความกว้างของ Card ขึ้น 1 เท่า (จากเดิมปกติ 300px เป็น 600px) */
+            max-width: calc(100vw - 32px) !important; /* [เพิ่ม] ป้องกันกล่องหลุดขอบจอเมื่อเปิดใช้งานบนมือถือ */
         }
         .driver-popover-title { font-weight: 700 !important; color: #5b5fc7 !important; font-size: 22px !important; margin-bottom: 12px !important; } 
         .driver-popover-description { font-size: 18px !important; line-height: 1.6 !important; color: #4b5563 !important; } 
