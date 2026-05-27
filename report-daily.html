@@ -1284,9 +1284,23 @@
                     onHighlightStarted: () => switchTab('activity-log') 
                 },
                 { 
-                    element: '#tab-manage', 
-                    popover: { title: '13. เพิ่มงาน', description: 'เป็นปุ่มใช้สำหรับการเพิ่มข้อมูลงาน เมื่อเพิ่มข้อมูลแล้ว เมนูทุกอย่างก็จะอัพเดทให้โดยอัตโนมัติ', side: "top", align: 'start' }, 
-                    onHighlightStarted: () => switchTab('manage') 
+                    // เปลี่ยนจาก '#tab-manage' เป็น ID ของปุ่มลอยมุมขวาล่าง
+                    element: '#btn-add-task-top', 
+                    popover: { 
+                        title: '13. เพิ่มงาน', 
+                        description: 'เป็นปุ่มใช้สำหรับการเพิ่มข้อมูลงาน เมื่อเพิ่มข้อมูลแล้ว เมนูทุกอย่างก็จะอัพเดทให้โดยอัตโนมัติ', 
+                        // เปลี่ยนด้านให้กล่องข้อความลอยอยู่ด้านบนของปุ่มขวาล่าง
+                        side: "top", 
+                        align: 'end' 
+                    }, 
+                    onHighlightStarted: () => {
+                        // ไม่ต้องบังคับสลับหน้าจอ (switchTab) ปล่อยให้อยู่หน้าเดิมเพื่อให้เห็นปุ่มลอยชัดเจน
+                        // แต่เช็คว่าถ้าหน้าจอมือถือ ต้องซ่อนเมนูด้านซ้ายกลับไปก่อน เพื่อให้เห็นปุ่มมุมขวาล่างได้
+                        const sidebarMenu = document.getElementById('sidebar-menu');
+                        if (window.innerWidth < 1024 && sidebarMenu && !sidebarMenu.classList.contains('-translate-x-full')) {
+                            window.toggleMobileMenu();
+                        }
+                    } 
                 }
             ]
         });
