@@ -1205,11 +1205,12 @@
                 const viewSystem = document.getElementById('view-system-summary'); 
                 if (viewSystem && !viewSystem.classList.contains('hidden')) renderSystemSummary();
                 const viewBrandsum = document.getElementById('view-brandsum-summary'); 
-                if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
-                if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
-                if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
-            }, 300); // หน่วงเวลา 300ms ให้ข้อมูล Firebase โหลดมาให้ครบก่อนแล้วค่อยวาดจอทีเดียว
-        }
+                    if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
+                    if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
+                    if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
+                    if (viewHolidaySummary && !viewHolidaySummary.classList.contains('hidden')) renderHolidaySummary(); // <-- [เพิ่ม] อัปเดตหน้าสรุปวันหยุด
+                }, 300); // หน่วงเวลา 300ms ให้ข้อมูล Firebase โหลดมาให้ครบก่อนแล้วค่อยวาดจอทีเดียว
+            }
 
         // --- ตั้งค่าเริ่มต้นตัวกรองเป็นเดือนปัจจุบัน ---
         window.addEventListener('DOMContentLoaded', () => {
@@ -1937,8 +1938,8 @@ function switchTab(activeTabId) {
             if (!currentUser) return;
             unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => {
                 let hols = []; snapshot.forEach(doc => { hols.push({ id: doc.id, ...doc.data() }); });
-                allHolidays = filterDataByRole(hols); renderCalendar();
-                if (viewHolidaySummary && !viewHolidaySummary.classList.contains('hidden')) renderHolidaySummary();
+                allHolidays = filterDataByRole(hols); 
+                debouncedRenderAll(); // <-- [แก้] เปลี่ยนมาใช้ระบบหน่วงเวลาแทนการสั่ง Render ทันที
             }, (error) => console.error(error));
         }
 
