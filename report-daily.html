@@ -1185,7 +1185,23 @@
         let currentUser = null, currentUserRole = 'user', unsubscribeTasks = null, allTasks = [], filteredTasks = [], currentCalendarDate = getThaiDate(), currentEditTaskId = null, currentNotes = [], currentSystems = [], allHolidays = [], unsubscribeHolidays = null, unsubscribeUser = null, currentUserData = null, allUsers = [], presenceInterval = null, allProjects = [], allTaskTypes = [], selectedTaskTypes = [], allSystemsData = [], allBrandsData = [], allAssignments = [], selectedAssignments = [], allResponsibles = [], selectedResponsibles = [], allCustomers = [], selectedCustomers = [], allLocations = [], selectedLocations = [];
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let allLogs = [], logCurrentPage = 1, unsubscribeLogs = null;
-        
+
+        // --- ตั้งค่าเริ่มต้นตัวกรองเป็นเดือนปัจจุบัน ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentMonthVal = `${getThaiDate().getFullYear()}-${String(getThaiDate().getMonth() + 1).padStart(2, '0')}`;
+            const filterPrefixes = ['search', 'summary-search', 'tasktype-search', 'system-search', 'brandsum-search', 'resp-search', 'cust-search'];
+            filterPrefixes.forEach(prefix => {
+                const timeTypeEl = document.getElementById(`${prefix}-time-type`);
+                const monthEl = document.getElementById(`${prefix}-month`);
+                const dateEl = document.getElementById(`${prefix}-date`);
+                if (timeTypeEl) timeTypeEl.value = 'month';
+                if (monthEl) { monthEl.value = currentMonthVal; monthEl.classList.remove('hidden'); monthEl.classList.add('block'); }
+                if (dateEl) { dateEl.classList.add('hidden'); dateEl.classList.remove('block'); }
+            });
+            const dashMonthEl = document.getElementById('dash-month-select');
+            if (dashMonthEl) dashMonthEl.value = dashCurrentMonth;
+        });
+
         // --- เริ่มต้นระบบ Tour Guide ---
         const driver = window.driver.js.driver;
         const driverObj = driver({
@@ -1352,7 +1368,7 @@
             sessionStorage.setItem('myDailyTaskSessionId', localSessionId);
         }
         
-        let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = 'all', dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
+        let dashCurrentYear = getThaiDate().getFullYear().toString(), dashCurrentMonth = String(getThaiDate().getMonth() + 1).padStart(2, '0'), dashCurrentProject = 'all', dashAvailableProjects = [], dashTimeView = 'month';
         let dashValueFilter = 'all'; // ตัวแปรรองรับการกดฟิลเตอร์การ์ดมูลค่างาน
         window.setDashValueFilter = (filterType) => { dashValueFilter = filterType; if(typeof renderDashboard === 'function') renderDashboard(); };
         let dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null };
