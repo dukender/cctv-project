@@ -1932,7 +1932,7 @@ function switchTab(activeTabId) {
                 debouncedRenderAll();
                 
             }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล'; statusEl.className = 'text-red-500 font-bold'; });
-
+        }
         function loadHolidays() {
             if (!currentUser) return;
             unsubscribeHolidays = onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_holidays'), (snapshot) => {
