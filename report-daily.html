@@ -4095,14 +4095,12 @@ function switchTab(activeTabId) {
             const totalProjEl = document.getElementById('dash-total-projects'), noProjEl = document.getElementById('dash-no-project'), filteredProjEl = document.getElementById('dash-filtered-projects');
             const totalTasksEl = document.getElementById('dash-total-tasks'), noProjTasksEl = document.getElementById('dash-no-project-tasks'), filteredTasksEl = document.getElementById('dash-filtered-tasks');
 
-            // 1 & 2: โครงการทั้งหมด และ งานทั้งหมด
+            // 1 & 2: โครงการทั้งหมด และ งานทั้งหมด (อ้างอิงจากข้อมูลทั้งหมดในระบบ)
             if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size.toLocaleString('th-TH');
-            // ตรงนี้ต้องใช้ baseDashTasks (งานหลังจากกรอง เวลา/เดือน/ปี/ชื่อโครงการจาก Dropdown) 
-            // ไม่ใช่ tasksToUse เพราะจะทำให้ตัวเลขไม่ตรงกับ "โครงการทั้งหมด" หากมีการเลือกดูเฉพาะเดือน
-            if (totalTasksEl) totalTasksEl.textContent = baseDashTasks.length.toLocaleString('th-TH');
+            if (totalTasksEl) totalTasksEl.textContent = tasksToUse.length.toLocaleString('th-TH');
             
-            // 3 & 4: โครงการที่ไม่มีชื่อ (แสดงเป็น 1 หากมี หรือ 0 หากไม่มี) และ งานที่ไม่มีชื่อ (นับจำนวนงานจริงๆ)
-            if (noProjEl) noProjEl.textContent = displayNoProjectCount > 0 ? "1" : "0"; 
+            // 3 & 4: โครงการที่ไม่มีชื่อ และ งานที่ไม่มีชื่อ (นับตามรายการจริง ไม่ยุบรวมเป็น 1 ตามที่ต้องการ)
+            if (noProjEl) noProjEl.textContent = displayNoProjectCount.toLocaleString('th-TH');
             if (noProjTasksEl) noProjTasksEl.textContent = displayNoProjectCount.toLocaleString('th-TH');
             
             // 5 & 6: โครงการตามตัวกรอง และ งานตามตัวกรอง
