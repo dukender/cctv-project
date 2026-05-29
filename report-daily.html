@@ -221,15 +221,10 @@
                             <div class="flex flex-col md:flex-row gap-6">
                                 <div class="md:w-1/4 flex flex-col border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 pr-0 md:pr-4">
                                     <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="bar-chart-3" class="w-5 h-5 text-indigo-500"></i> สถิติงานตามเวลา <span class="text-xs font-normal text-gray-500">(<span id="dash-time-label">รายเดือน</span>)</span></h3>
-                                    <div class="flex-1 grid grid-cols-2 gap-3 sm:gap-4 content-center">
-                                        <div class="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-100 flex flex-col justify-center"><p class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-xl sm:text-2xl lg:text-3xl font-bold text-[#5b5fc7]" id="dash-total-projects">0</p></div>
-                                        <div class="bg-gray-50 p-3 sm:p-4 rounded-lg border border-gray-100 flex flex-col justify-center"><p class="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">งานทั้งหมด</p><p class="text-xl sm:text-2xl lg:text-3xl font-bold text-[#5b5fc7]" id="dash-total-tasks">0</p></div>
-                                        
-                                        <div class="bg-orange-50 p-3 sm:p-4 rounded-lg border border-orange-100 flex flex-col justify-center"><p class="text-[10px] sm:text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">โครงการที่ไม่มีชื่อ</p><p class="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600" id="dash-no-project">0</p></div>
-                                        <div class="bg-orange-50 p-3 sm:p-4 rounded-lg border border-orange-100 flex flex-col justify-center"><p class="text-[10px] sm:text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">งานที่ไม่มีชื่อโครงการ</p><p class="text-xl sm:text-2xl lg:text-3xl font-bold text-orange-600" id="dash-no-project-tasks">0</p></div>
-                                        
-                                        <div class="bg-teal-50 p-3 sm:p-4 rounded-lg border border-teal-100 flex flex-col justify-center"><p class="text-[10px] sm:text-xs font-semibold text-teal-600 uppercase tracking-wider mb-1">โครงการตามตัวกรอง</p><p class="text-xl sm:text-2xl lg:text-3xl font-bold text-teal-600" id="dash-filtered-projects">0</p></div>
-                                        <div class="bg-teal-50 p-3 sm:p-4 rounded-lg border border-teal-100 flex flex-col justify-center"><p class="text-[10px] sm:text-xs font-semibold text-teal-600 uppercase tracking-wider mb-1">งานตามตัวกรอง</p><p class="text-xl sm:text-2xl lg:text-3xl font-bold text-teal-600" id="dash-filtered-tasks">0</p></div>
+                                    <div class="flex-1 flex flex-col justify-center gap-4">
+                                        <div class="bg-gray-50 p-4 rounded-lg border border-gray-100"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-3xl font-bold text-[#5b5fc7]" id="dash-total-projects">0</p></div>
+                                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-100"><p class="text-xs font-semibold text-orange-600 uppercase tracking-wider mb-1">โครงการที่ไม่มีชื่อ</p><p class="text-3xl font-bold text-orange-600" id="dash-no-project">0</p></div>
+                                        <div class="bg-teal-50 p-4 rounded-lg border border-teal-100"><p class="text-xs font-semibold text-teal-600 uppercase tracking-wider mb-1">โครงการตามตัวกรอง</p><p class="text-3xl font-bold text-teal-600" id="dash-filtered-projects">0</p></div>
                                     </div>
                                 </div>
                                 <div class="md:w-3/4 flex flex-col min-h-[250px]"><div class="relative flex-1 w-full"><canvas id="chart-time"></canvas></div></div>
@@ -4093,21 +4088,7 @@ function switchTab(activeTabId) {
             fullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') displayFilteredProjectsSet.add(t.projectName); else displayNoProjectCount++; });
 
             const totalProjEl = document.getElementById('dash-total-projects'), noProjEl = document.getElementById('dash-no-project'), filteredProjEl = document.getElementById('dash-filtered-projects');
-            const totalTasksEl = document.getElementById('dash-total-tasks'), noProjTasksEl = document.getElementById('dash-no-project-tasks'), filteredTasksEl = document.getElementById('dash-filtered-tasks');
-
-            // 1 & 2: โครงการทั้งหมด และ งานทั้งหมด
-            if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size.toLocaleString('th-TH');
-            // ตรงนี้ต้องใช้ baseDashTasks (งานหลังจากกรอง เวลา/เดือน/ปี/ชื่อโครงการจาก Dropdown) 
-            // ไม่ใช่ tasksToUse เพราะจะทำให้ตัวเลขไม่ตรงกับ "โครงการทั้งหมด" หากมีการเลือกดูเฉพาะเดือน
-            if (totalTasksEl) totalTasksEl.textContent = baseDashTasks.length.toLocaleString('th-TH');
-            
-            // 3 & 4: โครงการที่ไม่มีชื่อ (แสดงเป็น 1 หากมี หรือ 0 หากไม่มี) และ งานที่ไม่มีชื่อ (นับจำนวนงานจริงๆ)
-            if (noProjEl) noProjEl.textContent = displayNoProjectCount > 0 ? "1" : "0"; 
-            if (noProjTasksEl) noProjTasksEl.textContent = displayNoProjectCount.toLocaleString('th-TH');
-            
-            // 5 & 6: โครงการตามตัวกรอง และ งานตามตัวกรอง
-            if (filteredProjEl) filteredProjEl.textContent = displayFilteredProjectsSet.size.toLocaleString('th-TH');
-            if (filteredTasksEl) filteredTasksEl.textContent = fullyFilteredTasks.length.toLocaleString('th-TH');
+            if (totalProjEl) totalProjEl.textContent = totalProjectsSet.size; if (noProjEl) noProjEl.textContent = displayNoProjectCount; if (filteredProjEl) filteredProjEl.textContent = displayFilteredProjectsSet.size;
 
             const baseFilteredProjectsSet = new Set(); 
             baseFullyFilteredTasks.forEach(t => { if(t.projectName && t.projectName.trim() !== '') baseFilteredProjectsSet.add(t.projectName); });
