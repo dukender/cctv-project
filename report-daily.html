@@ -1192,6 +1192,25 @@
         let mySessionStartTime = null, sessionTimerInterval = null; // ตัวแปรสำหรับจับเวลาเข้าใช้งาน
         let allLogs = [], logCurrentPage = 1, unsubscribeLogs = null;
 
+        // [Code ใหม่ที่ต้องแทรกเพิ่ม] - ระบบหน่วงเวลา (Debounce) ป้องกันการ Render ซ้ำซ้อนตอน Login
+        let renderTimeout = null;
+        function debouncedRenderAll() {
+            if (renderTimeout) clearTimeout(renderTimeout);
+            renderTimeout = setTimeout(() => {
+                filterAndRenderTasks();
+                renderCalendar();
+                if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard();
+                if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
+                if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
+                const viewSystem = document.getElementById('view-system-summary'); 
+                if (viewSystem && !viewSystem.classList.contains('hidden')) renderSystemSummary();
+                const viewBrandsum = document.getElementById('view-brandsum-summary'); 
+                if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
+                if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
+                if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
+            }, 300); // หน่วงเวลา 300ms ให้ข้อมูล Firebase โหลดมาให้ครบก่อนแล้วค่อยวาดจอทีเดียว
+        }
+
         // --- ตั้งค่าเริ่มต้นตัวกรองเป็นเดือนปัจจุบัน ---
         window.addEventListener('DOMContentLoaded', () => {
             const currentMonthVal = `${getThaiDate().getFullYear()}-${String(getThaiDate().getMonth() + 1).padStart(2, '0')}`;
@@ -1851,7 +1870,7 @@ function switchTab(activeTabId) {
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_projects'), (snapshot) => {
                 allProjects = []; snapshot.forEach(doc => allProjects.push({id: doc.id, ...doc.data()}));
                 allProjects.sort((a,b) => a.createdAt - b.createdAt);
-                if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
+                debouncedRenderAll(); // [Code ใหม่] ใช้ Debounce 
             });
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'daily_task_types'), (snapshot) => {
                 allTaskTypes = []; snapshot.forEach(doc => allTaskTypes.push({id: doc.id, ...doc.data()}));
@@ -1908,16 +1927,11 @@ function switchTab(activeTabId) {
                     updateYearOptions(respYearSelect);
                     updateYearOptions(custYearSelect);
                 }
-                filterAndRenderTasks(); renderCalendar();   
-                if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard(); 
-                if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
-                if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
-                const viewSystem = document.getElementById('view-system-summary'); if (viewSystem && !viewSystem.classList.contains('hidden')) renderSystemSummary();
-                const viewBrandsum = document.getElementById('view-brandsum-summary'); if (viewBrandsum && !viewBrandsum.classList.contains('hidden')) renderBrandsumSummary();
-                if (viewResponsibleSummary && !viewResponsibleSummary.classList.contains('hidden')) renderResponsibleSummary();
-                if (viewCustomerSummary && !viewCustomerSummary.classList.contains('hidden')) renderCustomerSummary();
+                
+                // [Code ใหม่] เรียกใช้ Debounce แทนการ Render ตรงๆ เพื่อลดภาระ CPU
+                debouncedRenderAll();
+                
             }, (error) => { statusEl.textContent = 'เกิดข้อผิดพลาดในการดึงข้อมูล'; statusEl.className = 'text-red-500 font-bold'; });
-        }
 
         function loadHolidays() {
             if (!currentUser) return;
