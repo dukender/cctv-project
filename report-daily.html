@@ -4181,16 +4181,114 @@ function switchTab(activeTabId) {
             const timeCanvas = document.getElementById('chart-time');
             if (timeCanvas) {
                 destroyChart('time');
-                const sortedTimeKeys = Object.keys(timeData.counts).sort(), timeDataValues = sortedTimeKeys.map(k => timeData.counts[k]), thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-                const displayTimeLabels = sortedTimeKeys.map(k => {
-                    if (dashTimeView === 'year') { return k; }
-                    else if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
-                    else if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
-                    return k; 
+                let chartLabels = []; let chartDatasets = [];
+                const thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+
+                if (dashCurrentYear === 'all' && (dashTimeView === 'month' || dashTimeView === 'week')) {
+                    // โหมดเปรียบเทียบข้ามปี (Mixed Chart: แท่ง=ปีล่าสุด, เส้น=ปีก่อนหน้า)
+                    const yearSet = new Set(), periodSet = new Set(), dataMap = {};
+                    Object.keys(timeData.counts).forEach(k => {
+                        let yearStr = k.substring(0, 4), periodStr = dashTimeView === 'month' ? k.substring(5, 7) : k.substring(5);
+                        yearSet.add(yearStr); periodSet.add(periodStr);
+                        if (!dataMap[yearStr]) dataMap[yearStr] = {};
+                        dataMap[yearStr][periodStr] = timeData.counts[k];
+                    });
+                    
+                    // เรียงปีจาก มาก ไป น้อย (ปีล่าสุดจะอยู่ Index ที่ 0)
+                    const years = Array.from(yearSet).sort((a, b) => b.localeCompare(a)); 
+                    const periods = Array.from(periodSet).sort();
+                    
+                    chartLabels = periods.map(p => {
+                        if (dashTimeView === 'month') return thaiMonthNames[parseInt(p, 10) - 1];
+                        const [m, w] = p.split('-W'); return `สัปดาห์ที่ ${w} (${thaiMonthNames[parseInt(m, 10) - 1]})`;
+                    });
+
+                    // ชุดสีพาสเทล/ตุ่น สำหรับปีเก่าๆ
+                    const mutedLineColors = ['#f59e0b', '#14b8a6', '#ec4899', '#8b5cf6', '#64748b'];
+
+                    if (years.length > 0) {
+                        const latestYear = years[0];
+                        const latestYearData = periods.map(p => dataMap[latestYear][p] || 0);
+                        const maxVal = Math.max(...latestYearData);
+                        const maxIdx = latestYearData.indexOf(maxVal);
+
+                        // 1. เพิ่มชุดข้อมูล กราฟแท่ง สำหรับ "ปีล่าสุด"
+                        chartDatasets.push({
+                            type: 'bar',
+                            label: `ปี ${latestYear} (ล่าสุด)`,
+                            data: latestYearData,
+                            backgroundColor: latestYearData.map((_, i) => i === maxIdx ? '#5b5fc7' : '#e0e7ff'),
+                            borderRadius: 6,
+                            order: 2 // ลำดับการวาด ให้อยู่หลังสุด
+                        });
+
+                        // 2. เพิ่มชุดข้อมูล กราฟเส้น สำหรับ "ปีก่อนหน้าทั้งหมด"
+                        for (let i = 1; i < years.length; i++) {
+                            const yr = years[i];
+                            const lineColor = mutedLineColors[(i - 1) % mutedLineColors.length];
+                            chartDatasets.push({
+                                type: 'line',
+                                label: `ปี ${yr}`,
+                                data: periods.map(p => dataMap[yr][p] || 0),
+                                borderColor: lineColor,
+                                backgroundColor: lineColor,
+                                borderWidth: 3,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                tension: 0.3, // ทำให้เส้นโค้งมนเล็กน้อย
+                                fill: false,
+                                order: 1 // ลำดับการวาด ให้อยู่หน้ากราฟแท่ง
+                            });
+                        }
+                    }
+                } else {
+                    // โหมดปกติ (1 แท่งต่อ 1 ช่วงเวลา) ใช้สี 2 โทน
+                    const sortedTimeKeys = Object.keys(timeData.counts).sort(), timeDataValues = sortedTimeKeys.map(k => timeData.counts[k]);
+                    chartLabels = sortedTimeKeys.map(k => {
+                        if (dashTimeView === 'year') return k;
+                        if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
+                        if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
+                        return k; 
+                    });
+                    const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0, maxTimeIdx = timeDataValues.indexOf(maxTimeVal);
+                    chartDatasets = [{ type: 'bar', label: `จำนวนงาน`, data: timeDataValues, backgroundColor: timeDataValues.map((_, i) => i === maxTimeIdx ? '#5b5fc7' : '#e0e7ff'), borderRadius: 6 }];
+                }
+
+                // หาค่าสูงสุดจากทุก Dataset เพื่อจัดขนาดแกน Y
+                let globalMax = 0; chartDatasets.forEach(ds => { const m = Math.max(...ds.data); if (m > globalMax) globalMax = m; });
+                const timeYAxisMax = Math.max(10, Math.ceil(globalMax / 10) * 10);
+                const isGroupMode = dashCurrentYear === 'all' && (dashTimeView === 'month' || dashTimeView === 'week');
+
+                chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { 
+                    type: 'bar', 
+                    data: { labels: chartLabels, datasets: chartDatasets }, 
+                    options: { 
+                        responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, 
+                        plugins: { legend: { display: isGroupMode, position: 'top', labels: { font: { family: 'Sarabun' }, usePointStyle: true, pointStyle: 'circle' } } }, 
+                        scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } 
+                    }, 
+                    plugins: [{ 
+                        id: 'barLabels', 
+                        afterDatasetsDraw(chart) { 
+                            const { ctx, data } = chart; ctx.save(); 
+                            chart.data.datasets.forEach((dataset, i) => {
+                                // โชว์ตัวเลขเฉพาะของกราฟแท่ง (Bar) เท่านั้น ป้องกันไม่ให้รกทับกราฟเส้น
+                                if (dataset.type && dataset.type !== 'bar') return;
+                                
+                                chart.getDatasetMeta(i).data.forEach((datapoint, index) => {
+                                    const value = dataset.data[index];
+                                    if (value > 0) { 
+                                        ctx.font = 'bold 14px Sarabun, sans-serif'; 
+                                        ctx.fillStyle = '#5b5fc7'; 
+                                        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; 
+                                        ctx.fillText(value, datapoint.x, datapoint.y - 6); 
+                                    }
+                                });
+                            });
+                            ctx.restore(); 
+                        } 
+                    }] 
                 });
-                const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0, timeYAxisMax = Math.max(10, Math.ceil(maxTimeVal / 10) * 10);
-                const maxTimeIdx = timeDataValues.indexOf(maxTimeVal); // ค้นหาตำแหน่งแท่งกราฟที่มีค่ามากที่สุด
-                chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : dashTimeView === 'week' ? 'รายสัปดาห์' : 'รายปี'})`, data: timeDataValues, backgroundColor: timeDataValues.map((_, i) => i === maxTimeIdx ? '#5b5fc7' : '#e0e7ff'), borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'barLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#5b5fc7'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value, datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
                 const timeLabel = document.getElementById('dash-time-label'); if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : dashTimeView === 'week' ? 'รายสัปดาห์' : 'รายปี';
             }
 
