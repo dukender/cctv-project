@@ -4256,7 +4256,20 @@ function switchTab(activeTabId) {
 
                 // หาค่าสูงสุดจากทุก Dataset เพื่อจัดขนาดแกน Y
                 let globalMax = 0; chartDatasets.forEach(ds => { const m = Math.max(...ds.data); if (m > globalMax) globalMax = m; });
-                const timeYAxisMax = Math.max(10, Math.ceil(globalMax / 10) * 10);
+                
+                // คำนวณสเกลแกน Y กราฟเวลา (ตั้งค่าเริ่มต้น ปี=50, เดือน=20, สัปดาห์=10)
+                let timeStepSize = dashTimeView === 'year' ? 50 : (dashTimeView === 'month' ? 20 : 10);
+                
+                // ถ้าสเกลเริ่มต้นทำให้เส้นกริดเกิน 10 เส้น ให้คำนวณขยับหลักร้อย พัน หมื่น อัตโนมัติ
+                if (globalMax / timeStepSize > 10) {
+                    let rawStep = globalMax / 10;
+                    let mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+                    let norm = rawStep / mag;
+                    timeStepSize = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+                }
+                const timeYAxisMax = Math.max(timeStepSize, Math.ceil(globalMax / timeStepSize) * timeStepSize);
+                const finalTimeYAxisMax = timeYAxisMax + (globalMax === timeYAxisMax ? timeStepSize : 0); // เผื่อพื้นที่ขอบบนสุดให้ตัวเลขไม่ทะลุกราฟ
+                
                 const isGroupMode = dashCurrentYear === 'all' && (dashTimeView === 'month' || dashTimeView === 'week');
 
                 chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { 
@@ -4265,7 +4278,7 @@ function switchTab(activeTabId) {
                     options: { 
                         responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, 
                         plugins: { legend: { display: isGroupMode, position: 'top', labels: { font: { family: 'Sarabun' }, usePointStyle: true, pointStyle: 'circle' } } }, 
-                        scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } 
+                        scales: { y: { beginAtZero: true, max: finalTimeYAxisMax, ticks: { stepSize: timeStepSize } } } 
                     }, 
                     plugins: [{ 
                         id: 'barLabels', 
@@ -4321,6 +4334,28 @@ function switchTab(activeTabId) {
                     datasetsToUse = [{ label: 'ไม่ได้งาน', data: sortedTimeKeys.map(k => timeValueData.lost[k] || 0), backgroundColor: '#ef4444', borderRadius: 6 }];
                 }
 
+                // คำนวณสเกลแกน Y กราฟมูลค่า (ตั้งค่าเริ่มต้นที่ 10,000)
+                let valGlobalMax = 0;
+                if (isStacked) {
+                    sortedTimeKeys.forEach((k) => {
+                        let sum = (timeValueData.prog[k] || 0) + (timeValueData.won[k] || 0) + (timeValueData.lost[k] || 0);
+                        if (sum > valGlobalMax) valGlobalMax = sum;
+                    });
+                } else {
+                    datasetsToUse.forEach(ds => { const m = Math.max(...ds.data); if (m > valGlobalMax) valGlobalMax = m; });
+                }
+                
+                let valStepSize = 10000; // ค่าเริ่มต้น
+                // ถ้าสเกล 10k ทำให้ได้เส้นกริดเกิน 10 เส้น ให้คำนวณขยับหลักแสน ล้าน อัตโนมัติ
+                if (valGlobalMax / valStepSize > 10) {
+                    let rawStep = valGlobalMax / 10;
+                    let mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
+                    let norm = rawStep / mag;
+                    valStepSize = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
+                }
+                const valYAxisMax = Math.max(valStepSize, Math.ceil(valGlobalMax / valStepSize) * valStepSize);
+                const finalValYAxisMax = valYAxisMax + (valGlobalMax === valYAxisMax ? valStepSize : 0); // เผื่อขอบบนไม่ให้ตัวเลขทะลุ
+
                 chartInstances['value'] = new Chart(valueCanvas.getContext('2d'), { 
                     type: 'bar', 
                     data: { labels: displayTimeLabels, datasets: datasetsToUse }, 
@@ -4331,7 +4366,7 @@ function switchTab(activeTabId) {
                         plugins: { legend: { display: isStacked, position: 'top', labels: { font: { family: 'Sarabun' } } } },
                         scales: { 
                             x: { stacked: isStacked },
-                            y: { stacked: isStacked, beginAtZero: true, ticks: { callback: function(value) { return value.toLocaleString('th-TH'); } } } 
+                            y: { stacked: isStacked, beginAtZero: true, max: finalValYAxisMax, ticks: { stepSize: valStepSize, callback: function(value) { return value.toLocaleString('th-TH'); } } } 
                         } 
                     }, 
                     plugins: [{ 
