@@ -206,6 +206,7 @@
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <div class="flex items-center bg-gray-100 p-1 rounded-lg">
+                                <button id="btn-view-year" class="px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all">รายปี</button>
                                 <button id="btn-view-month" class="px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all">รายเดือน</button>
                                 <button id="btn-view-week" class="px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all">รายสัปดาห์</button>
                             </div>
@@ -4098,7 +4099,8 @@ function switchTab(activeTabId) {
             fullyFilteredTasks.forEach(t => {
                 if (!t.receiveDate) return; const [yearStr, monthStr, dayStr] = t.receiveDate.split('-'); const d = new Date(parseInt(yearStr, 10), parseInt(monthStr, 10) - 1, parseInt(dayStr, 10));
                 let timeKey = '';
-                if (dashTimeView === 'month') { timeKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`; timeData.counts[timeKey] = (timeData.counts[timeKey] || 0) + 1; }
+                if (dashTimeView === 'year') { timeKey = `${d.getFullYear()}`; timeData.counts[timeKey] = (timeData.counts[timeKey] || 0) + 1; }
+                else if (dashTimeView === 'month') { timeKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}`; timeData.counts[timeKey] = (timeData.counts[timeKey] || 0) + 1; }
                 else { const firstDayOfMonth = new Date(d.getFullYear(), d.getMonth(), 1).getDay(), weekOfMonth = Math.ceil((d.getDate() + firstDayOfMonth) / 7); timeKey = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2, '0')}-W${weekOfMonth}`; timeData.counts[timeKey] = (timeData.counts[timeKey] || 0) + 1; }
                 
                 const proj = t.projectName || 'ไม่ได้ระบุโครงการ'; 
@@ -4181,14 +4183,15 @@ function switchTab(activeTabId) {
                 destroyChart('time');
                 const sortedTimeKeys = Object.keys(timeData.counts).sort(), timeDataValues = sortedTimeKeys.map(k => timeData.counts[k]), thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
                 const displayTimeLabels = sortedTimeKeys.map(k => {
-                    if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
+                    if (dashTimeView === 'year') { return k; }
+                    else if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
                     else if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
                     return k; 
                 });
                 const maxTimeVal = timeDataValues.length > 0 ? Math.max(...timeDataValues) : 0, timeYAxisMax = Math.max(10, Math.ceil(maxTimeVal / 10) * 10);
                 const maxTimeIdx = timeDataValues.indexOf(maxTimeVal); // ค้นหาตำแหน่งแท่งกราฟที่มีค่ามากที่สุด
-                chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์'})`, data: timeDataValues, backgroundColor: timeDataValues.map((_, i) => i === maxTimeIdx ? '#5b5fc7' : '#e0e7ff'), borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'barLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#5b5fc7'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value, datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
-                const timeLabel = document.getElementById('dash-time-label'); if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
+                chartInstances['time'] = new Chart(timeCanvas.getContext('2d'), { type: 'bar', data: { labels: displayTimeLabels, datasets: [{ label: `จำนวนงาน (${dashTimeView === 'month' ? 'รายเดือน' : dashTimeView === 'week' ? 'รายสัปดาห์' : 'รายปี'})`, data: timeDataValues, backgroundColor: timeDataValues.map((_, i) => i === maxTimeIdx ? '#5b5fc7' : '#e0e7ff'), borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } }, scales: { y: { beginAtZero: true, max: timeYAxisMax, ticks: { stepSize: 1 } } } }, plugins: [{ id: 'barLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); chart.getDatasetMeta(0).data.forEach((datapoint, index) => { const value = data.datasets[0].data[index]; if (value > 0) { ctx.font = 'bold 14px Sarabun, sans-serif'; ctx.fillStyle = '#5b5fc7'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value, datapoint.x, datapoint.y - 6); } }); ctx.restore(); } }] });
+                const timeLabel = document.getElementById('dash-time-label'); if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : dashTimeView === 'week' ? 'รายสัปดาห์' : 'รายปี';
             }
 
             const valueCanvas = document.getElementById('chart-value');
@@ -4196,7 +4199,8 @@ function switchTab(activeTabId) {
                 destroyChart('value');
                 const sortedTimeKeys = Object.keys(timeValueData.counts).sort(), thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
                 const displayTimeLabels = sortedTimeKeys.map(k => {
-                    if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
+                    if (dashTimeView === 'year') { return k; }
+                    else if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
                     else if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
                     return k; 
                 });
@@ -4259,7 +4263,8 @@ function switchTab(activeTabId) {
                         } 
                     }] 
                 });
-                const valueLabel = document.getElementById('dash-value-label'); if(valueLabel) valueLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : 'รายสัปดาห์';
+                const valueLabel = document.getElementById('dash-value-label'); if(valueLabel) valueLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : dashTimeView === 'week' ? 'รายสัปดาห์' : 'รายปี';
+            }
             }
 
             const projCanvas = document.getElementById('chart-project');
@@ -4339,8 +4344,9 @@ function switchTab(activeTabId) {
             dashCurrentProject = 'all'; if (dashProjInput) { dashProjInput.value = ''; dashProjInput.placeholder = 'ทุกโครงการทั้งหมด'; }
             dashCrossFilters = { responsible: null, customer: null, assignment: null, tasktype: null }; dashCurrentYear = 'all'; dashCurrentMonth = 'all'; dashValueFilter = 'all'; renderDashboard();
         });
-        document.getElementById('btn-view-month')?.addEventListener('click', () => { dashTimeView = 'month'; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
-        document.getElementById('btn-view-week')?.addEventListener('click', () => { dashTimeView = 'week'; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
+        document.getElementById('btn-view-year')?.addEventListener('click', () => { dashTimeView = 'year'; document.getElementById('btn-view-year').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
+        document.getElementById('btn-view-month')?.addEventListener('click', () => { dashTimeView = 'month'; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-year').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
+        document.getElementById('btn-view-week')?.addEventListener('click', () => { dashTimeView = 'week'; document.getElementById('btn-view-week').className = "px-5 py-2 text-sm font-semibold rounded-md bg-white shadow-sm text-[#5b5fc7] transition-all"; document.getElementById('btn-view-year').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; document.getElementById('btn-view-month').className = "px-5 py-2 text-sm font-semibold rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-50 transition-all"; renderDashboard(); });
 
         // ฟังก์ชันสร้าง Canvas สัดส่วน A3 แนวตั้ง (297x420mm) เพื่อบีบทุกอย่างลง 1 หน้าเต็มขอบ
         const createA3Canvas = (originalCanvas) => {
