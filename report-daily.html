@@ -1975,67 +1975,59 @@ function switchTab(activeTabId) {
             projList?.classList.add('hidden'); 
             
             if (name) {
+                // ดึงข้อมูลทุกงานของโครงการนี้มา
                 const projectTasks = allTasks.filter(t => t.projectName === name);
                 if (projectTasks.length > 0) {
                     
-                    // 1. คำนวณหายอดรวม (Total Qty) ของแต่ละระบบงานและยี่ห้อ จาก "ทุกงาน" ในโครงการนี้
-                    const totalQtyMap = {};
-                    projectTasks.forEach(task => {
+                    // 1. เรียงลำดับงานจาก "เก่าสุด" ไปหา "ใหม่สุด" (เพื่อให้ค่าใหม่เขียนทับค่าเก่าได้ถูกต้อง)
+                    const sortedTasks = [...projectTasks].sort((a, b) => {
+                        const timeA = a.updatedAt || a.createdAt || 0;
+                        const timeB = b.updatedAt || b.createdAt || 0;
+                        return timeA - timeB; // เรียงน้อยไปมาก (เก่าไปใหม่)
+                    });
+        
+                    // 2. ใช้ Map เพื่อเก็บระบบงานและยี่ห้อที่ไม่ซ้ำกัน 
+                    // ถ้าระบบ+ยี่ห้อเดิมโผล่มาในงานที่ใหม่กว่า มันจะแทนที่ (Overwrite) ข้อมูลเดิมทันที ห้ามบวก
+                    const systemMap = new Map();
+        
+                    sortedTasks.forEach(task => {
                         if (Array.isArray(task.systems)) {
                             task.systems.forEach(s => {
                                 const sName = (s.system || '').trim();
                                 const bName = (s.brand || '').trim();
+                                
                                 if (sName !== '' || bName !== '') {
-                                    // สร้าง Key เพื่อแยกเก็บยอดรวมของแต่ละระบบและยี่ห้อ
+                                    // สร้าง Key เพื่อเช็คความซ้ำซ้อน
                                     const key = `${sName}_||_${bName}`;
-                                    const parsedQty = parseFloat(s.qty);
                                     
-                                    // นำจำนวนมาบวกเพิ่มสะสมไปเรื่อยๆ
-                                    if (!isNaN(parsedQty)) {
-                                        totalQtyMap[key] = (totalQtyMap[key] || 0) + parsedQty;
-                                    }
+                                    // นำข้อมูลยัดลง Map ถ้า Key ซ้ำกัน มันจะเอาจำนวน (qty) ของรอบที่ใหม่กว่าทับค่าเก่าทันที
+                                    systemMap.set(key, {
+                                        system: sName,
+                                        brand: bName,
+                                        qty: (s.qty !== undefined && s.qty !== null) ? s.qty : ''
+                                    });
                                 }
                             });
                         }
                     });
         
-                    // 2. ค้นหางานที่มีการบันทึกหรืออัปเดตล่าสุด เพื่อใช้เป็นโครงสร้างตั้งต้น
-                    const latestTask = projectTasks.reduce((latest, current) => {
-                        const currentVal = current.updatedAt || current.createdAt || 0;
-                        const latestVal = latest.updatedAt || latest.createdAt || 0;
-                        return currentVal > latestVal ? current : latest;
-                    }, projectTasks[0]);
-        
-                    if (Array.isArray(latestTask.systems) && latestTask.systems.length > 0) {
-                        currentSystems = []; // ล้างค่าเดิมในหน้าจอออกก่อน
+                    // 3. นำข้อมูลจาก Map (ซึ่งเป็นค่าล่าสุดของทุกระบบในโครงการ) มาแสดงผล
+                    if (systemMap.size > 0) {
+                        currentSystems = []; // ล้างหน้าจอเดิม
                         let i = 0;
-                        let hasValidSystem = false;
                         
-                        latestTask.systems.forEach(s => {
-                            const sName = (s.system || '').trim();
-                            const bName = (s.brand || '').trim();
-                            
-                            if (sName !== '' || bName !== '') {
-                                hasValidSystem = true;
-                                const key = `${sName}_||_${bName}`;
-                                
-                                // 3. ดึงยอดรวมทั้งหมดที่คำนวณไว้มาแสดงผล ถ้าไม่มียอดรวมให้เป็นค่าว่าง
-                                const totalPreviousQty = totalQtyMap[key] !== undefined ? totalQtyMap[key] : '';
-        
-                                currentSystems.push({
-                                    id: 'sys_auto_' + Date.now() + '_' + (i++),
-                                    checked: true, 
-                                    system: sName,
-                                    brand: bName,
-                                    qty: totalPreviousQty // ส่งยอดรวมสะสมไปแสดงเพื่อให้รู้จำนวนเดิมทั้งหมด
-                                });
-                            }
+                        systemMap.forEach((val, key) => {
+                            currentSystems.push({
+                                id: 'sys_auto_' + Date.now() + '_' + (i++),
+                                checked: true, 
+                                system: val.system,
+                                brand: val.brand,
+                                qty: val.qty // นี่คือจำนวนล่าสุดที่ถูกเขียนทับมาแล้ว
+                            });
                         });
         
-                        if (hasValidSystem) {
-                            renderSystems(); 
-                            showNotification(`ดึงข้อมูลและจำนวนรวมทั้งหมดของโครงการ "${name}" แล้ว`, "success");
-                        }
+                        renderSystems(); 
+                        showNotification(`ดึงข้อมูลระบบงานทั้งหมดของโครงการ "${name}" แล้ว`, "success");
                     }
                 }
             }
