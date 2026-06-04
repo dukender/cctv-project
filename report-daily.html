@@ -4358,26 +4358,43 @@ function switchTab(activeTabId) {
                         scales: { y: { beginAtZero: true, max: finalTimeYAxisMax, ticks: { stepSize: timeStepSize } } } 
                     }, 
                     plugins: [{ 
-                        id: 'barLabels', 
+                        id: 'barLabelsVal', 
                         afterDatasetsDraw(chart) { 
-                            const { ctx, data } = chart; ctx.save(); 
-                            chart.data.datasets.forEach((dataset, i) => {
-                                // โชว์ตัวเลขเฉพาะของกราฟแท่ง (Bar) เท่านั้น ป้องกันไม่ให้รกทับกราฟเส้น
-                                if (dataset.type && dataset.type !== 'bar') return;
-                                
-                                chart.getDatasetMeta(i).data.forEach((datapoint, index) => {
-                                    const value = dataset.data[index];
+                            const { ctx, data } = chart;
+                            ctx.save(); 
+                            if(!isStacked) {
+                                chart.getDatasetMeta(0).data.forEach((datapoint, index) => { 
+                                    const value = data.datasets[0].data[index]; 
                                     if (value > 0) { 
-                                        ctx.font = 'bold 14px Sarabun, sans-serif'; 
-                                        ctx.fillStyle = '#5b5fc7'; 
-                                        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; 
-                                        ctx.fillText(value, datapoint.x, datapoint.y - 6); 
+                                        ctx.font = 'bold 12px Sarabun, sans-serif'; 
+                                        
+                                        // ✅ ดึงสีจาก Array ให้ตรงกับแท่งนั้นๆ
+                                        ctx.fillStyle = Array.isArray(data.datasets[0].backgroundColor) 
+                                            ? data.datasets[0].backgroundColor[index] 
+                                            : data.datasets[0].backgroundColor; 
+                                            
+                                        ctx.textAlign = 'center'; 
+                                        ctx.textBaseline = 'bottom'; 
+                                        ctx.fillText(value.toLocaleString('th-TH'), datapoint.x, datapoint.y - 6); 
+                                    } 
+                                });
+                            } else {
+                                sortedTimeKeys.forEach((k, index) => {
+                                    const totalVal = timeValueData.counts[k] || 0;
+                                    if (totalVal > 0) {
+                                        let maxY = chart.scales.y.getPixelForValue(totalVal);
+                                        let meta = chart.getDatasetMeta(2);
+                                        if (meta.hidden) meta = chart.getDatasetMeta(1);
+                                        if (meta.hidden) meta = chart.getDatasetMeta(0);
+                                        if (!meta.data[index]) return;
+                                        ctx.font = 'bold 12px Sarabun, sans-serif'; ctx.fillStyle = '#4b5563'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; 
+                                        ctx.fillText(totalVal.toLocaleString('th-TH'), meta.data[index].x, maxY - 6);
                                     }
                                 });
-                            });
-                            ctx.restore(); 
+                            }
+                            ctx.restore();
                         } 
-                    }] 
+                    }]
                 });
                 const timeLabel = document.getElementById('dash-time-label'); if(timeLabel) timeLabel.textContent = dashTimeView === 'month' ? 'รายเดือน' : dashTimeView === 'week' ? 'รายสัปดาห์' : 'รายปี';
             }
@@ -4395,20 +4412,32 @@ function switchTab(activeTabId) {
                 
                 let datasetsToUse = [];
                 let isStacked = false;
+
+                // ฟังก์ชันช่วยหาค่าสี 2 โทน (ค่าสูงสุด = สีเข้ม, นอกนั้น = สีอ่อน)
+                const getTwoToneColors = (dataArr, darkHex, lightHex) => {
+                    if (dataArr.length === 0) return [];
+                    const maxVal = Math.max(...dataArr);
+                    return dataArr.map(val => (val > 0 && val === maxVal) ? darkHex : lightHex);
+                };
+
+                // เตรียมข้อมูลตัวเลขแยกตามแต่ละสถานะ
+                const progData = sortedTimeKeys.map(k => timeValueData.prog[k] || 0);
+                const wonData = sortedTimeKeys.map(k => timeValueData.won[k] || 0);
+                const lostData = sortedTimeKeys.map(k => timeValueData.lost[k] || 0);
                 
                 if (dashValueFilter === 'all') {
                     isStacked = true;
                     datasetsToUse = [
-                        { label: 'กำลังดำเนินการ', data: sortedTimeKeys.map(k => timeValueData.prog[k] || 0), backgroundColor: '#3b82f6', borderRadius: 0 },
-                        { label: 'ได้งาน', data: sortedTimeKeys.map(k => timeValueData.won[k] || 0), backgroundColor: '#10b981', borderRadius: 0 },
-                        { label: 'ไม่ได้งาน', data: sortedTimeKeys.map(k => timeValueData.lost[k] || 0), backgroundColor: '#ef4444', borderRadius: 0 }
+                        { label: 'กำลังดำเนินการ', data: progData, backgroundColor: getTwoToneColors(progData, '#3b82f6', '#bfdbfe'), borderRadius: 6 },
+                        { label: 'ได้งาน', data: wonData, backgroundColor: getTwoToneColors(wonData, '#10b981', '#a7f3d0'), borderRadius: 6 },
+                        { label: 'ไม่ได้งาน', data: lostData, backgroundColor: getTwoToneColors(lostData, '#ef4444', '#fecaca'), borderRadius: 6 }
                     ];
                 } else if (dashValueFilter === 'in_progress') {
-                    datasetsToUse = [{ label: 'กำลังดำเนินการ', data: sortedTimeKeys.map(k => timeValueData.prog[k] || 0), backgroundColor: '#3b82f6', borderRadius: 6 }];
+                    datasetsToUse = [{ label: 'กำลังดำเนินการ', data: progData, backgroundColor: getTwoToneColors(progData, '#3b82f6', '#bfdbfe'), borderRadius: 6 }];
                 } else if (dashValueFilter === 'won') {
-                    datasetsToUse = [{ label: 'ได้งาน', data: sortedTimeKeys.map(k => timeValueData.won[k] || 0), backgroundColor: '#10b981', borderRadius: 6 }];
+                    datasetsToUse = [{ label: 'ได้งาน', data: wonData, backgroundColor: getTwoToneColors(wonData, '#10b981', '#a7f3d0'), borderRadius: 6 }];
                 } else if (dashValueFilter === 'lost') {
-                    datasetsToUse = [{ label: 'ไม่ได้งาน', data: sortedTimeKeys.map(k => timeValueData.lost[k] || 0), backgroundColor: '#ef4444', borderRadius: 6 }];
+                    datasetsToUse = [{ label: 'ไม่ได้งาน', data: lostData, backgroundColor: getTwoToneColors(lostData, '#ef4444', '#fecaca'), borderRadius: 6 }];
                 }
 
                 // คำนวณสเกลแกน Y กราฟมูลค่า (ตั้งค่าเริ่มต้นที่ 10,000)
