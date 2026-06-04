@@ -1974,60 +1974,42 @@ function switchTab(activeTabId) {
             if(projInput) projInput.value = name; 
             projList?.classList.add('hidden'); 
             
+            // --- ดึงข้อมูลระบบงานและยี่ห้ออ้างอิงจากงานที่อัปเดตล่าสุดของโครงการนี้เท่านั้น ---
             if (name) {
-                // ดึงข้อมูลทุกงานของโครงการนี้มา
                 const projectTasks = allTasks.filter(t => t.projectName === name);
                 if (projectTasks.length > 0) {
-                    
-                    // 1. เรียงลำดับงานจาก "เก่าสุด" ไปหา "ใหม่สุด" (เพื่อให้ค่าใหม่เขียนทับค่าเก่าได้ถูกต้อง)
-                    const sortedTasks = [...projectTasks].sort((a, b) => {
-                        const timeA = a.updatedAt || a.createdAt || 0;
-                        const timeB = b.updatedAt || b.createdAt || 0;
-                        return timeA - timeB; // เรียงน้อยไปมาก (เก่าไปใหม่)
-                    });
-        
-                    // 2. ใช้ Map เพื่อเก็บระบบงานและยี่ห้อที่ไม่ซ้ำกัน 
-                    // ถ้าระบบ+ยี่ห้อเดิมโผล่มาในงานที่ใหม่กว่า มันจะแทนที่ (Overwrite) ข้อมูลเดิมทันที ห้ามบวก
-                    const systemMap = new Map();
-        
-                    sortedTasks.forEach(task => {
-                        if (Array.isArray(task.systems)) {
-                            task.systems.forEach(s => {
-                                const sName = (s.system || '').trim();
-                                const bName = (s.brand || '').trim();
-                                
-                                if (sName !== '' || bName !== '') {
-                                    // สร้าง Key เพื่อเช็คความซ้ำซ้อน
-                                    const key = `${sName}_||_${bName}`;
-                                    
-                                    // นำข้อมูลยัดลง Map ถ้า Key ซ้ำกัน มันจะเอาจำนวน (qty) ของรอบที่ใหม่กว่าทับค่าเก่าทันที
-                                    systemMap.set(key, {
-                                        system: sName,
-                                        brand: bName,
-                                        qty: (s.qty !== undefined && s.qty !== null) ? s.qty : ''
-                                    });
-                                }
-                            });
-                        }
-                    });
-        
-                    // 3. นำข้อมูลจาก Map (ซึ่งเป็นค่าล่าสุดของทุกระบบในโครงการ) มาแสดงผล
-                    if (systemMap.size > 0) {
-                        currentSystems = []; // ล้างหน้าจอเดิม
+                    // ค้นหางานที่มีการบันทึกหรืออัปเดตล่าสุดเพียงงานเดียว
+                    const latestTask = projectTasks.reduce((latest, current) => {
+                        const currentVal = current.updatedAt || current.createdAt || 0;
+                        const latestVal = latest.updatedAt || latest.createdAt || 0;
+                        return currentVal > latestVal ? current : latest;
+                    }, projectTasks[0]);
+
+                    // ดึงเฉพาะข้อมูลระบบจากงานล่าสุดมาแสดงผล
+                    if (Array.isArray(latestTask.systems) && latestTask.systems.length > 0) {
+                        currentSystems = []; // ล้างช่องว่างที่ไม่ได้กรอก
                         let i = 0;
+                        let hasValidSystem = false;
                         
-                        systemMap.forEach((val, key) => {
-                            currentSystems.push({
-                                id: 'sys_auto_' + Date.now() + '_' + (i++),
-                                checked: true, 
-                                system: val.system,
-                                brand: val.brand,
-                                qty: val.qty // นี่คือจำนวนล่าสุดที่ถูกเขียนทับมาแล้ว
-                            });
+                        latestTask.systems.forEach(s => {
+                            const sName = (s.system || '').trim();
+                            const bName = (s.brand || '').trim();
+                            if (sName !== '' || bName !== '') {
+                                hasValidSystem = true;
+                                currentSystems.push({
+                                    id: 'sys_auto_' + Date.now() + '_' + (i++),
+                                    checked: true, // ติ๊กถูกเปิดใช้งานให้อัตโนมัติ
+                                    system: sName,
+                                    brand: bName,
+                                    qty: s.qty || ''
+                                });
+                            }
                         });
-        
-                        renderSystems(); 
-                        showNotification(`ดึงข้อมูลระบบงานทั้งหมดของโครงการ "${name}" แล้ว`, "success");
+
+                        if (hasValidSystem) {
+                            renderSystems(); // รีเฟรชหน้าจอการ์ดระบบงาน
+                            showNotification(`ดึงข้อมูลระบบงานล่าสุดของโครงการ "${name}" แล้ว`, "success");
+                        }
                     }
                 }
             }
@@ -3844,24 +3826,40 @@ function switchTab(activeTabId) {
             content.innerHTML = '';
             if (projectTasks.length === 0) content.innerHTML = `<div class="text-center text-gray-400 py-8"><i data-lucide="coffee" class="w-10 h-10 mx-auto mb-2 opacity-50"></i><p>ไม่มีงานในโครงการนี้</p></div>`;
             else {
-                // ดึงข้อมูลระบบงานและยี่ห้อทั้งหมดในโครงการนี้มารวมกัน พร้อมรวมจำนวนอุปกรณ์
+                // ดึงข้อมูลระบบงานและยี่ห้อทั้งหมดในโครงการนี้มารวมกัน พร้อมอัปเดตจำนวนล่าสุด (ห้ามนำมาบวกสะสม)
                 let projectSystems = new Set(), projectBrands = new Set(), sysBrandQtyMap = {};
-                projectTasks.forEach(task => {
+                
+                // เรียงประวัติจากเก่าไปใหม่ เพื่อให้ค่ายอดล่าสุดเข้าไปเขียนทับยอดเดิมเสมอ
+                const sortedProjectTasks = [...projectTasks].sort((a, b) => {
+                    const timeA = a.updatedAt || a.createdAt || 0;
+                    const timeB = b.updatedAt || b.createdAt || 0;
+                    return timeA - timeB;
+                });
+
+                sortedProjectTasks.forEach(task => {
                     if (Array.isArray(task.systems)) {
                         task.systems.forEach(s => {
                             let sName = (s.system && s.system.trim() !== '') ? s.system.trim() : 'ไม่ระบุระบบ';
                             let bName = (s.brand && s.brand.trim() !== '') ? s.brand.trim() : 'ไม่ระบุยี่ห้อ';
                             let qty = parseInt(String(s.qty).replace(/,/g, ''), 10) || 0;
-                            
+
                             if (sName !== 'ไม่ระบุระบบ') projectSystems.add(sName);
                             if (bName !== 'ไม่ระบุยี่ห้อ') projectBrands.add(bName);
+
+                            let key = `${sName} : ${bName}`;
                             
-                            if (qty > 0) {
-                                let key = `${sName} : ${bName}`;
-                                if (!sysBrandQtyMap[key]) sysBrandQtyMap[key] = 0;
-                                sysBrandQtyMap[key] += qty;
+                            // ใช้ = เขียนทับค่าไปเลย (ห้ามใช้ += เด็ดขาด)
+                            if (qty > 0 || sysBrandQtyMap[key] !== undefined) {
+                                sysBrandQtyMap[key] = qty;
                             }
                         });
+                    }
+                });
+                
+                // ล้างข้อมูลอุปกรณ์ที่ยอดล่าสุดถูกผู้ใช้แก้เป็น 0 ออก เพื่อไม่ให้แสดงในหน้าสรุป
+                Object.keys(sysBrandQtyMap).forEach(key => {
+                    if (sysBrandQtyMap[key] <= 0) {
+                        delete sysBrandQtyMap[key];
                     }
                 });
                 let sysArray = Array.from(projectSystems).sort((a,b) => a.localeCompare(b, 'th'));
