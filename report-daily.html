@@ -1984,10 +1984,11 @@ function switchTab(activeTabId) {
                         const latestVal = latest.updatedAt || latest.createdAt || 0;
                         return currentVal > latestVal ? current : latest;
                     }, projectTasks[0]);
-
+        
                     // ดึงเฉพาะข้อมูลระบบจากงานล่าสุดมาแสดงผล
                     if (Array.isArray(latestTask.systems) && latestTask.systems.length > 0) {
-                        currentSystems = []; // ล้างช่องว่างที่ไม่ได้กรอก
+                        // ล้างค่าเดิมใน currentSystems ทิ้งทั้งหมด เพื่อให้มั่นใจว่าจะไม่ไปปะปนหรือรวมกับข้อมูลชุดเก่า
+                        currentSystems = []; 
                         let i = 0;
                         let hasValidSystem = false;
                         
@@ -2001,11 +2002,12 @@ function switchTab(activeTabId) {
                                     checked: true, // ติ๊กถูกเปิดใช้งานให้อัตโนมัติ
                                     system: sName,
                                     brand: bName,
-                                    qty: s.qty || ''
+                                    // ดึงจำนวน (qty) ของงานล่าสุดมาแทนที่ตรงๆ โดยไม่เอาไปรวมหรือบวกกับของเดิม
+                                    qty: (s.qty !== undefined && s.qty !== null) ? s.qty : ''
                                 });
                             }
                         });
-
+        
                         if (hasValidSystem) {
                             renderSystems(); // รีเฟรชหน้าจอการ์ดระบบงาน
                             showNotification(`ดึงข้อมูลระบบงานล่าสุดของโครงการ "${name}" แล้ว`, "success");
