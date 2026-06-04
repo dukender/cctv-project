@@ -1974,42 +1974,71 @@ function switchTab(activeTabId) {
             if(projInput) projInput.value = name; 
             projList?.classList.add('hidden'); 
             
-            // --- ดึงข้อมูลระบบงานและยี่ห้ออ้างอิงจากงานที่อัปเดตล่าสุดของโครงการนี้เท่านั้น ---
             if (name) {
+                // ดึงข้อมูลทุกงานของโครงการนี้มา
                 const projectTasks = allTasks.filter(t => t.projectName === name);
                 if (projectTasks.length > 0) {
-                    // ค้นหางานที่มีการบันทึกหรืออัปเดตล่าสุดเพียงงานเดียว
-                    const latestTask = projectTasks.reduce((latest, current) => {
-                        const currentVal = current.updatedAt || current.createdAt || 0;
-                        const latestVal = latest.updatedAt || latest.createdAt || 0;
-                        return currentVal > latestVal ? current : latest;
-                    }, projectTasks[0]);
+                    
+                    // 1. เรียงลำดับงานจาก "เก่าสุด" ไปหา "ใหม่สุด"
+                    const sortedTasks = [...projectTasks].sort((a, b) => {
+                        const timeA = a.updatedAt || a.createdAt || 0;
+                        const timeB = b.updatedAt || b.createdAt || 0;
+                        return timeA - timeB; 
+                    });
+        
+                    // 2. ใช้ Map เพื่อเก็บระบบงาน ยี่ห้อ และจำนวน
+                    const systemMap = new Map();
+        
+                    sortedTasks.forEach(task => {
+                        if (Array.isArray(task.systems)) {
+                            task.systems.forEach(s => {
+                                const sName = (s.system || '').trim();
+                                const bName = (s.brand || '').trim();
+                                
+                                if (sName !== '' || bName !== '') {
+                                    const key = `${sName}_||_${bName}`;
+                                    const existingData = systemMap.get(key);
+                                    
+                                    // รักษายอดจำนวนอ้างอิง: หากงานล่าสุดไม่ได้กรอกจำนวนมา ให้ดึงจำนวนจากประวัติเก่ามาแสดง
+                                    let latestQty = '';
+                                    if (s.qty !== undefined && s.qty !== null && s.qty !== '') {
+                                        latestQty = s.qty; // ยึดค่าใหม่ที่กรอกล่าสุด
+                                    } else if (existingData && existingData.qty !== '') {
+                                        latestQty = existingData.qty; // ดึงค่าเก่ามาใช้ถ้าของใหม่ถูกปล่อยว่าง
+                                    }
 
-                    // ดึงเฉพาะข้อมูลระบบจากงานล่าสุดมาแสดงผล
-                    if (Array.isArray(latestTask.systems) && latestTask.systems.length > 0) {
-                        currentSystems = []; // ล้างช่องว่างที่ไม่ได้กรอก
-                        let i = 0;
-                        let hasValidSystem = false;
-                        
-                        latestTask.systems.forEach(s => {
-                            const sName = (s.system || '').trim();
-                            const bName = (s.brand || '').trim();
-                            if (sName !== '' || bName !== '') {
-                                hasValidSystem = true;
-                                currentSystems.push({
-                                    id: 'sys_auto_' + Date.now() + '_' + (i++),
-                                    checked: true, // ติ๊กถูกเปิดใช้งานให้อัตโนมัติ
-                                    system: sName,
-                                    brand: bName,
-                                    qty: s.qty || ''
-                                });
-                            }
-                        });
-
-                        if (hasValidSystem) {
-                            renderSystems(); // รีเฟรชหน้าจอการ์ดระบบงาน
-                            showNotification(`ดึงข้อมูลระบบงานล่าสุดของโครงการ "${name}" แล้ว`, "success");
+                                    systemMap.set(key, {
+                                        system: sName,
+                                        brand: bName,
+                                        qty: latestQty
+                                    });
+                                }
+                            });
                         }
+                    });
+        
+                    // 3. นำข้อมูลจาก Map มาแสดงผลบนหน้าจอ
+                    if (systemMap.size > 0) {
+                        currentSystems = []; // ล้างหน้าจอเดิม
+                        let i = 0;
+                        
+                        systemMap.forEach((val, key) => {
+                            // แปลงตัวเลขให้มีลูกน้ำ (Comma) เพื่อความสวยงามตามรูปแบบหน้าจอ
+                            const displayQty = (val.qty !== '' && !isNaN(String(val.qty).replace(/,/g, ''))) 
+                                               ? Number(String(val.qty).replace(/,/g, '')).toLocaleString('th-TH') 
+                                               : val.qty;
+
+                            currentSystems.push({
+                                id: 'sys_auto_' + Date.now() + '_' + (i++),
+                                checked: true, 
+                                system: val.system,
+                                brand: val.brand,
+                                qty: displayQty // แสดงจำนวนทั้งหมดของโครงการ
+                            });
+                        });
+        
+                        renderSystems(); 
+                        showNotification(`ดึงข้อมูลระบบงานและจำนวนทั้งหมดของโครงการ "${name}" แล้ว`, "success");
                     }
                 }
             }
