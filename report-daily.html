@@ -1974,12 +1974,32 @@ function switchTab(activeTabId) {
             if(projInput) projInput.value = name; 
             projList?.classList.add('hidden'); 
             
-            // --- ดึงข้อมูลระบบงาน ยี่ห้อ และจำนวนอ้างอิงจากงานที่อัปเดตล่าสุด ---
             if (name) {
                 const projectTasks = allTasks.filter(t => t.projectName === name);
                 if (projectTasks.length > 0) {
                     
-                    // 1. ค้นหางานที่มีการบันทึกหรืออัปเดตล่าสุด
+                    // 1. คำนวณหายอดรวม (Total Qty) ของแต่ละระบบงานและยี่ห้อ จาก "ทุกงาน" ในโครงการนี้
+                    const totalQtyMap = {};
+                    projectTasks.forEach(task => {
+                        if (Array.isArray(task.systems)) {
+                            task.systems.forEach(s => {
+                                const sName = (s.system || '').trim();
+                                const bName = (s.brand || '').trim();
+                                if (sName !== '' || bName !== '') {
+                                    // สร้าง Key เพื่อแยกเก็บยอดรวมของแต่ละระบบและยี่ห้อ
+                                    const key = `${sName}_||_${bName}`;
+                                    const parsedQty = parseFloat(s.qty);
+                                    
+                                    // นำจำนวนมาบวกเพิ่มสะสมไปเรื่อยๆ
+                                    if (!isNaN(parsedQty)) {
+                                        totalQtyMap[key] = (totalQtyMap[key] || 0) + parsedQty;
+                                    }
+                                }
+                            });
+                        }
+                    });
+        
+                    // 2. ค้นหางานที่มีการบันทึกหรืออัปเดตล่าสุด เพื่อใช้เป็นโครงสร้างตั้งต้น
                     const latestTask = projectTasks.reduce((latest, current) => {
                         const currentVal = current.updatedAt || current.createdAt || 0;
                         const latestVal = latest.updatedAt || latest.createdAt || 0;
@@ -1987,7 +2007,7 @@ function switchTab(activeTabId) {
                     }, projectTasks[0]);
         
                     if (Array.isArray(latestTask.systems) && latestTask.systems.length > 0) {
-                        currentSystems = []; // ล้างค่าในหน้าจอออกก่อน
+                        currentSystems = []; // ล้างค่าเดิมในหน้าจอออกก่อน
                         let i = 0;
                         let hasValidSystem = false;
                         
@@ -1995,24 +2015,26 @@ function switchTab(activeTabId) {
                             const sName = (s.system || '').trim();
                             const bName = (s.brand || '').trim();
                             
-                            // 2. ดึงจำนวนเดิม (Previous Quantity) มาเก็บไว้
-                            const previousQty = (s.qty !== undefined && s.qty !== null) ? s.qty : '';
-        
                             if (sName !== '' || bName !== '') {
                                 hasValidSystem = true;
+                                const key = `${sName}_||_${bName}`;
+                                
+                                // 3. ดึงยอดรวมทั้งหมดที่คำนวณไว้มาแสดงผล ถ้าไม่มียอดรวมให้เป็นค่าว่าง
+                                const totalPreviousQty = totalQtyMap[key] !== undefined ? totalQtyMap[key] : '';
+        
                                 currentSystems.push({
                                     id: 'sys_auto_' + Date.now() + '_' + (i++),
                                     checked: true, 
                                     system: sName,
                                     brand: bName,
-                                    qty: previousQty // 3. ส่งจำนวนเดิมไปแสดงที่ช่อง Input เพื่อให้รู้จำนวนเดิม และพร้อมให้ผู้ใช้พิมพ์แก้ไข
+                                    qty: totalPreviousQty // ส่งยอดรวมสะสมไปแสดงเพื่อให้รู้จำนวนเดิมทั้งหมด
                                 });
                             }
                         });
         
                         if (hasValidSystem) {
-                            renderSystems(); // นำข้อมูลทั้งหมดรวมถึงจำนวนเดิมไปแสดงบนหน้าจอ
-                            showNotification(`ดึงข้อมูลระบบและจำนวนอ้างอิงล่าสุดของโครงการ "${name}" แล้ว`, "success");
+                            renderSystems(); 
+                            showNotification(`ดึงข้อมูลและจำนวนรวมทั้งหมดของโครงการ "${name}" แล้ว`, "success");
                         }
                     }
                 }
