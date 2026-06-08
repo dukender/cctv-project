@@ -4658,7 +4658,8 @@ function switchTab(activeTabId) {
         document.getElementById('btn-export-excel')?.addEventListener('click', () => {
             if (filteredTasks.length === 0) return showNotification("ไม่มีข้อมูลให้ Export", "error");
             const exportData = filteredTasks.map(t => { 
-                let notesStr = t.notes ? t.notes.map(n => n.text).filter(text => text.trim() !== '').join(' | ') : ''; 
+                // เพิ่ม [x] สำหรับรายการที่เสร็จแล้ว และ [ ] สำหรับรายการที่ยังไม่เสร็จ
+                let notesStr = t.notes ? t.notes.map(n => (n.completed ? '[x] ' : '[ ] ') + n.text).filter(text => text.replace(/^\[x\] |^\[ \] /, '').trim() !== '').join(' | ') : ''; 
                 let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || '-'); 
  
                 let assignStr = Array.isArray(t.assignment) ? t.assignment.join(', ') : (t.assignment || '-'); 
@@ -4739,12 +4740,25 @@ function switchTab(activeTabId) {
                         
                         let notesArray = [];
                         if (row['บันทึกย่อ'] && row['บันทึกย่อ'] !== '-') {
-                            notesArray = String(row['บันทึกย่อ']).split('|').map(s => ({
-                                id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-                                text: s.trim(),
-                                completed: false,
-                                completedAt: null
-                            })).filter(n => n.text !== '');
+                            notesArray = String(row['บันทึกย่อ']).split('|').map(s => {
+                                let str = s.trim();
+                                let isCompleted = false;
+                                
+                                // ตรวจสอบสัญลักษณ์หน้าข้อความเพื่อแปลงเป็นสถานะ Check
+                                if (str.toLowerCase().startsWith('[x]')) {
+                                    isCompleted = true;
+                                    str = str.substring(3).trim(); // ตัด [x] ออกให้เหลือแต่ข้อความ
+                                } else if (str.startsWith('[ ]')) {
+                                    str = str.substring(3).trim(); // ตัด [ ] ออกให้เหลือแต่ข้อความ
+                                }
+
+                                return {
+                                    id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                                    text: str,
+                                    completed: isCompleted,
+                                    completedAt: isCompleted ? Date.now() : null
+                                };
+                            }).filter(n => n.text !== '');
                         }
 
                         let systemsArray = [];
