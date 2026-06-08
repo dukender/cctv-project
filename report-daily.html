@@ -832,6 +832,10 @@
                                 <select id="search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
                                 <button id="btn-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
                                 <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                    <input type="file" id="import-excel-file" accept=".xlsx, .xls" class="hidden">
+                                    <button id="btn-import-excel" class="role-restricted-action p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors relative" title="นำเข้าข้อมูลจาก Excel">
+                                        <i data-lucide="upload-cloud" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-blue-600 px-0.5 rounded-sm border border-blue-200 leading-none">IMPORT</span>
+                                    </button>
                                     <button id="btn-export-excel" class="p-2 bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 rounded-md transition-colors relative"><i data-lucide="file-spreadsheet" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-green-600 px-0.5 rounded-sm border border-green-200 leading-none">EXCEL</span></button>
                                     <button onclick="window.print()" class="p-2 bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors relative" title="สั่งพิมพ์หน้าจอ">
                                         <i data-lucide="printer" class="w-5 h-5"></i></button>
@@ -4656,24 +4660,142 @@ function switchTab(activeTabId) {
             const exportData = filteredTasks.map(t => { 
                 let notesStr = t.notes ? t.notes.map(n => n.text).filter(text => text.trim() !== '').join(' | ') : ''; 
                 let typeStr = Array.isArray(t.taskType) ? t.taskType.join(', ') : (t.taskType || '-'); 
+ 
                 let assignStr = Array.isArray(t.assignment) ? t.assignment.join(', ') : (t.assignment || '-'); 
+                
+                let sysStr = (t.systems && Array.isArray(t.systems) && t.systems.length > 0) 
+                    ? t.systems.map(s => `${s.system || 'ไม่ระบุ'}/${s.brand || 'ไม่ระบุ'} (${s.qty || 0})`).join(', ') 
+                    : '-';
+
                 return { 
-                    'วันรับงาน': t.receiveDate ? new Date(t.receiveDate) : null, // แก้ตรงนี้
+                    'วันรับงาน': t.receiveDate ? new Date(t.receiveDate) : null,
                     'ชื่องาน': t.taskName || '-', 
+    
                     'ชื่อโครงการ': t.projectName || '-', 
                     'ประเภทงาน': typeStr, 
                     'ผู้รับผิดชอบ': t.responsibleName || '-', 
                     'การมอบหมาย': assignStr, 
+            
                     'ชื่อลูกค้า': t.customerName || '-', 
                     'เบอร์ลูกค้า': t.customerPhone || '-', 
                     'สถานที่': t.workLocation || '-', 
-                    'บันทึกย่อ': notesStr 
-                }; 
+                    'บันทึกย่อ': notesStr,
+                    'ระบบงาน/ยี่ห้อ (จำนวน)': sysStr
+                };
             });
             const worksheet = XLSX.utils.json_to_sheet(exportData), workbook = XLSX.utils.book_new(); 
             XLSX.utils.book_append_sheet(workbook, worksheet, "Daily Tasks"); 
-            XLSX.writeFile(workbook, `Daily_Tasks_${getThaiDateString()}.xlsx`, { cellDates: true }); // เพิ่มตัวเลือก
+            XLSX.writeFile(workbook, `Daily_Tasks_${getThaiDateString()}.xlsx`, { cellDates: true });
             showNotification("Export Excel สำเร็จ");
+        });
+
+        // Event สำหรับจำลองการคลิก Input File
+        document.getElementById('btn-import-excel')?.addEventListener('click', () => {
+            document.getElementById('import-excel-file').click();
+        });
+
+        // Event สำหรับอ่านและบันทึกข้อมูลเข้า Firebase เมื่อเลือกไฟล์เสร็จ
+        document.getElementById('import-excel-file')?.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!currentUser || currentUserRole === 'monitor') {
+                showNotification("คุณไม่มีสิทธิ์นำเข้าข้อมูล", "error");
+                e.target.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async (evt) => {
+                try {
+                    showNotification("กำลังอ่านไฟล์ Excel...", "success");
+                    const data = evt.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary', cellDates: true });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    if (rows.length === 0) {
+                        showNotification("ไม่พบข้อมูลในไฟล์ Excel", "error");
+                        e.target.value = '';
+                        return;
+                    }
+
+                    showNotification(`กำลังนำเข้าข้อมูล ${rows.length} รายการ โปรดรอสักครู่...`, "success");
+                    let successCount = 0;
+                    
+                    for (const row of rows) {
+                        let rDate = '';
+                        if (row['วันรับงาน']) {
+                            const d = new Date(row['วันรับงาน']);
+                            if (!isNaN(d.getTime())) {
+                                rDate = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                            }
+                        }
+                        if(!rDate) rDate = getThaiDateString();
+
+                        let taskTypes = row['ประเภทงาน'] && row['ประเภทงาน'] !== '-' ? String(row['ประเภทงาน']).split(',').map(s=>s.trim()).filter(Boolean) : [];
+                        let assignments = row['การมอบหมาย'] && row['การมอบหมาย'] !== '-' ? String(row['การมอบหมาย']).split(',').map(s=>s.trim()).filter(Boolean) : [];
+                        
+                        let notesArray = [];
+                        if (row['บันทึกย่อ'] && row['บันทึกย่อ'] !== '-') {
+                            notesArray = String(row['บันทึกย่อ']).split('|').map(s => ({
+                                id: 'note_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+                                text: s.trim(),
+                                completed: false,
+                                completedAt: null
+                            })).filter(n => n.text !== '');
+                        }
+
+                        let systemsArray = [];
+                        if (row['ระบบงาน/ยี่ห้อ (จำนวน)'] && row['ระบบงาน/ยี่ห้อ (จำนวน)'] !== '-') {
+                            const sysItems = String(row['ระบบงาน/ยี่ห้อ (จำนวน)']).split(',');
+                            sysItems.forEach(item => {
+                                const match = item.match(/^(.*?)\/(.*?)\s*\((\d+)\)$/);
+                                if(match) {
+                                    systemsArray.push({
+                                        system: match[1].trim() === 'ไม่ระบุ' ? '' : match[1].trim(),
+                                        brand: match[2].trim() === 'ไม่ระบุ' ? '' : match[2].trim(),
+                                        qty: parseInt(match[3]) || 0
+                                    });
+                                } else {
+                                    systemsArray.push({ system: item.trim(), brand: '', qty: 0 });
+                                }
+                            });
+                        }
+
+                        const taskData = { 
+                            taskName: row['ชื่องาน'] && row['ชื่องาน'] !== '-' ? row['ชื่องาน'] : 'ไม่มีชื่องาน', 
+                            projectName: row['ชื่อโครงการ'] && row['ชื่อโครงการ'] !== '-' ? row['ชื่อโครงการ'] : '', 
+                            taskType: taskTypes, 
+                            receiveDate: rDate, 
+                            responsibleName: row['ผู้รับผิดชอบ'] && row['ผู้รับผิดชอบ'] !== '-' ? row['ผู้รับผิดชอบ'] : '', 
+                            assignment: assignments, 
+                            customerName: row['ชื่อลูกค้า'] && row['ชื่อลูกค้า'] !== '-' ? row['ชื่อลูกค้า'] : '', 
+                            customerPhone: row['เบอร์ลูกค้า'] && row['เบอร์ลูกค้า'] !== '-' ? row['เบอร์ลูกค้า'] : '', 
+                            workLocation: row['สถานที่'] && row['สถานที่'] !== '-' ? row['สถานที่'] : '', 
+                            notes: notesArray, 
+                            systems: systemsArray, 
+                            createdAt: Date.now(),
+                            updatedAt: Date.now(),
+                            ownerId: currentUser.uid, 
+                            ownerEmail: currentUser.email 
+                        };
+
+                        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'daily_tasks'), taskData);
+                        successCount++;
+                    }
+
+                    await recordLog('เพิ่ม', `นำเข้าข้อมูลงานจาก Excel จำนวน ${successCount} รายการ`);
+                    showNotification(`นำเข้าข้อมูลสำเร็จ ${successCount} รายการ`, "success");
+                } catch (error) {
+                    console.error(error);
+                    showNotification("เกิดข้อผิดพลาดในการนำเข้าข้อมูล: " + error.message, "error");
+                } finally {
+                    e.target.value = '';
+                }
+            };
+            reader.readAsBinaryString(file);
         });
         function loadUsersList() {
             if (currentUserRole !== 'admin' && currentUserRole !== 'monitor') return;
