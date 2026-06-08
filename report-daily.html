@@ -143,6 +143,7 @@
                 <div class="p-2 lg:p-4 h-full flex flex-col">
                     <div class="bg-white lg:rounded-xl lg:shadow-sm lg:border border-gray-100 p-2 flex flex-col gap-1 overflow-y-auto no-scrollbar flex-1">
                         <button id="tab-dashboard" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap bg-indigo-50 text-[#5b5fc7] ring-1 ring-[#5b5fc7]/20"><i data-lucide="pie-chart" class="w-5 h-5"></i> แดชบอร์ดสถิติ</button>
+                        <button id="tab-timeline" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="gantt-chart" class="w-5 h-5"></i> Timeline โครงการ</button>
                         <button id="tab-project-summary" class="w-full text-left px-4 py-3 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800"><i data-lucide="layout-list" class="w-5 h-5"></i> สรุปโครงการ</button>
                         <button id="tab-tasktype-summary" class="relative w-full text-left pl-11 pr-4 py-2.5 text-sm font-semibold rounded-lg transition-colors flex items-center gap-3 whitespace-nowrap text-gray-500 hover:bg-gray-100 hover:text-gray-800">
                             <span class="block absolute left-[25px] -top-1 w-4 h-[calc(50%+4px)] border-l-2 border-b-2 border-gray-300 rounded-bl-sm pointer-events-none"></span>
@@ -292,6 +293,49 @@
                             <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2"><i data-lucide="arrow-right-left" class="w-5 h-5 text-rose-500"></i> สัดส่วนตามการมอบหมาย</h3>
                             <div class="flex flex-col sm:flex-row items-center sm:items-start flex-1 w-full gap-4 sm:gap-0 mt-2 sm:mt-0"><div class="relative w-48 h-48 sm:w-52 sm:h-52 shrink-0 mx-auto sm:mx-0 sm:ml-2 md:ml-10"><canvas id="chart-assignment"></canvas></div><div id="legend-assignment" class="flex-1 w-full sm:w-auto pl-0 sm:pl-4 md:pl-8 overflow-y-auto max-h-[300px] no-scrollbar flex flex-col gap-0.5"></div></div>
                         </div>
+                    </div>
+                        </div>
+
+                <div id="view-timeline" class="hidden animate-fade-in pb-10">
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4 border-b border-gray-100 pb-5">
+                            <div><h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="gantt-chart" class="w-6 h-6 text-[#5b5fc7]"></i> Timeline โครงการ</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูล <span id="timeline-display-count" class="font-bold text-[#5b5fc7]">0</span> รายการ</p></div>
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="timeline-search-input" placeholder="ค้นหาชื่อโครงการ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow"></div>
+                                <select id="timeline-search-time-type" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 bg-white flex-1 sm:flex-none"><option value="day">รายวัน</option><option value="month">รายเดือน</option><option value="year">รายปี</option></select>
+                                <input type="date" id="timeline-search-date" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 block">
+                                <input type="month" id="timeline-search-month" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden">
+                                <select id="timeline-search-year" class="px-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#5b5fc7] transition-shadow text-gray-600 hidden min-w-[120px]"><option value="">ทุกปีทั้งหมด</option></select>
+                                <button id="btn-timeline-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
+                                <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
+                                    <button onclick="window.print()" class="p-2 bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors relative" title="พิมพ์หน้าจอ"><i data-lucide="printer" class="w-5 h-5"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
+                            <div id="card-time-all" onclick="setTimelineFilter('all')" class="bg-gray-50 p-4 rounded-lg border border-gray-200 text-center cursor-pointer transition-all hover:shadow-md ring-2 ring-gray-400 ring-offset-2 scale-[1.02]"><p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">โครงการทั้งหมด</p><p class="text-xl font-bold text-gray-800" id="timeline-total">0 ( 0% )</p></div>
+                            <div id="card-time-prog" onclick="setTimelineFilter('in_progress')" class="bg-blue-50 p-4 rounded-lg border border-blue-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-1">กำลังดำเนินการ</p><p class="text-xl font-bold text-blue-700" id="timeline-progress">0 ( 0% )</p></div>
+                            <div id="card-time-won" onclick="setTimelineFilter('won')" class="bg-green-50 p-4 rounded-lg border border-green-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-green-600 uppercase tracking-wider mb-1">ได้งาน</p><p class="text-xl font-bold text-green-700" id="timeline-won">0 ( 0% )</p></div>
+                            <div id="card-time-lost" onclick="setTimelineFilter('lost')" class="bg-red-50 p-4 rounded-lg border border-red-200 text-center cursor-pointer transition-all hover:shadow-md"><p class="text-xs font-semibold text-red-600 uppercase tracking-wider mb-1">ไม่ได้งาน</p><p class="text-xl font-bold text-red-700" id="timeline-lost">0 ( 0% )</p></div>
+                        </div>
+
+                        <div class="overflow-x-auto border border-gray-200 rounded-lg flex flex-col md:flex-row bg-white relative">
+                            <div class="w-full md:w-56 shrink-0 flex flex-col z-20 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] bg-white border-b md:border-b-0 md:border-r border-gray-200">
+                                <div class="h-[52px] bg-gray-100 flex items-center px-4 font-bold text-gray-700 text-xs uppercase tracking-wider border-b border-gray-200 shrink-0">ชื่อโครงการ</div>
+                                <div id="timeline-left-rows" class="flex flex-col bg-white"></div>
+                            </div>
+                            <div class="flex-1 overflow-x-auto flex flex-col bg-white no-scrollbar" style="cursor: grab;" id="timeline-scroll-area">
+                                <div class="flex bg-gray-100 shrink-0">
+                                    <div id="timeline-header-months" class="flex h-6 border-b border-gray-200 text-[10px] font-bold text-gray-600"></div>
+                                </div>
+                                <div class="flex bg-gray-50 shrink-0">
+                                    <div id="timeline-header-days" class="flex h-[28px] border-b border-gray-200 text-[9px] text-gray-500"></div>
+                                </div>
+                                <div id="timeline-right-rows" class="relative flex flex-col bg-white" style="background-image: linear-gradient(to right, #e5e7eb 1px, transparent 1px); background-size: 24px 100%;"></div>
+                            </div>
+                        </div>
+                        <div id="timeline-pagination"></div>
                     </div>
                 </div>
 
@@ -1204,6 +1248,8 @@
                 filterAndRenderTasks();
                 renderCalendar();
                 if (viewDashboard && !viewDashboard.classList.contains('hidden')) renderDashboard();
+                const viewTimeline = document.getElementById('view-timeline'); 
+                if (viewTimeline && !viewTimeline.classList.contains('hidden')) renderTimeline();
                 if (viewProjectSummary && !viewProjectSummary.classList.contains('hidden')) renderProjectSummary();
                 if (viewTasktypeSummary && !viewTasktypeSummary.classList.contains('hidden')) renderTasktypeSummary();
                 const viewSystem = document.getElementById('view-system-summary'); 
@@ -1219,7 +1265,7 @@
         // --- ตั้งค่าเริ่มต้นตัวกรองเป็นเดือนปัจจุบัน ---
         window.addEventListener('DOMContentLoaded', () => {
             const currentMonthVal = `${getThaiDate().getFullYear()}-${String(getThaiDate().getMonth() + 1).padStart(2, '0')}`;
-            const filterPrefixes = ['search', 'summary-search', 'tasktype-search', 'system-search', 'brandsum-search', 'resp-search', 'cust-search'];
+            const filterPrefixes = ['search', 'timeline-search', 'summary-search', 'tasktype-search', 'system-search', 'brandsum-search', 'resp-search', 'cust-search'];
             filterPrefixes.forEach(prefix => {
                 const timeTypeEl = document.getElementById(`${prefix}-time-type`);
                 const monthEl = document.getElementById(`${prefix}-month`);
@@ -1406,7 +1452,7 @@
         
         // 1. กำหนดค่าเริ่มต้น: มือถือโชว์ 20, คอมพิวเตอร์โชว์ 40
         let itemsPerPage = window.innerWidth < 768 ? 20 : 40;
-        let listCurrentPage = 1, summaryCurrentPage = 1;
+        let listCurrentPage = 1, summaryCurrentPage = 1, timelineCurrentPage = 1;
 
         // 2. ฟังก์ชันรับค่าเมื่อผู้ใช้เลือก Dropdown โชว์จำนวนรายการ
         window.changeItemsPerPage = (val) => {
@@ -1564,7 +1610,8 @@ function switchTab(activeTabId) {
             if (activeTabId === 'dashboard' && typeof renderDashboard === 'function') renderDashboard(); 
             else if (activeTabId === 'calendar' && typeof renderCalendar === 'function') renderCalendar();
             else if (activeTabId === 'field-calendar' && typeof renderFieldCalendar === 'function') renderFieldCalendar();    
-            else if (activeTabId === 'list' && typeof filterAndRenderTasks === 'function') filterAndRenderTasks(); 
+            else if (activeTabId === 'list' && typeof filterAndRenderTasks === 'function') filterAndRenderTasks();
+            else if (activeTabId === 'timeline' && typeof renderTimeline === 'function') renderTimeline();
             else if (activeTabId === 'project-summary' && typeof renderProjectSummary === 'function') renderProjectSummary(); 
             else if (activeTabId === 'tasktype-summary' && typeof renderTasktypeSummary === 'function') renderTasktypeSummary(); 
             else if (activeTabId === 'system-summary' && typeof renderSystemSummary === 'function') renderSystemSummary(); 
@@ -1588,6 +1635,7 @@ function switchTab(activeTabId) {
         window.switchTab = switchTab;
         
         document.getElementById('tab-dashboard')?.addEventListener('click', () => switchTab('dashboard'));
+        document.getElementById('tab-timeline')?.addEventListener('click', () => switchTab('timeline'));
         document.getElementById('tab-calendar')?.addEventListener('click', () => switchTab('calendar'));
         document.getElementById('tab-field-calendar')?.addEventListener('click', () => switchTab('field-calendar'));
         document.getElementById('tab-holiday-summary')?.addEventListener('click', () => switchTab('holiday-summary'));
@@ -1915,7 +1963,7 @@ function switchTab(activeTabId) {
                 tasks.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
                 allTasks = tasks; 
                 populateEmailDropdowns();
-                const listYearSelect = document.getElementById('search-year'), summaryYearSelect = document.getElementById('summary-search-year'), respYearSelect = document.getElementById('resp-search-year'), custYearSelect = document.getElementById('cust-search-year'); 
+                const listYearSelect = document.getElementById('search-year'), summaryYearSelect = document.getElementById('summary-search-year'), timelineYearSelect = document.getElementById('timeline-search-year'), respYearSelect = document.getElementById('resp-search-year'), custYearSelect = document.getElementById('cust-search-year'); 
                 if (listYearSelect) {
                     const yearsSet = new Set(); tasks.forEach(t => { if (t.receiveDate) yearsSet.add(t.receiveDate.substring(0, 4)); });
                     const sortedYears = Array.from(yearsSet).sort().reverse();
@@ -1929,6 +1977,7 @@ function switchTab(activeTabId) {
                     };
                     updateYearOptions(listYearSelect);
                     updateYearOptions(summaryYearSelect);
+                    updateYearOptions(timelineYearSelect);
                     updateYearOptions(respYearSelect);
                     updateYearOptions(custYearSelect);
                 }
@@ -2337,6 +2386,235 @@ function switchTab(activeTabId) {
                 document.querySelectorAll('[id^="brand-list-"]').forEach(el => el.classList.add('hidden'));
             }
         });
+
+        // --- Logic สำหรับหน้า Timeline โครงการ ---
+    let currentTimelineFilter = 'all', finalDisplayTimelineData = [];
+    window.setTimelineFilter = (filterType) => { currentTimelineFilter = filterType; timelineCurrentPage = 1; renderTimeline(); };
+    window.goToTimelinePage = (page) => { timelineCurrentPage = page; renderTimeline(); };
+
+    function renderTimeline() {
+        const leftRows = document.getElementById('timeline-left-rows');
+        const rightRows = document.getElementById('timeline-right-rows');
+        const headerMonths = document.getElementById('timeline-header-months');
+        const headerDays = document.getElementById('timeline-header-days');
+        const paginationContainer = document.getElementById('timeline-pagination');
+        const timelineScroll = document.getElementById('timeline-scroll-area');
+
+        if (!leftRows || !rightRows) return;
+
+        const tasksToUse = getTasksByFilter();
+        const userProjectNames = new Set(tasksToUse.map(t => t.projectName).filter(Boolean));
+        let visibleProjects = [];
+        
+        if (currentUserRole === 'admin') {
+            if (globalEmailFilter === 'all') visibleProjects = [...allProjects];
+            else {
+                const targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
+                visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name));
+            }
+        } else if (currentUserRole === 'monitor') {
+            if (globalEmailFilter === 'all') visibleProjects = window.getAllowedOptions(allProjects, 'project');
+            else {
+                const targetUid = tasksToUse.length > 0 ? tasksToUse[0].ownerId : null;
+                visibleProjects = allProjects.filter(p => p.ownerId === targetUid || p.ownerEmail === globalEmailFilter || userProjectNames.has(p.name));
+            }
+        } else {
+            visibleProjects = window.getAllowedOptions(allProjects, 'project');
+        }
+
+        if (currentUserData && (currentUserData.viewStartDate || currentUserData.viewEndDate)) {
+            const dateFilteredProjectNames = new Set(filterDataByRole(visibleProjects).map(p => p.name));
+            visibleProjects = visibleProjects.filter(p => userProjectNames.has(p.name) || dateFilteredProjectNames.has(p.name));
+        }
+
+        const projectData = visibleProjects.map(p => {
+            const pTasks = tasksToUse.filter(t => t.projectName === p.name && t.receiveDate);
+            let earliestDate = '', latestDate = '';
+            if (pTasks.length > 0) {
+                pTasks.sort((a, b) => a.receiveDate.localeCompare(b.receiveDate));
+                earliestDate = pTasks[0].receiveDate;
+                latestDate = pTasks[pTasks.length - 1].receiveDate;
+            }
+            return { ...p, status: p.status === undefined ? 'in_progress' : p.status, earliestDate, latestDate, sortDate: earliestDate || '0000-00-00' };
+        });
+
+        const searchInput = document.getElementById('timeline-search-input')?.value.toLowerCase() || '';
+        const timeType = document.getElementById('timeline-search-time-type')?.value || 'day';
+        const searchDate = document.getElementById('timeline-search-date')?.value;
+        const searchMonth = document.getElementById('timeline-search-month')?.value;
+        const searchYear = document.getElementById('timeline-search-year')?.value;
+
+        // หากมีการค้นหาวัน/เดือน ให้กำหนดปีที่ใช้วาดปฏิทินจากค่านั้น
+        let renderYear = new Date().getFullYear();
+        if (timeType === 'day' && searchDate) renderYear = parseInt(searchDate.substring(0, 4));
+        else if (timeType === 'month' && searchMonth) renderYear = parseInt(searchMonth.substring(0, 4));
+        else if (timeType === 'year' && searchYear) renderYear = parseInt(searchYear);
+
+        const searchedProjects = projectData.filter(p => {
+            let matchTime = true;
+            if (timeType === 'day' && searchDate) matchTime = p.earliestDate === searchDate;
+            else if (timeType === 'month' && searchMonth) matchTime = p.earliestDate && p.earliestDate.startsWith(searchMonth);
+            else if (timeType === 'year' && searchYear) matchTime = p.earliestDate && p.earliestDate.startsWith(searchYear);
+            
+            const matchText = searchInput ? p.name.toLowerCase().includes(searchInput) : true;
+            return matchTime && matchText;
+        });
+
+        searchedProjects.sort((a, b) => b.sortDate.localeCompare(a.sortDate));
+
+        let total = searchedProjects.length, inProgress = 0, won = 0, lost = 0;
+        searchedProjects.forEach(p => { if (p.status === 'in_progress') inProgress++; else if (p.status === 'won') won++; else if (p.status === 'lost') lost++; });
+        const getPct = (val) => total > 0 ? Math.round((val / total) * 100) : 0;
+        
+        document.getElementById('timeline-total').textContent = `${total} ( 100% )`;
+        document.getElementById('timeline-progress').textContent = `${inProgress} ( ${getPct(inProgress)}% )`;
+        document.getElementById('timeline-won').textContent = `${won} ( ${getPct(won)}% )`;
+        document.getElementById('timeline-lost').textContent = `${lost} ( ${getPct(lost)}% )`;
+
+        const cards = [ { id: 'card-time-all', match: 'all', ring: 'ring-gray-400' }, { id: 'card-time-prog', match: 'in_progress', ring: 'ring-blue-500' }, { id: 'card-time-won', match: 'won', ring: 'ring-green-500' }, { id: 'card-time-lost', match: 'lost', ring: 'ring-red-500' } ];
+        cards.forEach(c => {
+            const el = document.getElementById(c.id);
+            if(el) { el.classList.remove('ring-2', 'ring-offset-2', 'scale-[1.02]', 'ring-gray-400', 'ring-blue-500', 'ring-green-500', 'ring-red-500'); if(currentTimelineFilter === c.match) el.classList.add('ring-2', 'ring-offset-2', 'scale-[1.02]', c.ring); }
+        });
+
+        finalDisplayTimelineData = searchedProjects.filter(p => currentTimelineFilter === 'all' ? true : p.status === currentTimelineFilter);
+        document.getElementById('timeline-display-count').textContent = finalDisplayTimelineData.length;
+
+        const totalPages = Math.ceil(finalDisplayTimelineData.length / itemsPerPage) || 1;
+        if (timelineCurrentPage > totalPages) timelineCurrentPage = totalPages;
+        const startIndex = (timelineCurrentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedData = finalDisplayTimelineData.slice(startIndex, endIndex);
+
+        // Rendering Grid Headers (1 ช่องวัน = 24px)
+        const isLeapYear = (renderYear % 4 === 0 && renderYear % 100 !== 0) || (renderYear % 400 === 0);
+        const daysInMonths = [31, isLeapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+        const DAY_WIDTH = 24; 
+
+        let hMonths = '', hDays = '';
+        for (let m = 0; m < 12; m++) {
+            const days = daysInMonths[m];
+            hMonths += `<div class="shrink-0 flex items-center justify-center border-r border-gray-200" style="width: ${days * DAY_WIDTH}px">${thaiMonths[m]} ${renderYear + 543}</div>`;
+            for (let d = 1; d <= days; d++) {
+                hDays += `<div class="shrink-0 flex items-center justify-center border-r border-gray-200" style="width: ${DAY_WIDTH}px">${d}</div>`;
+            }
+        }
+        headerMonths.innerHTML = hMonths;
+        headerDays.innerHTML = hDays;
+
+        leftRows.innerHTML = '';
+        rightRows.innerHTML = '';
+        rightRows.style.width = `${(isLeapYear ? 366 : 365) * DAY_WIDTH}px`;
+
+        if (paginatedData.length === 0) {
+            leftRows.innerHTML = `<div class="p-8 text-center text-gray-400 font-medium whitespace-nowrap">ไม่พบข้อมูลตามเงื่อนไขที่เลือก</div>`;
+            if (paginationContainer) paginationContainer.innerHTML = '';
+        } else {
+            paginatedData.forEach((p, index) => {
+                const globalIndex = startIndex + index + 1;
+                
+                // ฝั่งซ้าย
+                leftRows.innerHTML += `
+                    <div class="h-[52px] border-b border-gray-100 px-4 flex items-center bg-white truncate hover:bg-gray-50 cursor-pointer" onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')" title="${p.name}">
+                        <span class="text-gray-400 mr-2 font-medium text-xs w-4 shrink-0">${globalIndex}.</span>
+                        <span class="font-bold text-gray-800 text-sm truncate group-hover:text-[#5b5fc7] group-hover:underline w-full">${p.name}</span>
+                    </div>
+                `;
+
+                // คำนวณความกว้างบาร์และ 2 โทนสีเข้ม/อ่อน
+                let barHtml = '';
+                if (p.earliestDate && p.latestDate) {
+                    const startDt = new Date(p.earliestDate);
+                    const endDt = new Date(p.latestDate);
+                    
+                    // แสดงผลเฉพาะที่ตัดกับปีปฏิทินที่เลือก
+                    if (startDt.getFullYear() <= renderYear && endDt.getFullYear() >= renderYear) {
+                        const drawStart = startDt.getFullYear() < renderYear ? new Date(renderYear, 0, 1) : startDt;
+                        const drawEnd = endDt.getFullYear() > renderYear ? new Date(renderYear, 11, 31) : endDt;
+
+                        const startDayOfYear = Math.floor((drawStart - new Date(renderYear, 0, 0)) / 1000 / 60 / 60 / 24);
+                        const endDayOfYear = Math.floor((drawEnd - new Date(renderYear, 0, 0)) / 1000 / 60 / 60 / 24);
+                        const durationDays = (endDayOfYear - startDayOfYear) + 1;
+
+                        const leftPx = (startDayOfYear - 1) * DAY_WIDTH;
+                        const widthPx = durationDays * DAY_WIDTH;
+                        
+                        // สี 2 โทนสลับกัน โทนเข้ม โทนอ่อน (Dark/Light Blue)
+                        const isEven = index % 2 === 0;
+                        const barColorClass = isEven ? 'bg-[#5b5fc7]' : 'bg-[#93c5fd] text-blue-900';
+                        const textClass = isEven ? 'text-white' : 'text-blue-900';
+
+                        barHtml = `
+                            <div class="absolute top-2.5 h-[32px] rounded shadow-sm ${barColorClass} flex items-center px-2 ${textClass} text-xs font-semibold whitespace-nowrap overflow-hidden z-10 hover:brightness-110 cursor-pointer border ${isEven ? 'border-[#4a4e9e]' : 'border-[#60a5fa]'}" 
+                                 style="left: ${leftPx}px; width: ${widthPx}px;"
+                                 title="${p.name} (${formatDate(p.earliestDate)} - ${formatDate(p.latestDate)})"
+                                 onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">
+                                <span class="truncate w-full block">${durationDays >= 3 ? p.name : ''}</span>
+                            </div>
+                        `;
+                    }
+                }
+
+                // ฝั่งขวาใช้ CSS linear-gradient สร้างตาราง
+                rightRows.innerHTML += `
+                    <div class="h-[52px] border-b border-gray-200 relative hover:bg-indigo-50/30 transition-colors w-full">
+                        ${barHtml}
+                    </div>
+                `;
+            });
+            renderTablePagination('timeline-pagination', timelineCurrentPage, totalPages, 'goToTimelinePage', searchedProjects.length);
+        }
+
+        // ฟังชั่นลากเมาส์เลื่อนหน้าจอ Timeline ซ้าย-ขวา
+        if (timelineScroll && !timelineScroll.hasAttribute('data-drag-bound')) {
+            timelineScroll.setAttribute('data-drag-bound', 'true');
+            let isDown = false, startX, scrollLeft;
+            timelineScroll.addEventListener('mousedown', (e) => {
+                isDown = true;
+                timelineScroll.style.cursor = 'grabbing';
+                startX = e.pageX - timelineScroll.offsetLeft;
+                scrollLeft = timelineScroll.scrollLeft;
+            });
+            timelineScroll.addEventListener('mouseleave', () => { isDown = false; timelineScroll.style.cursor = 'grab'; });
+            timelineScroll.addEventListener('mouseup', () => { isDown = false; timelineScroll.style.cursor = 'grab'; });
+            timelineScroll.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - timelineScroll.offsetLeft;
+                timelineScroll.scrollLeft = scrollLeft - (x - startX) * 2;
+            });
+        }
+        lucide.createIcons();
+    }
+
+    // --- Events ค้นหาสำหรับหน้า Timeline ---
+    document.getElementById('timeline-search-time-type')?.addEventListener('change', (e) => {
+        const type = e.target.value;
+        const dateInput = document.getElementById('timeline-search-date');
+        const monthInput = document.getElementById('timeline-search-month');
+        const yearInput = document.getElementById('timeline-search-year');
+        if (dateInput) { if (type === 'day') { dateInput.classList.remove('hidden'); dateInput.classList.add('block'); } else { dateInput.classList.add('hidden'); dateInput.classList.remove('block'); } }
+        if (monthInput) { if (type === 'month') { monthInput.classList.remove('hidden'); monthInput.classList.add('block'); } else { monthInput.classList.add('hidden'); monthInput.classList.remove('block'); } }
+        if (yearInput) { if (type === 'year') { yearInput.classList.remove('hidden'); yearInput.classList.add('block'); } else { yearInput.classList.add('hidden'); yearInput.classList.remove('block'); } }
+        if (dateInput) dateInput.value = '';
+        if (monthInput) monthInput.value = '';
+        if (yearInput) yearInput.value = '';
+        timelineCurrentPage = 1;
+        renderTimeline();
+    });
+    document.getElementById('timeline-search-input')?.addEventListener('input', () => { timelineCurrentPage = 1; renderTimeline(); });
+    document.getElementById('timeline-search-date')?.addEventListener('change', () => { timelineCurrentPage = 1; renderTimeline(); });
+    document.getElementById('timeline-search-month')?.addEventListener('change', () => { timelineCurrentPage = 1; renderTimeline(); });
+    document.getElementById('timeline-search-year')?.addEventListener('change', () => { timelineCurrentPage = 1; renderTimeline(); });
+    document.getElementById('btn-timeline-reset-search')?.addEventListener('click', () => {
+        const searchInput = document.getElementById('timeline-search-input'), timeType = document.getElementById('timeline-search-time-type');
+        if (searchInput) searchInput.value = '';
+        if (timeType) { timeType.value = 'day'; timeType.dispatchEvent(new Event('change')); }
+        currentTimelineFilter = 'all'; 
+        timelineCurrentPage = 1;
+        renderTimeline();
+    });
 
         let currentSummaryFilter = 'all', finalDisplayProjectData = [];
         window.setSummaryFilter = (filterType) => { currentSummaryFilter = filterType; summaryCurrentPage = 1; renderProjectSummary(); };
