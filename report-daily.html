@@ -4385,45 +4385,100 @@ function switchTab(activeTabId) {
             const valueCanvas = document.getElementById('chart-value');
             if (valueCanvas) {
                 destroyChart('value');
-                const sortedTimeKeys = Object.keys(timeValueData.counts).sort(), thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-                const displayTimeLabels = sortedTimeKeys.map(k => {
-                    if (dashTimeView === 'year') { return k; }
-                    else if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
-                    else if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
-                    return k; 
-                });
-                
+                const thaiMonthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+                let valChartLabels = [];
                 let datasetsToUse = [];
-                let isStacked = false;
                 
-                if (dashValueFilter === 'all') {
-                    isStacked = true;
-                    datasetsToUse = [
-                        { label: 'กำลังดำเนินการ', data: sortedTimeKeys.map(k => timeValueData.prog[k] || 0), backgroundColor: '#3b82f6', borderRadius: 0 },
-                        { label: 'ได้งาน', data: sortedTimeKeys.map(k => timeValueData.won[k] || 0), backgroundColor: '#10b981', borderRadius: 0 },
-                        { label: 'ไม่ได้งาน', data: sortedTimeKeys.map(k => timeValueData.lost[k] || 0), backgroundColor: '#ef4444', borderRadius: 0 }
-                    ];
-                } else if (dashValueFilter === 'in_progress') {
-                    datasetsToUse = [{ label: 'กำลังดำเนินการ', data: sortedTimeKeys.map(k => timeValueData.prog[k] || 0), backgroundColor: '#3b82f6', borderRadius: 6 }];
-                } else if (dashValueFilter === 'won') {
-                    datasetsToUse = [{ label: 'ได้งาน', data: sortedTimeKeys.map(k => timeValueData.won[k] || 0), backgroundColor: '#10b981', borderRadius: 6 }];
-                } else if (dashValueFilter === 'lost') {
-                    datasetsToUse = [{ label: 'ไม่ได้งาน', data: sortedTimeKeys.map(k => timeValueData.lost[k] || 0), backgroundColor: '#ef4444', borderRadius: 6 }];
+                // กำหนดสีและข้อมูลอ้างอิงตามสถานะที่เลือก
+                let activeColor = '#5b5fc7', lightColor = '#e0e7ff';
+                let activeDataMap = timeValueData.counts;
+                let dataLabel = 'มูลค่างานทั้งหมด';
+                
+                if (dashValueFilter === 'in_progress') { activeColor = '#3b82f6'; lightColor = '#dbeafe'; activeDataMap = timeValueData.prog; dataLabel = 'กำลังดำเนินการ'; }
+                else if (dashValueFilter === 'won') { activeColor = '#10b981'; lightColor = '#d1fae5'; activeDataMap = timeValueData.won; dataLabel = 'ได้งาน'; }
+                else if (dashValueFilter === 'lost') { activeColor = '#ef4444'; lightColor = '#fee2e2'; activeDataMap = timeValueData.lost; dataLabel = 'ไม่ได้งาน'; }
+
+                let isGroupModeVal = dashCurrentYear === 'all' && (dashTimeView === 'month' || dashTimeView === 'week');
+
+                if (isGroupModeVal) {
+                    const yearSet = new Set(), periodSet = new Set(), dataMap = {};
+                    Object.keys(activeDataMap).forEach(k => {
+                        let yearStr = k.substring(0, 4), periodStr = dashTimeView === 'month' ? k.substring(5, 7) : k.substring(5);
+                        yearSet.add(yearStr); periodSet.add(periodStr);
+                        if (!dataMap[yearStr]) dataMap[yearStr] = {};
+                        dataMap[yearStr][periodStr] = activeDataMap[k];
+                    });
+                    
+                    const years = Array.from(yearSet).sort((a, b) => b.localeCompare(a));
+                    const periods = Array.from(periodSet).sort();
+                    
+                    valChartLabels = periods.map(p => {
+                        if (dashTimeView === 'month') return thaiMonthNames[parseInt(p, 10) - 1];
+                        const [m, w] = p.split('-W'); return `สัปดาห์ที่ ${w} (${thaiMonthNames[parseInt(m, 10) - 1]})`;
+                    });
+
+                    const mutedLineColors = ['#f59e0b', '#14b8a6', '#ec4899', '#8b5cf6', '#64748b'];
+
+                    if (years.length > 0) {
+                        const latestYear = years[0];
+                        const latestYearData = periods.map(p => dataMap[latestYear][p] || 0);
+                        const maxVal = Math.max(...latestYearData);
+                        const maxIdx = latestYearData.indexOf(maxVal);
+
+                        datasetsToUse.push({
+                            type: 'bar',
+                            label: `ปี ${latestYear} (ล่าสุด)`,
+                            data: latestYearData,
+                            backgroundColor: latestYearData.map((_, i) => i === maxIdx ? activeColor : lightColor),
+                            borderRadius: 6,
+                            order: 2
+                        });
+
+                        for (let i = 1; i < years.length; i++) {
+                            const yr = years[i];
+                            const lineColor = mutedLineColors[(i - 1) % mutedLineColors.length];
+                            datasetsToUse.push({
+                                type: 'line',
+                                label: `ปี ${yr}`,
+                                data: periods.map(p => dataMap[yr][p] || 0),
+                                borderColor: lineColor,
+                                backgroundColor: lineColor,
+                                borderWidth: 3,
+                                pointRadius: 4,
+                                pointHoverRadius: 6,
+                                tension: 0.3,
+                                fill: false,
+                                order: 1
+                            });
+                        }
+                    }
+                } else {
+                    const sortedTimeKeysVal = Object.keys(activeDataMap).sort();
+                    const timeDataValuesVal = sortedTimeKeysVal.map(k => activeDataMap[k]);
+                    
+                    valChartLabels = sortedTimeKeysVal.map(k => {
+                        if (dashTimeView === 'year') return k;
+                        if (dashTimeView === 'month') { const parts = k.split('-'); if (parts.length === 2) return [thaiMonthNames[parseInt(parts[1], 10) - 1], `(${parts[0]})`]; }
+                        if (dashTimeView === 'week') { const parts = k.split('-'); if (parts.length === 3) return [`สัปดาห์ที่ ${parts[2].replace('W', '')}`, `(${thaiMonthNames[parseInt(parts[1], 10) - 1]} ${parts[0]})`]; }
+                        return k; 
+                    });
+
+                    const maxTimeVal = timeDataValuesVal.length > 0 ? Math.max(...timeDataValuesVal) : 0;
+                    const maxTimeIdx = timeDataValuesVal.indexOf(maxTimeVal);
+
+                    datasetsToUse = [{
+                        type: 'bar',
+                        label: dataLabel,
+                        data: timeDataValuesVal,
+                        backgroundColor: timeDataValuesVal.map((_, i) => i === maxTimeIdx ? activeColor : lightColor),
+                        borderRadius: 6
+                    }];
                 }
 
-                // คำนวณสเกลแกน Y กราฟมูลค่า (ตั้งค่าเริ่มต้นที่ 10,000)
                 let valGlobalMax = 0;
-                if (isStacked) {
-                    sortedTimeKeys.forEach((k) => {
-                        let sum = (timeValueData.prog[k] || 0) + (timeValueData.won[k] || 0) + (timeValueData.lost[k] || 0);
-                        if (sum > valGlobalMax) valGlobalMax = sum;
-                    });
-                } else {
-                    datasetsToUse.forEach(ds => { const m = Math.max(...ds.data); if (m > valGlobalMax) valGlobalMax = m; });
-                }
+                datasetsToUse.forEach(ds => { const m = Math.max(...ds.data); if (m > valGlobalMax) valGlobalMax = m; });
                 
-                let valStepSize = 10000; // ค่าเริ่มต้น
-                // ถ้าสเกล 10k ทำให้ได้เส้นกริดเกิน 10 เส้น ให้คำนวณขยับหลักแสน ล้าน อัตโนมัติ
+                let valStepSize = 10000;
                 if (valGlobalMax / valStepSize > 10) {
                     let rawStep = valGlobalMax / 10;
                     let mag = Math.pow(10, Math.floor(Math.log10(rawStep)));
@@ -4431,45 +4486,38 @@ function switchTab(activeTabId) {
                     valStepSize = (norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10) * mag;
                 }
                 const valYAxisMax = Math.max(valStepSize, Math.ceil(valGlobalMax / valStepSize) * valStepSize);
-                const finalValYAxisMax = valYAxisMax + (valGlobalMax === valYAxisMax ? valStepSize : 0); // เผื่อขอบบนไม่ให้ตัวเลขทะลุ
+                const finalValYAxisMax = valYAxisMax + (valGlobalMax === valYAxisMax ? valStepSize : 0);
 
                 chartInstances['value'] = new Chart(valueCanvas.getContext('2d'), { 
                     type: 'bar', 
-                    data: { labels: displayTimeLabels, datasets: datasetsToUse }, 
+                    data: { labels: valChartLabels, datasets: datasetsToUse }, 
                     options: { 
                         responsive: true, 
                         maintainAspectRatio: false, 
                         layout: { padding: { top: 30 } }, 
-                        plugins: { legend: { display: isStacked, position: 'top', labels: { font: { family: 'Sarabun' } } } },
+                        plugins: { legend: { display: isGroupModeVal, position: 'top', labels: { font: { family: 'Sarabun' }, usePointStyle: true, pointStyle: 'circle' } } },
                         scales: { 
-                            x: { stacked: isStacked },
-                            y: { stacked: isStacked, beginAtZero: true, max: finalValYAxisMax, ticks: { stepSize: valStepSize, callback: function(value) { return value.toLocaleString('th-TH'); } } } 
+                            y: { beginAtZero: true, max: finalValYAxisMax, ticks: { stepSize: valStepSize, callback: function(value) { return value.toLocaleString('th-TH'); } } } 
                         } 
                     }, 
                     plugins: [{ 
                         id: 'barLabelsVal', 
                         afterDatasetsDraw(chart) { 
-                            const { ctx, data } = chart; ctx.save(); 
-                            if(!isStacked) {
-                                chart.getDatasetMeta(0).data.forEach((datapoint, index) => { 
-                                    const value = data.datasets[0].data[index]; 
-                                    if (value > 0) { ctx.font = 'bold 12px Sarabun, sans-serif'; ctx.fillStyle = data.datasets[0].backgroundColor; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; ctx.fillText(value.toLocaleString('th-TH'), datapoint.x, datapoint.y - 6); } 
-                                }); 
-                            } else {
-                                sortedTimeKeys.forEach((k, index) => {
-                                    const totalVal = timeValueData.counts[k] || 0;
-                                    if (totalVal > 0) {
-                                        let maxY = chart.scales.y.getPixelForValue(totalVal);
-                                        let meta = chart.getDatasetMeta(2);
-                                        if (meta.hidden) meta = chart.getDatasetMeta(1);
-                                        if (meta.hidden) meta = chart.getDatasetMeta(0);
-                                        if (!meta.data[index]) return;
-                                        ctx.font = 'bold 12px Sarabun, sans-serif'; ctx.fillStyle = '#4b5563'; ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; 
-                                        ctx.fillText(totalVal.toLocaleString('th-TH'), meta.data[index].x, maxY - 6);
+                            const { ctx, data } = chart;
+                            ctx.save(); 
+                            chart.data.datasets.forEach((dataset, i) => {
+                                if (dataset.type && dataset.type !== 'bar') return;
+                                chart.getDatasetMeta(i).data.forEach((datapoint, index) => {
+                                    const value = dataset.data[index];
+                                    if (value > 0) { 
+                                        ctx.font = 'bold 12px Sarabun, sans-serif'; 
+                                        ctx.fillStyle = activeColor; 
+                                        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'; 
+                                        ctx.fillText(value.toLocaleString('th-TH'), datapoint.x, datapoint.y - 6); 
                                     }
                                 });
-                            }
-                            ctx.restore(); 
+                            });
+                            ctx.restore();
                         } 
                     }] 
                 });
