@@ -2556,7 +2556,7 @@ function switchTab(activeTabId) {
                     </div>
                 `;
 
-                // คำนวณความกว้างบาร์และ 2 โทนสีเข้ม/อ่อน
+                // คำนวณความกว้างและวาดเส้น Timeline (Line & Nodes)
                 let barHtml = '';
                 if (p.earliestDate && p.latestDate) {
                     const startDt = new Date(p.earliestDate);
@@ -2569,24 +2569,69 @@ function switchTab(activeTabId) {
 
                         const startDayOfYear = Math.floor((drawStart - new Date(renderYear, 0, 0)) / 1000 / 60 / 60 / 24);
                         const endDayOfYear = Math.floor((drawEnd - new Date(renderYear, 0, 0)) / 1000 / 60 / 60 / 24);
-                        const durationDays = (endDayOfYear - startDayOfYear) + 1;
-
-                        const leftPx = (startDayOfYear - 1) * DAY_WIDTH;
-                        const widthPx = durationDays * DAY_WIDTH;
+                        
+                        // คำนวณให้เส้นอยู่กึ่งกลางของช่องวัน
+                        const lineStartPx = (startDayOfYear - 1) * DAY_WIDTH + (DAY_WIDTH / 2);
+                        const lineEndPx = (endDayOfYear - 1) * DAY_WIDTH + (DAY_WIDTH / 2);
+                        const lineWidthPx = Math.max(lineEndPx - lineStartPx, 0);
                         
                         // สี 2 โทนสลับกัน โทนเข้ม โทนอ่อน (Dark/Light Blue)
                         const isEven = index % 2 === 0;
-                        const barColorClass = isEven ? 'bg-[#5b5fc7]' : 'bg-[#93c5fd] text-blue-900';
-                        const textClass = isEven ? 'text-white' : 'text-blue-900';
+                        const lineColorClass = isEven ? 'bg-[#5b5fc7]' : 'bg-[#60a5fa]';
+                        const nodeBgClass = isEven ? 'bg-[#5b5fc7]' : 'bg-[#60a5fa]';
 
-                        barHtml = `
-                            <div class="absolute top-2.5 h-[32px] rounded shadow-sm ${barColorClass} flex items-center px-2 ${textClass} text-xs font-semibold whitespace-nowrap overflow-hidden z-10 hover:brightness-110 cursor-pointer border ${isEven ? 'border-[#4a4e9e]' : 'border-[#60a5fa]'}" 
-                                 style="left: ${leftPx}px; width: ${widthPx}px;"
-                                 title="${p.name} (${formatDate(p.earliestDate)} - ${formatDate(p.latestDate)})"
-                                 onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">
-                                <span class="truncate w-full block">${durationDays >= 3 ? p.name : ''}</span>
+                        // 1. เส้นหลัก (Main Line)
+                        barHtml += `
+                            <div class="absolute top-[26px] h-[3px] rounded-full ${lineColorClass} z-10 shadow-sm" 
+                                 style="left: ${lineStartPx}px; width: ${lineWidthPx}px; transform: translateY(-50%); pointer-events: none;">
                             </div>
                         `;
+
+                        // 2. จุดหัว-ท้าย (Endpoints)
+                        barHtml += `
+                            <div class="absolute top-[26px] w-2.5 h-2.5 rounded-full ${lineColorClass} z-10 ring-2 ring-white shadow-sm" 
+                                 style="left: ${lineStartPx}px; transform: translate(-50%, -50%); pointer-events: none;"></div>
+                        `;
+                        if (lineWidthPx > 0) {
+                            barHtml += `
+                                <div class="absolute top-[26px] w-2.5 h-2.5 rounded-full ${lineColorClass} z-10 ring-2 ring-white shadow-sm" 
+                                     style="left: ${lineEndPx}px; transform: translate(-50%, -50%); pointer-events: none;"></div>
+                            `;
+                        }
+
+                        // 3. วงกลมระบุผู้รับผิดชอบตามวันที่มีงาน (Responsible Nodes)
+                        const pTasks = tasksToUse.filter(t => t.projectName === p.name && t.receiveDate && t.receiveDate.startsWith(renderYear.toString()));
+                        const tasksByDate = {};
+                        
+                        // จัดกลุ่มงานที่มีในวันเดียวกัน
+                        pTasks.forEach(t => {
+                            if (!tasksByDate[t.receiveDate]) tasksByDate[t.receiveDate] = [];
+                            tasksByDate[t.receiveDate].push(t);
+                        });
+
+                        Object.keys(tasksByDate).forEach(dateStr => {
+                            const dateObj = new Date(dateStr);
+                            const dayOfYear = Math.floor((dateObj - new Date(renderYear, 0, 0)) / 1000 / 60 / 60 / 24);
+                            const nodeCenterPx = (dayOfYear - 1) * DAY_WIDTH + (DAY_WIDTH / 2);
+
+                            const dayTasks = tasksByDate[dateStr];
+                            // หาชื่อคนรับผิดชอบคนแรกสุดของวันนั้น
+                            const respNames = [...new Set(dayTasks.map(t => t.responsibleName && t.responsibleName !== 'ไม่ระบุ' ? t.responsibleName.split(',')[0].trim() : 'ไม่ระบุ'))];
+                            const displayInitial = respNames[0] !== 'ไม่ระบุ' ? respNames[0].charAt(0).toUpperCase() : '?';
+                            const hasMultiple = respNames.length > 1;
+
+                            // Tooltip แสดงชื่องานและผู้รับผิดชอบเมื่อเอาเมาส์ชี้
+                            const tooltipText = dayTasks.map(t => `- ${t.taskName} (${t.responsibleName || 'ไม่ระบุ'})`).join('&#10;');
+
+                            barHtml += `
+                                <div class="absolute top-[26px] w-5 h-5 rounded-full ${nodeBgClass} text-white border-2 border-white flex items-center justify-center text-[9px] font-bold z-20 shadow-md cursor-pointer hover:scale-125 transition-transform" 
+                                     style="left: ${nodeCenterPx}px; transform: translate(-50%, -50%);"
+                                     title="วันที่: ${formatDate(dateStr)}&#10;${tooltipText}"
+                                     onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">
+                                    ${displayInitial}${hasMultiple ? '+' : ''}
+                                </div>
+                            `;
+                        });
                     }
                 }
 
