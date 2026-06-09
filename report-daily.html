@@ -46,6 +46,55 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
+        /* 1. ตรึงหัวตารางทุกตารางในระบบ (Freeze Table Headers) */
+        div:has(> table) {
+            max-height: calc(100vh - 220px); /* บังคับให้ตารางเลื่อนลงในแนวตั้งได้ */
+            overflow-y: auto;
+        }
+        table thead {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+        table thead th {
+            background-color: #f3f4f6 !important; /* อิงจากสี bg-gray-100 */
+            box-shadow: inset 0 -1px 0 #e5e7eb; /* สร้างเส้นขอบคั่นด้านล่างให้คมชัด */
+        }
+        
+        /* 2. ตรึงส่วนหัว วัน/เดือน และชื่อโครงการของหน้า Timeline */
+        #view-timeline .flex-col.md\:flex-row {
+            max-height: calc(100vh - 220px);
+            overflow-y: auto;
+            align-items: flex-start; /* เพื่อให้กรอบซ้ายขวาไม่ยืดพังเวลาเลื่อน */
+        }
+        #view-timeline .md\:w-56 > div:first-child {
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            background-color: #f3f4f6;
+        }
+        #timeline-header-months {
+            position: sticky;
+            top: 0;
+            z-index: 29;
+            background-color: #f3f4f6;
+        }
+        #timeline-header-days {
+            position: sticky;
+            top: 24px; /* ระยะห่างจากด้านบนเท่ากับความสูงของแถวเดือน (h-6 = 24px) */
+            z-index: 28;
+            background-color: #f9fafb;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* 3. ปลดล็อกความสูงเวลากดพิมพ์ (Print) ไม่ให้ตารางขาดหาย */
+        @media print {
+            div:has(> table), #view-timeline .flex-col.md\:flex-row {
+                max-height: none !important;
+                overflow: visible !important;
+            }
+        }
+        
         /* บังคับลดขนาดตัวอักษรลงอีก (รวมเล็กลง 4px) ในโหมดมือถือทั้งหมด (ต่ำกว่า 768px) */
         @media (max-width: 767px) {
             html { font-size: 12px !important; }
