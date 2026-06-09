@@ -2615,20 +2615,16 @@ function switchTab(activeTabId) {
                             const nodeCenterPx = (dayOfYear - 1) * DAY_WIDTH + (DAY_WIDTH / 2);
 
                             const dayTasks = tasksByDate[dateStr];
-                            // หาชื่อคนรับผิดชอบคนแรกสุดของวันนั้น
-                            const respNames = [...new Set(dayTasks.map(t => t.responsibleName && t.responsibleName !== 'ไม่ระบุ' ? t.responsibleName.split(',')[0].trim() : 'ไม่ระบุ'))];
-                            const displayInitial = respNames[0] !== 'ไม่ระบุ' ? respNames[0].charAt(0).toUpperCase() : '?';
-                            const hasMultiple = respNames.length > 1;
 
                             // Tooltip แสดงชื่องานและผู้รับผิดชอบเมื่อเอาเมาส์ชี้
                             const tooltipText = dayTasks.map(t => `- ${t.taskName} (${t.responsibleName || 'ไม่ระบุ'})`).join('&#10;');
 
                             barHtml += `
-                                <div class="absolute top-[26px] w-5 h-5 rounded-full ${nodeBgClass} text-white border-2 border-white flex items-center justify-center text-[9px] font-bold z-20 shadow-md cursor-pointer hover:scale-125 transition-transform" 
+                                <div class="absolute top-[26px] w-5 h-5 rounded-full ${nodeBgClass} text-white border-2 border-white flex items-center justify-center z-20 shadow-md cursor-pointer hover:scale-125 transition-transform" 
                                      style="left: ${nodeCenterPx}px; transform: translate(-50%, -50%);"
                                      title="วันที่: ${formatDate(dateStr)}&#10;${tooltipText}"
                                      onclick="window.openProjectDetailModal('${p.name.replace(/'/g, "\\'")}')">
-                                    ${displayInitial}${hasMultiple ? '+' : ''}
+                                    <i data-lucide="circle-user-round" class="w-3.5 h-3.5"></i>
                                 </div>
                             `;
                         });
