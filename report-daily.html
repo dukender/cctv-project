@@ -1880,22 +1880,44 @@ function switchTab(activeTabId) {
             setTimeout(() => { window.startTourGuide(); }, 500);
         }
 
-        // --- บล็อกโค้ดปิดระบบ Login (Bypass สำหรับจัด Layout) ---
-        /*
-        onAuthStateChanged(auth, async (user) => { ... โค้ดเดิมถูกปิดไว้ ... });
-        */
+        onAuthStateChanged(auth, async (user) => {
+            const loginView = document.getElementById('view-login'), mainApp = document.getElementById('main-app');
+            if (user) {
+                // ก่อนโหลดเข้าแอป เช็คว่ามีใครใช้งานอยู่หรือไม่
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.email.toLowerCase());
+                const userSnap = await getDoc(userRef);
+                
+                let isDuplicate = false;
+                if (userSnap.exists()) {
+                    const uData = userSnap.data();
+                    // ถ้าออนไลน์, มี session id ไม่ตรงกับเครื่องนี้, และ active ล่าสุดไม่เกิน 2 นาที แปลว่ามีคนใช้งานอยู่จริงๆ
+                    if (uData.isOnline && uData.sessionId && uData.sessionId !== localSessionId && (Date.now() - (uData.lastActive || 0) < 120000)) {
+                        isDuplicate = true;
+                    }
+                }
 
-        // สร้าง Mock User (จำลองว่าเป็น Admin ชื่อ dukender7188@gmail.com เพื่อให้เห็นทุกเมนู)
-        const mockAdminUser = {
-            uid: "builder-io-bypass-uid",
-            email: "dukender7188@gmail.com"
-        };
-
-        // สั่งให้แอปพลิเคชันเริ่มต้นทำงานทันทีด้วย Mock User
-        setTimeout(() => {
-            initializeUserApp(mockAdminUser);
-        }, 500);
-        // --- จบบล็อกโค้ด Bypass ---
+                if (isDuplicate) {
+                    const dupModal = document.getElementById('duplicate-login-modal');
+                    dupModal.classList.remove('hidden');
+                    
+                    document.getElementById('btn-cancel-login').onclick = () => {
+                        dupModal.classList.add('hidden');
+                        signOut(auth);
+                    };
+                    
+                    document.getElementById('btn-force-login').onclick = () => {
+                        dupModal.classList.add('hidden');
+                        initializeUserApp(user); // บังคับเข้าใช้งาน (จะไปเตะเครื่องเก่าที่ onSnapshot ของเครื่องนั้น)
+                    };
+                } else {
+                    initializeUserApp(user); // ใช้งานปกติ
+                }
+            } else {
+                currentUser = null; currentUserRole = 'user'; loginView.classList.remove('hidden'); mainApp.classList.add('hidden');
+                if (presenceInterval) clearInterval(presenceInterval);
+                if (unsubscribeTasks) unsubscribeTasks(); if (unsubscribeHolidays) unsubscribeHolidays(); if (unsubscribeUser) unsubscribeUser();
+            }
+        });
 
         function loadOptions() {
             if (!currentUser) return;
