@@ -881,6 +881,9 @@
                                 <button id="btn-reset-search" class="p-2 bg-gray-50 text-gray-500 hover:text-gray-800 hover:bg-gray-200 border border-gray-200 rounded-md transition-colors"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
                                 <div class="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
                                     <input type="file" id="import-excel-file" accept=".xlsx, .xls" class="hidden">
+                                    <button id="btn-bulk-delete-tasks" class="role-restricted-action p-2 bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 rounded-md transition-colors relative hidden" title="ลบรายการที่เลือก">
+                                        <i data-lucide="trash-2" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">DELETE</span>
+                                    </button>
                                     <button id="btn-import-excel" class="role-restricted-action p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200 rounded-md transition-colors relative" title="นำเข้าข้อมูลจาก Excel">
                                         <i data-lucide="upload-cloud" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-blue-600 px-0.5 rounded-sm border border-blue-200 leading-none">IMPORT</span>
                                     </button>
@@ -893,7 +896,10 @@
                         <div class="overflow-x-auto min-h-[400px]">
                             <table class="w-full text-left text-sm whitespace-nowrap" id="tasks-table">
                                 <thead class="bg-gray-100 border-b border-gray-200 text-gray-600 uppercase text-xs tracking-wider">
-                                    <tr><th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-6 py-4 font-semibold text-center w-28">วัน/เดือน/ปี</th><th class="px-6 py-4 font-semibold">ชื่องาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th><th class="px-6 py-4 font-semibold">ลูกค้า</th><th class="px-6 py-4 font-semibold">สถานที่</th><th class="px-6 py-4 font-semibold">ประเภทงาน</th><th class="px-6 py-4 font-semibold text-right action-cell">จัดการ</th></tr>
+                                    <tr>
+                                        <th class="px-4 py-4 font-semibold text-center w-12 action-cell"><input type="checkbox" id="selectAllTasksCb" onchange="toggleSelectAllTasks(this.checked)" class="w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7] cursor-pointer"></th>
+                                        <th class="px-4 py-4 font-semibold text-center w-16">ลำดับ</th><th class="px-6 py-4 font-semibold text-center w-28">วัน/เดือน/ปี</th><th class="px-6 py-4 font-semibold">ชื่องาน</th><th class="px-6 py-4 font-semibold">ชื่อโครงการ</th><th class="px-6 py-4 font-semibold">ผู้รับผิดชอบ</th><th class="px-6 py-4 font-semibold">ลูกค้า</th><th class="px-6 py-4 font-semibold">สถานที่</th><th class="px-6 py-4 font-semibold">ประเภทงาน</th><th class="px-6 py-4 font-semibold text-right action-cell">จัดการ</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="tasks-table-body" class="divide-y divide-gray-100"></tbody>
                             </table>
@@ -4353,8 +4359,13 @@ function switchTab(activeTabId) {
                 const globalIndex = startIndex + index + 1, tr = document.createElement('tr'); tr.className = "hover:bg-[#eef1ff]/50 transition-colors group";
                 let typeArray = Array.isArray(task.taskType) ? [...task.taskType] : (task.taskType ? [task.taskType] : []); typeArray.sort((a, b) => a.localeCompare(b, 'th'));
                 let displayTaskTypeHtml = typeArray.length > 0 ? typeArray.map(t => `<div class="whitespace-nowrap">- ${t}</div>`).join('') : '-';
-                let actionBtns = (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid)) ? `<button onclick="editTask('${task.id}')" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="แก้ไขงาน"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="deleteTask('${task.id}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="ลบงาน"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
-                tr.innerHTML = `<td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td><td class="px-6 py-4 text-center text-sm text-gray-600 whitespace-nowrap">${task.receiveDate ? formatDate(task.receiveDate) : '-'}</td><td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td><td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td><td class="px-6 py-4 text-right action-cell"><div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${actionBtns}</div></td>`;
+                
+                // ตรวจสอบสิทธิ์การจัดการ เพื่อแสดงปุ่มและ Checkbox
+                const canManage = (currentUserRole === 'admin' || (currentUserRole === 'user' && task.ownerId === currentUser.uid));
+                let actionBtns = canManage ? `<button onclick="editTask('${task.id}')" class="p-1.5 text-blue-600 hover:bg-blue-100 rounded transition-colors" title="แก้ไขงาน"><i data-lucide="edit-3" class="w-4 h-4"></i></button><button onclick="deleteTask('${task.id}')" class="p-1.5 text-red-500 hover:bg-red-50 rounded transition-colors" title="ลบงาน"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : '';
+                let checkboxHtml = canManage ? `<input type="checkbox" value="${task.id}" class="task-row-cb w-4 h-4 text-[#5b5fc7] rounded border-gray-300 focus:ring-[#5b5fc7] cursor-pointer" onchange="handleTaskSelection()">` : '';
+
+                tr.innerHTML = `<td class="px-4 py-4 text-center action-cell">${checkboxHtml}</td><td class="px-4 py-4 text-center text-gray-500 font-medium">${globalIndex}</td><td class="px-6 py-4 text-center text-sm text-gray-600 whitespace-nowrap">${task.receiveDate ? formatDate(task.receiveDate) : '-'}</td><td class="px-6 py-4 font-medium text-gray-900 max-w-[200px] truncate" title="${task.taskName}">${task.taskName}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.projectName || '-'}">${task.projectName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]" title="${task.responsibleName || '-'}">${task.responsibleName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.customerName || '-'}</td><td class="px-6 py-4 text-gray-600 truncate max-w-[150px]">${task.workLocation || '-'}</td><td class="px-6 py-4 text-gray-600 text-sm">${displayTaskTypeHtml}</td><td class="px-6 py-4 text-right action-cell"><div class="flex items-center justify-end gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">${actionBtns}</div></td>`;
                 tableBody.appendChild(tr);
             });
             renderTablePagination('list-pagination', listCurrentPage, totalPages, 'goToListPage', tasks.length);
@@ -6132,6 +6143,89 @@ function switchTab(activeTabId) {
             showNotification('Export Excel สำเร็จ');
         });
         
+        // --- ระบบเลือกหลายรายการและการลบ (Bulk Delete) ---
+        window.toggleSelectAllTasks = (isChecked) => {
+            const checkboxes = document.querySelectorAll('.task-row-cb');
+            checkboxes.forEach(cb => cb.checked = isChecked);
+            handleTaskSelection();
+        };
+
+        window.handleTaskSelection = () => {
+            const checkedBoxes = document.querySelectorAll('.task-row-cb:checked');
+            const bulkDeleteBtn = document.getElementById('btn-bulk-delete-tasks');
+            const selectAllCb = document.getElementById('selectAllTasksCb');
+            const allCheckboxes = document.querySelectorAll('.task-row-cb');
+
+            // แสดง/ซ่อน ปุ่มลบเมื่อมีการเลือก
+            if (checkedBoxes.length > 0) {
+                bulkDeleteBtn.classList.remove('hidden');
+            } else {
+                bulkDeleteBtn.classList.add('hidden');
+            }
+
+            // จัดการสถานะของ Checkbox เลือกทั้งหมด
+            if (selectAllCb && allCheckboxes.length > 0) {
+                selectAllCb.checked = checkedBoxes.length === allCheckboxes.length;
+            }
+        };
+
+        document.getElementById('btn-bulk-delete-tasks')?.addEventListener('click', async () => {
+            if (!currentUser || currentUserRole === 'monitor') return;
+            const checkedBoxes = document.querySelectorAll('.task-row-cb:checked');
+            if (checkedBoxes.length === 0) return;
+
+            if (confirm(`คุณแน่ใจหรือไม่ว่าต้องการลบงานที่เลือกจำนวน ${checkedBoxes.length} รายการ? (การกระทำนี้ไม่สามารถย้อนกลับได้ทั้งหมดในครั้งเดียว)`)) {
+                
+                const btn = document.getElementById('btn-bulk-delete-tasks');
+                btn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">DELETING</span>`;
+                btn.disabled = true;
+
+                let successCount = 0;
+                
+                try {
+                    for (let cb of checkedBoxes) {
+                        const taskId = cb.value;
+                        const taskToRestore = allTasks.find(t => t.id === taskId);
+                        
+                        if (!taskToRestore) continue;
+                        if (currentUserRole === 'user' && taskToRestore.ownerId !== currentUser.uid) continue;
+
+                        const projectName = taskToRestore.projectName; 
+                        let projectToDeleteId = null;
+
+                        // ตรวจสอบว่าถ้าลบงานนี้แล้ว โครงการจะว่างเปล่าหรือไม่
+                        if (projectName) {
+                            const remainingTasks = allTasks.filter(t => t.projectName === projectName && t.id !== taskId);
+                            if (remainingTasks.length === 0) { 
+                                const projObj = allProjects.find(p => p.name === projectName); 
+                                if (projObj) { projectToDeleteId = projObj.id; } 
+                            }
+                        }
+
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_tasks', taskId));
+                        if (projectToDeleteId) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'daily_projects', projectToDeleteId));
+                        
+                        successCount++;
+                    }
+                    
+                    if(successCount > 0) {
+                        await recordLog('ลบ', `ลบงานพร้อมกันจำนวน ${successCount} รายการ`);
+                        showNotification(`ลบงานสำเร็จ ${successCount} รายการ`, "success");
+                    }
+                    
+                    // รีเซ็ตสถานะปุ่มและ Checkbox
+                    document.getElementById('selectAllTasksCb').checked = false;
+                    btn.classList.add('hidden');
+
+                } catch (error) {
+                    showNotification("เกิดข้อผิดพลาดในการลบงานบางรายการ", "error");
+                } finally {
+                    btn.innerHTML = `<i data-lucide="trash-2" class="w-5 h-5"></i><span class="absolute bottom-0.5 right-0.5 text-[7px] font-bold bg-white text-red-600 px-0.5 rounded-sm border border-red-200 leading-none">DELETE</span>`;
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }
+            }
+        });
         // ----------------------------------------------------
         lucide.createIcons();
     </script>
