@@ -2460,13 +2460,26 @@ function switchTab(activeTabId) {
         else if (timeType === 'month' && searchMonth) renderYear = parseInt(searchMonth.substring(0, 4));
         else if (timeType === 'year' && searchYear) renderYear = parseInt(searchYear);
 
-        const searchedProjects = projectData.filter(p => {
+        // 1. กรองหา "โครงการ" ที่มีงาน (Task) เกิดขึ้นในช่วงเวลาที่เลือกไว้ (เหมือนหน้าสรุปประเภทงาน)
+        const activeProjectsInTime = new Set();
+        tasksToUse.forEach(t => {
             let matchTime = true;
-            if (timeType === 'day' && searchDate) matchTime = p.earliestDate === searchDate;
-            else if (timeType === 'month' && searchMonth) matchTime = p.earliestDate && p.earliestDate.startsWith(searchMonth);
-            else if (timeType === 'year' && searchYear) matchTime = p.earliestDate && p.earliestDate.startsWith(searchYear);
+            if (timeType === 'day' && searchDate) matchTime = t.receiveDate === searchDate;
+            else if (timeType === 'month' && searchMonth) matchTime = t.receiveDate && t.receiveDate.startsWith(searchMonth);
+            else if (timeType === 'year' && searchYear) matchTime = t.receiveDate && t.receiveDate.startsWith(searchYear);
             
+            // หากงานนี้ตรงกับเดือน/เวลาที่หา ให้เก็บชื่อโครงการไว้
+            if (matchTime && t.projectName) {
+                activeProjectsInTime.add(t.projectName);
+            }
+        });
+
+        // 2. กรองโครงการที่จะนำมาแสดงใน Timeline
+        const searchedProjects = projectData.filter(p => {
+            // โครงการจะแสดงก็ต่อเมื่อมีชื่ออยู่ใน activeProjectsInTime (มีงานตกอยู่ในเงื่อนไขเวลา)
+            const matchTime = activeProjectsInTime.has(p.name);
             const matchText = searchInput ? p.name.toLowerCase().includes(searchInput) : true;
+            
             return matchTime && matchText;
         });
 
