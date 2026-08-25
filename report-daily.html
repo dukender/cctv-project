@@ -340,10 +340,19 @@
                                         if (col.style.width) {
                                             col.style.width = '';
                                             col.style.minWidth = '';
+                                            col.style.maxWidth = '';
                                             icon.setAttribute('data-lucide', 'maximize-2');
                                         } else {
-                                            col.style.width = 'min(400px, 70vw)';
-                                            col.style.minWidth = 'min(400px, 70vw)';
+                                            if (window.innerWidth >= 768) {
+                                                /* สำหรับคอมพิวเตอร์ ขยายตามความยาวชื่อโครงการ (max-content) แต่ล็อคสูงสุดไม่เกิน 50% ของจอ */
+                                                col.style.width = 'max-content';
+                                                col.style.minWidth = 'max-content';
+                                                col.style.maxWidth = '50vw'; 
+                                            } else {
+                                                /* สำหรับมือถือ ขยายจำกัดเพื่อไม่ให้ล้นจอ */
+                                                col.style.width = 'min(400px, 70vw)';
+                                                col.style.minWidth = 'min(400px, 70vw)';
+                                            }
                                             icon.setAttribute('data-lucide', 'minimize-2');
                                         }
                                         if (window.lucide) window.lucide.createIcons();
