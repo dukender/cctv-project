@@ -385,137 +385,28 @@
                             <div><h2 class="text-xl font-bold text-gray-800 flex items-center gap-2"><i data-lucide="layout-list" class="w-6 h-6 text-[#059669]"></i> สรุปรายชื่อโครงการทั้งหมด</h2><p class="text-sm text-gray-500 mt-1">แสดงข้อมูล <span id="summary-display-count" class="font-bold text-[#059669]">0</span> รายการ</p></div>
                             <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
                                 
-                                // ==========================================
-                                // 1. ดึงรายชื่อผู้รับผิดชอบที่ไม่ซ้ำกันมาใส่ใน Dropdown Checkbox
-                                // ==========================================
-                                function populateSummaryRespDropdown(taskList) {
-                                    const listContainer = document.getElementById('summary-resp-checkbox-list');
-                                    if (!listContainer) return;
-                                
-                                    // ดึงเฉพาะชื่อผู้รับผิดชอบจาก taskList (แยกกรณีมีหลายคนในงานเดียวด้วย comma)
-                                    const respSet = new Set();
-                                    taskList.forEach(task => {
-                                        if (task.responsible) {
-                                            task.responsible.split(',').forEach(name => {
-                                                const trimmed = name.trim();
-                                                if (trimmed) respSet.add(trimmed);
-                                            });
-                                        }
-                                    });
-                                
-                                    // ล้างรายการเดิมที่เคยดึงมา (คงไว้เฉพาะปุ่มเลือกทั้งหมด)
-                                    const checkAllLabel = listContainer.querySelector('label:first-child');
-                                    const hr = listContainer.querySelector('hr');
-                                    listContainer.innerHTML = '';
-                                    if (checkAllLabel) listContainer.appendChild(checkAllLabel);
-                                    if (hr) listContainer.appendChild(hr);
-                                
-                                    // สร้าง Checkbox ตามรายชื่อที่ดึงได้
-                                    Array.from(respSet).sort().forEach(name => {
-                                        const label = document.createElement('label');
-                                        label.className = 'flex items-center px-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded text-sm text-gray-700 resp-item';
-                                        label.innerHTML = `
-                                            <input type="checkbox" value="${name}" class="summary-resp-item-check mr-2 rounded text-[#059669] focus:ring-[#059669] w-4 h-4" checked>
-                                            <span class="truncate">${name}</span>
-                                        `;
-                                        listContainer.appendChild(label);
-                                    });
-                                
-                                    bindSummaryRespEvents();
-                                }
-                                
-                                // ==========================================
-                                // 2. ผูก Event การคลิก เปิด/ปิด, เลือกทั้งหมด และการค้นหาชื่อใน Dropdown
-                                // ==========================================
-                                function bindSummaryRespEvents() {
-                                    const btn = document.getElementById('summary-resp-dropdown-btn');
-                                    const menu = document.getElementById('summary-resp-dropdown-menu');
-                                    const checkAll = document.getElementById('summary-resp-check-all');
-                                    const itemChecks = document.querySelectorAll('.summary-resp-item-check');
-                                    const searchInput = document.getElementById('summary-resp-search-inside');
-                                    const labelDisplay = document.getElementById('summary-resp-dropdown-label');
-                                
-                                    // เปิด - ปิด Dropdown Menu
-                                    btn.onclick = (e) => {
-                                        e.stopPropagation();
-                                        menu.classList.toggle('hidden');
-                                    };
-                                
-                                    // ปิดเมื่อคลิกนอกพื้นที่ Dropdown
-                                    document.addEventListener('click', (e) => {
-                                        if (!document.getElementById('summary-resp-filter-container').contains(e.target)) {
-                                            menu.classList.add('hidden');
-                                        }
-                                    });
-                                
-                                    // ค้นหาชื่อภายใน Dropdown
-                                    if (searchInput) {
-                                        searchInput.oninput = function () {
-                                            const val = this.value.toLowerCase();
-                                            document.querySelectorAll('#summary-resp-checkbox-list .resp-item').forEach(item => {
-                                                const name = item.textContent.toLowerCase();
-                                                item.style.display = name.includes(val) ? 'flex' : 'none';
-                                            });
-                                        };
-                                    }
-                                
-                                    // ฟังก์ชั่นอัปเดตสถานะปุ่มและกรองข้อมูล
-                                    function updateSelectionState() {
-                                        const selected = Array.from(document.querySelectorAll('.summary-resp-item-check:checked')).map(c => c.value);
-                                        const totalItems = document.querySelectorAll('.summary-resp-item-check').length;
-                                
-                                        if (selected.length === 0) {
-                                            labelDisplay.textContent = 'ไม่ได้เลือกผู้รับผิดชอบ';
-                                            checkAll.checked = false;
-                                            checkAll.indeterminate = false;
-                                        } else if (selected.length === totalItems) {
-                                            labelDisplay.textContent = 'ผู้รับผิดชอบทั้งหมด';
-                                            checkAll.checked = true;
-                                            checkAll.indeterminate = false;
-                                        } else {
-                                            labelDisplay.textContent = `เลือกแล้ว (${selected.length} คน)`;
-                                            checkAll.checked = false;
-                                            checkAll.indeterminate = true;
-                                        }
-                                
-                                        // เรียกฟังก์ชันกรองข้อมูลในตารางสรุปโครงการ
-                                        filterProjectSummaryByResp(selected);
-                                    }
-                                
-                                    // เช็ค/ยกเลิกเลือกทั้งหมด
-                                    if (checkAll) {
-                                        checkAll.onchange = function () {
-                                            itemChecks.forEach(chk => chk.checked = this.checked);
-                                            updateSelectionState();
-                                        };
-                                    }
-                                
-                                    // เช็ครายคน
-                                    itemChecks.forEach(chk => {
-                                        chk.onchange = updateSelectionState;
-                                    });
-                                }
-                                
-                                // ==========================================
-                                // 3. ฟังก์ชันกรองข้อมูลโครงการตามรายชื่อผู้รับผิดชอบที่เลือก
-                                // ==========================================
-                                function filterProjectSummaryByResp(selectedNames) {
-                                    // สมมติว่า allProjects คือ Array ข้อมูลโครงการทั้งหมดที่คุณมีในระบบ
-                                    if (typeof allProjects === 'undefined') return;
-                                
-                                    const filteredProjects = allProjects.filter(project => {
-                                        if (selectedNames.length === 0) return false;
-                                        
-                                        // ตรวจสอบว่าในงานของโครงการนี้ มีผู้รับผิดชอบตรงกับที่เลือกไว้หรือไม่
-                                        const projectResps = project.responsible ? project.responsible.split(',').map(s => s.trim()) : [];
-                                        return selectedNames.some(name => projectResps.includes(name));
-                                    });
-                                
-                                    // เรียกฟังก์ชันเรนเดอร์ตารางสรุปโครงการเดิมที่มีอยู่
-                                    if (typeof renderProjectSummaryTable === 'function') {
-                                        renderProjectSummaryTable(filteredProjects);
-                                    }
-                                }
+                                <!-- ส่วนที่เพิ่มใหม่: Dropdown ผู้รับผิดชอบ (เลือกได้หลายคน) -->
+                                <div class="relative w-full sm:w-auto min-w-[180px]" id="summary-resp-filter-container">
+                                    <button type="button" id="summary-resp-dropdown-btn" class="w-full flex items-center justify-between px-3 py-2 bg-white border border-gray-200 rounded-md text-sm text-gray-600 focus:outline-none focus:ring-1 focus:ring-[#059669] transition-shadow">
+                                        <span id="summary-resp-dropdown-label" class="truncate text-left flex-1">ผู้รับผิดชอบทั้งหมด</span>
+                                        <i data-lucide="chevron-down" class="w-4 h-4 ml-2 shrink-0"></i>
+                                    </button>
+                                    
+                                    <!-- เมนู Dropdown Checkbox -->
+                                    <div id="summary-resp-dropdown-menu" class="absolute left-0 z-50 hidden w-64 mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                        <div class="p-2 border-b border-gray-100 sticky top-0 bg-white z-10">
+                                            <input type="text" id="summary-resp-search-inside" placeholder="ค้นหาชื่อ..." class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[#059669]">
+                                        </div>
+                                        <div id="summary-resp-checkbox-list" class="p-1">
+                                            <label class="flex items-center px-2 py-1.5 hover:bg-gray-50 cursor-pointer rounded text-sm text-gray-700">
+                                                <input type="checkbox" value="all" id="summary-resp-check-all" class="mr-2 rounded text-[#059669] focus:ring-[#059669] w-4 h-4" checked> 
+                                                <span>เลือกทั้งหมด</span>
+                                            </label>
+                                            <hr class="my-1 border-gray-100">
+                                            <!-- รายการ Checkbox คนอื่นๆ จะถูกนำมาใส่ที่นี่ด้วย Javascript -->
+                                        </div>
+                                    </div>
+                                </div>
                                 <!-- จบส่วนที่เพิ่มใหม่ -->
 
                                 <div class="relative w-full sm:flex-1 min-w-[150px]"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i><input type="text" id="summary-search-input" placeholder="ค้นหาชื่อโครงการ..." class="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-[#059669] transition-shadow"></div>
